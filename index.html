@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Josh Executive Dashboard</title>
+<!-- MSAL.js 2.x (browser) for delegated Microsoft 365 authentication -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+/* ════════════════════════════════════════════════════════════════════════════
+   APPROVED COLOR PALETTE  (v10 — explicitly declared)
+   ─────────────────────────────────────────────────────────────────────────
+   Primary blue          #0070F2   header, CS Created bars, Emails bars,
+                                   primary accents, btn-signin text
+   Dark blue-gray        #5B738B   Extraordinary bars, Case Survey header,
+                                   Survey ranking current-month bars,
+                                   Commendation bars
+   Teal accent           #2CE0BF   PFTC Appreciate bars, Quality at-target,
+                                   PFTC card accent
+
+   Secondary chart tones (retained for multi-series distinction):
+     #89D1FF  Client Created / Successful
+     #B0C6D6  Progressing
+     #1B90FF  Outstanding / Call Conversations
+   ─────────────────────────────────────────────────────────────────────────
+   Do NOT use purple, violet, indigo, or gradient variants of any of the
+   above colors.  All three approved colors are pure-blue-family at hue ~213°.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════════
+   THEME VARIABLES  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Light mode (default) ─────────────────────────────────────────────────── */
+:root {
+  --pg:    #D9DDE3;
+  --db:    #EEF2F7;
+  --cb:    #FFFFFF;
+  --ch:    #E8F0FB;
+  --ct:    #00144A;
+  --cx:    #1D2329;
+  --cm:    #6D7990;
+  --cd:    #D0D8E6;
+  --cg:    #EAECEE;
+  --cf:    #8C9BAC;
+  --rh:    #F7F9FC;
+  --rb:    #F0F2F5;
+  --ds:    0 4px 24px rgba(0,0,0,.18);
+  --cs:    0 1px 4px  rgba(0,0,0,.08);
+  --ttbg:  #FFFFFF;
+  --ttbd:  #D0D8E6;
+  --tthc:  #00144A;
+  --ttlc:  #6D7990;
+  --ttvc:  #00144A;
+  --ttsc:  #E8EFF7;
+  --ttic:  #A0AABB;
+  --tths:  #F0F2F5;
+  --tick:  #1D2329;
+  --tickb: #00144A;
+  --grid:  #EAECEE;
+  --dlbl:  #1D2329;
+  --qnul:  #EAECEE;
+  --svpv:  #D0D8E6;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+html[data-theme="dark"] {
+  --pg:    #0A111C;
+  --db:    #10192A;
+  --cb:    #172030;
+  --ch:    #1C2840;
+  --ct:    #A8C4DC;
+  --cx:    #BDD2E6;
+  --cm:    #5C7890;
+  --cd:    #263545;
+  --cg:    #1E2D3D;
+  --cf:    #4A6278;
+  --rh:    #1C2840;
+  --rb:    #1E2D3D;
+  --ds:    0 4px 28px rgba(0,0,0,.55);
+  --cs:    0 1px 6px  rgba(0,0,0,.40);
+  --ttbg:  #172030;
+  --ttbd:  #2E4560;
+  --tthc:  #BDD2E6;
+  --ttlc:  #5C7890;
+  --ttvc:  #D0E4F4;
+  --ttsc:  #243445;
+  --ttic:  #4A6070;
+  --tths:  #1E2D3D;
+  --tick:  #84A8C4;
+  --tickb: #84A8C4;
+  --grid:  #1E2D3D;
+  --dlbl:  #B0CAE0;
+  --qnul:  #243445;
+  --svpv:  #2E4258;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BASE RESET & BODY  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{
+  font-family:"72","72full",-apple-system,"Segoe UI",Arial,sans-serif;
+  background:var(--pg);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:16px;
+  transition:background .25s;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DASHBOARD WRAPPER  (position:relative added for sign-in overlay)
+════════════════════════════════════════════════════════════════════════════ */
+.dashboard{
+  position:relative;
+  width:100%;
+  max-width:1440px;
+  background:var(--db);
+  border-radius:6px;
+  overflow:hidden;
+  box-shadow:var(--ds);
+  transition:background .25s, box-shadow .25s;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   HEADER  (v4 — unchanged, plus new sub-elements)
+════════════════════════════════════════════════════════════════════════════ */
+.hdr{
+  background:#0070F2;
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  height:58px;
+  gap:12px;
+}
+.hdr-logo{height:30px;flex-shrink:0}
+.hdr-divider{width:1px;height:26px;background:rgba(255,255,255,.35)}
+.hdr-title{color:#fff;font-size:15.5px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.hdr-sub{color:rgba(255,255,255,.80);font-size:12px;margin-left:3px;white-space:nowrap}
+.hdr-spacer{flex:1}
+.hdr-meta{text-align:right;color:rgba(255,255,255,.75);font-size:10.5px;line-height:1.55}
+.hdr-meta strong{color:#fff;font-weight:600}
+/* "Last refreshed" sub-line in meta */
+.last-refresh{
+  display:none;
+  font-size:9px;
+  color:rgba(255,255,255,.50);
+  margin-top:1px;
+}
+.last-refresh.visible{display:block}
+/* Signed-in user name (tiny, inside meta) */
+.hdr-user{
+  display:none;
+  font-size:9px;
+  color:rgba(255,255,255,.55);
+  margin-top:1px;
+}
+.hdr-user.visible{display:block}
+
+/* ── Header buttons (shared base style — v4 unchanged) ─────────────────── */
+.hdr-btn{
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.38);
+  color:#fff;
+  padding:5px 11px;
+  border-radius:4px;
+  font-size:10.5px;
+  font-family:inherit;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:background .15s, border-color .15s;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.hdr-btn:hover:not(:disabled){background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.60)}
+.hdr-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* Refresh button */
+.btn-refresh{margin-left:8px}
+.btn-icon{display:inline-block}
+.btn-refresh.spinning .btn-icon{animation:spin .7s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Theme toggle */
+.btn-theme{margin-left:6px;min-width:72px;justify-content:center}
+
+/* Sign-in button (header — shown only when not authenticated) */
+.btn-signin{
+  background:rgba(255,255,255,.90);
+  border:1px solid rgba(255,255,255,.70);
+  color:#0070F2;
+  font-weight:600;
+  margin-left:8px;
+}
+.btn-signin:hover{background:#fff;border-color:#fff}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SIGN-IN OVERLAY  (new in v5)
+════════════════════════════════════════════════════════════════════════════ */
+.signin-overlay{
+  position:absolute;
+  inset:0;
+  background:var(--db);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:60;
+  transition:background .25s;
+}
+.signin-overlay.hidden{display:none}
+.signin-card{
+  text-align:center;
+  padding:44px 36px;
+  max-width:400px;
+}
+.signin-logo-img{
+  height:58px;
+  margin-bottom:20px;
+  border-radius:4px;
+}
+.signin-title{
+  font-size:17px;
+  font-weight:700;
+  color:var(--ct);
+  margin-bottom:6px;
+  letter-spacing:.1px;
+  transition:color .25s;
+}
+.signin-sub{
+  font-size:12px;
+  color:var(--cm);
+  margin-bottom:28px;
+  line-height:1.75;
+  transition:color .25s;
+}
+.btn-ms-signin{
+  background:#0070F2;
+  color:#fff;
+  border:none;
+  padding:10px 26px;
+  border-radius:4px;
+  font-size:13px;
+  font-family:inherit;
+  font-weight:600;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:14px;
+  transition:background .15s;
+}
+.btn-ms-signin:hover{background:#0057C2}
+.signin-hint{
+  font-size:9.5px;
+  color:var(--cm);
+  transition:color .25s;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MAIN GRID  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:8px;
+  padding:8px;
+}
+.card-cp{grid-row:1/3}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CARDS  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.card{background:var(--cb);border-radius:5px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--cs);transition:background .25s, box-shadow .25s}
+.card-accent{height:4px;flex-shrink:0}
+.card-head{background:var(--ch);padding:6px 10px 5px;font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--ct);text-transform:uppercase;border-bottom:1px solid var(--cd);flex-shrink:0;transition:background .25s, color .25s, border-color .25s}
+.card-body{padding:8px 10px 6px;flex:1;display:flex;flex-direction:column;min-height:0}
+.card-divider{height:1px;background:var(--cd);margin:6px -10px;flex-shrink:0;transition:background .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION SUB-HEADERS  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.sec-hdr{font-size:9.5px;font-weight:700;color:var(--ct);letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase;flex-shrink:0;transition:color .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CHART WRAPPERS  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.chart-wrap{position:relative;flex:1;min-height:0}
+.chart-wrap canvas{display:block;cursor:crosshair}
+.h160{height:160px;flex:none}
+.h175{height:175px;flex:none}
+.h190{height:190px;flex:none}
+.h200{height:200px;flex:none}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LEGEND  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:5px;flex-shrink:0}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--cx);transition:color .25s}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BADGE  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.badge{display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600;white-space:nowrap}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CP TABLE  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.cp-table{width:100%;border-collapse:collapse;font-size:10px;flex-shrink:0}
+.cp-table th{background:var(--ch);color:var(--ct);font-weight:700;font-size:9px;letter-spacing:.3px;padding:4px 5px;text-align:center;border-bottom:1px solid var(--cd);transition:background .25s, color .25s, border-color .25s}
+.cp-table th:first-child{text-align:left}
+.cp-table td{padding:3px 5px;border-bottom:1px solid var(--rb);color:var(--cx);transition:border-color .25s, color .25s}
+.cp-name{font-weight:600;color:var(--ct);transition:color .25s}
+.cp-n{text-align:center}
+.cp-s{text-align:center}
+.cp-table tr:last-child td{border-bottom:none}
+.cp-table tr:hover td{background:var(--rh);transition:background .15s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SURVEY TABLE  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.sv-table{width:100%;border-collapse:collapse;font-size:10px;flex-shrink:0}
+.sv-table th{background:#5B738B;color:#fff;font-weight:700;font-size:9px;letter-spacing:.3px;padding:4px 6px;text-align:center}
+.sv-table th:first-child{text-align:left}
+.sv-table td{padding:3px 6px;border-bottom:1px solid var(--rb);color:var(--cx);transition:border-color .25s, color .25s}
+.svt-name{font-weight:600;color:var(--ct);transition:color .25s}
+.svt-n{text-align:center}
+.svt-t{text-align:center;font-size:9.5px}
+.sv-table tr:last-child td{border-bottom:none}
+.sv-table tr:hover td{background:var(--rh);transition:background .15s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   QUALITY NOTE  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.q-note{font-size:9px;font-style:italic;color:var(--cm);text-align:center;padding:3px 4px;margin-bottom:2px;flex-shrink:0;display:none;transition:color .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FOOTER  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+.footer{text-align:center;color:var(--cf);font-size:9.5px;padding:8px 0 4px;transition:color .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TOAST  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:#1D2329;color:#fff;font-size:10.5px;padding:7px 16px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:opacity .22s, transform .22s;z-index:2000;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CHART TOOLTIP  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+#chart-tt{position:fixed;z-index:1500;background:var(--ttbg);border:1px solid var(--ttbd);border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.18);padding:8px 10px;pointer-events:none;opacity:0;transition:opacity .12s ease, background .25s, border-color .25s;min-width:148px;max-width:220px;font-family:"72","72full",-apple-system,"Segoe UI",Arial,sans-serif}
+#chart-tt.sticky{border-color:#0070F2;box-shadow:0 4px 20px rgba(0,112,242,.22)}
+.tt-hdr{font-size:10.5px;font-weight:700;color:var(--tthc);padding-bottom:5px;margin-bottom:5px;border-bottom:1px solid var(--ttsc);transition:color .25s, border-color .25s}
+.tt-row{display:flex;align-items:center;gap:6px;margin:2.5px 0;font-size:9.5px}
+.tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tt-dot-empty{background:transparent;border:none}
+.tt-lbl{color:var(--ttlc);flex:1;transition:color .25s}
+.tt-val{font-weight:700;color:var(--ttvc);text-align:right;transition:color .25s}
+.tt-sep{height:1px;background:var(--ttsc);margin:4px 0;transition:background .25s}
+.tt-bold .tt-lbl{color:var(--cx);font-weight:600}
+.tt-bold .tt-val{color:var(--ct);font-weight:700}
+.tt-hint{font-size:8.5px;color:var(--ttic);margin-top:5px;padding-top:4px;border-top:1px solid var(--tths);text-align:center;transition:color .25s, border-color .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TAB NAVIGATION
+════════════════════════════════════════════════════════════════════════════ */
+.tab-nav{
+  display:flex;
+  align-items:center;
+  background:var(--db);
+  border-bottom:1px solid var(--cd);
+  padding:8px 16px;
+  gap:8px;
+  flex-shrink:0;
+  transition:background .25s, border-color .25s;
+}
+.tab-btn{
+  background:var(--cb);
+  border:1px solid var(--cd);
+  color:var(--cm);
+  padding:5px 16px;
+  border-radius:20px;
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:600;
+  cursor:pointer;
+  letter-spacing:.2px;
+  transition:background .15s, border-color .15s, color .15s, box-shadow .15s;
+  white-space:nowrap;
+  line-height:1.6;
+}
+.tab-btn:hover:not(.active){
+  border-color:#0070F2;
+  color:#0070F2;
+  background:var(--ch);
+}
+.tab-btn.active{
+  background:#0070F2;
+  border-color:#0070F2;
+  color:#FFFFFF;
+  box-shadow:0 2px 8px rgba(0,112,242,.25);
+}
+.tab-section{display:block}
+.tab-section.hidden{display:none}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LEAVE PLANNER — CONTAINER
+════════════════════════════════════════════════════════════════════════════ */
+.lp-container{padding:12px 16px 20px}
+
+/* ── LP Header row ─────────────────────────────────────────────────────────── */
+.lp-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.lp-nav-btn{
+  background:var(--cb);border:1px solid var(--cd);color:var(--ct);
+  width:30px;height:30px;border-radius:4px;font-size:20px;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .15s,border-color .15s;flex-shrink:0;font-family:inherit;
+}
+.lp-nav-btn:hover{background:var(--ch);border-color:#0070F2}
+.lp-month-label{
+  font-size:15px;font-weight:700;color:var(--ct);
+  min-width:170px;text-align:center;transition:color .25s;
+}
+.lp-header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.lp-add-btn{
+  background:#0070F2;color:#fff;border:none;
+  padding:6px 14px;border-radius:4px;font-size:11.5px;
+  font-family:inherit;font-weight:600;cursor:pointer;
+  transition:background .15s;white-space:nowrap;
+}
+.lp-add-btn:hover{background:#0057C2}
+.lp-today-btn{
+  background:var(--cb);border:1px solid var(--cd);color:var(--ct);
+  padding:5px 12px;border-radius:4px;font-size:11px;font-family:inherit;
+  cursor:pointer;transition:background .15s,border-color .15s;
+}
+.lp-today-btn:hover{background:var(--ch);border-color:#0070F2}
+
+/* ── LP Legend ────────────────────────────────────────────────────────────── */
+.lp-legend{
+  display:flex;flex-wrap:wrap;gap:5px 14px;margin-bottom:10px;
+  background:var(--cb);border:1px solid var(--cd);border-radius:4px;
+  padding:7px 12px;transition:background .25s,border-color .25s;
+}
+.lp-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--cx);transition:color .25s}
+.lp-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.lp-leg-abbr{font-weight:700;font-size:10px;margin-right:1px}
+
+/* ── Calendar wrapper ─────────────────────────────────────────────────────── */
+.lp-calendar-wrap{
+  background:var(--cb);border:1px solid var(--cd);border-radius:5px;
+  overflow:hidden;transition:background .25s,border-color .25s;
+}
+.lp-dow-headers{display:grid;grid-template-columns:repeat(7,1fr);background:#0070F2}
+.lp-dow-headers > div{
+  text-align:center;padding:7px 4px;
+  font-size:10.5px;font-weight:700;color:#fff;
+  letter-spacing:.4px;text-transform:uppercase;
+}
+.lp-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  border-top:1px solid var(--cd);transition:border-color .25s;
+}
+
+/* ── Day cell ─────────────────────────────────────────────────────────────── */
+.lp-day{
+  min-height:96px;
+  border-right:1px solid var(--cd);border-bottom:1px solid var(--cd);
+  padding:4px 5px 5px;cursor:pointer;background:var(--cb);
+  position:relative;transition:background .12s,border-color .25s;
+}
+.lp-day:hover{background:var(--ch)}
+.lp-day:nth-child(7n){border-right:none}
+.lp-day.other-month{background:var(--rb);cursor:default}
+.lp-day.other-month:hover{background:var(--rb)}
+.lp-day.today{background:#E8F0FB;border:1.5px solid #0070F2}
+html[data-theme="dark"] .lp-day.today{background:#1C2840;border-color:#4CB1FF}
+.lp-day-num{font-size:11px;font-weight:700;color:var(--ct);text-align:right;margin-bottom:3px;line-height:1;transition:color .25s}
+.lp-day.other-month .lp-day-num{color:var(--cf)}
+.lp-day.today .lp-day-num{color:#0070F2}
+html[data-theme="dark"] .lp-day.today .lp-day-num{color:#4CB1FF}
+.lp-day-entries{display:flex;flex-direction:column;gap:2px}
+
+/* ── Leave entry pill ─────────────────────────────────────────────────────── */
+.lp-entry{
+  font-size:9.5px;font-weight:600;padding:2px 5px;border-radius:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:pointer;line-height:1.4;transition:opacity .12s;
+}
+.lp-entry:hover{opacity:.82}
+
+/* ── Status bar ───────────────────────────────────────────────────────────── */
+.lp-status{margin-top:8px;font-size:10px;color:var(--cm);min-height:16px;transition:color .25s}
+
+/* ── Loading state ────────────────────────────────────────────────────────── */
+.lp-loading{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 20px;
+  color:var(--cm);font-size:12px;gap:12px;transition:color .25s;
+}
+.lp-spinner{
+  width:28px;height:28px;border:3px solid var(--cd);
+  border-top-color:#0070F2;border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LEAVE PLANNER — PHILIPPINE HOLIDAY BADGES
+════════════════════════════════════════════════════════════════════════════ */
+.lp-holiday{
+  font-size:9px;font-weight:600;
+  padding:2px 5px;border-radius:3px;
+  background:#FFF3CD;color:#5A3E00;
+  border-left:2px solid #E6A817;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  cursor:default;line-height:1.4;pointer-events:none;
+  transition:background .25s,color .25s,border-color .25s;
+}
+.lp-holiday.lp-holiday-special{
+  background:#F0F4FF;color:#3A4A8A;
+  border-left-color:#6B7FCC;
+}
+html[data-theme="dark"] .lp-holiday{
+  background:#2A2200;color:#E0B040;border-left-color:#C08820;
+}
+html[data-theme="dark"] .lp-holiday.lp-holiday-special{
+  background:#1A1E3A;color:#8BA0E0;border-left-color:#4A5CA0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LEAVE PLANNER — DIALOGS
+════════════════════════════════════════════════════════════════════════════ */
+.lp-dialog-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;z-index:800;
+}
+.lp-dialog-overlay.hidden{display:none}
+.lp-dialog{
+  background:var(--cb);border-radius:6px;
+  box-shadow:0 8px 32px rgba(0,0,0,.28);
+  width:100%;max-width:380px;
+  display:flex;flex-direction:column;
+  transition:background .25s;margin:16px;
+}
+.lp-dialog-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 10px;border-bottom:1px solid var(--cd);
+  font-size:13px;font-weight:700;color:var(--ct);
+  transition:border-color .25s,color .25s;
+}
+.lp-dialog-close{
+  background:none;border:none;color:var(--cm);font-size:14px;
+  cursor:pointer;padding:2px 5px;border-radius:3px;
+  transition:color .15s,background .15s;
+}
+.lp-dialog-close:hover{color:var(--ct);background:var(--ch)}
+.lp-dialog-body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.lp-field{display:flex;flex-direction:column;gap:4px}
+.lp-field label{
+  font-size:10px;font-weight:700;color:var(--ct);
+  letter-spacing:.4px;text-transform:uppercase;transition:color .25s;
+}
+.lp-field select,
+.lp-field input[type="text"],
+.lp-field input[type="date"]{
+  background:var(--db);border:1px solid var(--cd);border-radius:4px;
+  color:var(--cx);font-family:inherit;font-size:12px;padding:6px 8px;
+  outline:none;width:100%;
+  transition:border-color .15s,background .25s,color .25s;
+}
+.lp-field select:focus,
+.lp-field input:focus{
+  border-color:#0070F2;box-shadow:0 0 0 2px rgba(0,112,242,.12);
+}
+.lp-dialog-footer{
+  display:flex;gap:8px;padding:10px 14px 14px;
+  border-top:1px solid var(--cd);transition:border-color .25s;
+}
+.lp-btn-primary{
+  background:#0070F2;color:#fff;border:none;padding:7px 18px;
+  border-radius:4px;font-family:inherit;font-size:11.5px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+}
+.lp-btn-primary:hover{background:#0057C2}
+.lp-btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.lp-btn-secondary{
+  background:var(--cb);color:var(--ct);border:1px solid var(--cd);
+  padding:7px 14px;border-radius:4px;font-family:inherit;font-size:11.5px;
+  cursor:pointer;transition:background .15s,border-color .15s;
+}
+.lp-btn-secondary:hover{background:var(--ch);border-color:var(--ct)}
+.lp-btn-danger{
+  background:#BB0000;color:#fff;border:none;padding:7px 14px;
+  border-radius:4px;font-family:inherit;font-size:11.5px;font-weight:600;
+  cursor:pointer;transition:background .15s;
+}
+.lp-btn-danger:hover{background:#990000}
+.lp-btn-danger:disabled{opacity:.5;cursor:not-allowed}
+
+/* View-dialog rows */
+.lp-view-row{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:5px 0;border-bottom:1px solid var(--cg);
+  font-size:11.5px;transition:border-color .25s;
+}
+.lp-view-row:last-child{border-bottom:none}
+.lp-view-lbl{
+  font-weight:700;color:var(--ct);min-width:90px;
+  font-size:10px;text-transform:uppercase;letter-spacing:.3px;
+  padding-top:1px;transition:color .25s;
+}
+.lp-view-val{color:var(--cx);flex:1;transition:color .25s}
+
+/* Delete confirm */
+.lp-del-msg{font-size:12px;color:var(--cx);padding:4px 0;line-height:1.6;transition:color .25s}
+</style>
+</head>
+<body>
+
+<!-- ── Tooltip element ──────────────────────────────────────────────────── -->
+<div id="chart-tt" role="tooltip" aria-live="polite"></div>
+
+<!-- ── Toast ────────────────────────────────────────────────────────────── -->
+<div id="toast"></div>
+
+<div class="dashboard">
+
+  <!-- ── Header ───────────────────────────────────────────────────────── -->
+  <header class="hdr">
+    <img class="hdr-logo"
+      src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjgiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9Ii4xNSIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjU0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlQ8L3RleHQ+PC9zdmc+"
+      id="hdr-logo-img" alt="Team Josh">
+    <div class="hdr-divider"></div>
+    <span class="hdr-title">Team Josh Executive Dashboard</span>
+    <span class="hdr-sub">&mdash; <span id="hdr-month"></span></span>
+    <div class="hdr-spacer"></div>
+    <div class="hdr-meta">
+      <strong id="hdr-version"></strong><br>Data as of <span id="hdr-date"></span>
+      <span id="last-refresh" class="last-refresh"></span>
+      <span id="hdr-user"    class="hdr-user"></span>
+    </div>
+    <!-- Sign In button (visible only when not authenticated) -->
+    <button class="hdr-btn btn-signin" id="btnSignIn"
+            onclick="signIn()" title="Sign in with Microsoft 365">
+      Sign In
+    </button>
+    <button class="hdr-btn btn-theme" id="btnTheme"
+            onclick="toggleTheme()" title="Toggle light / dark mode">
+      <span id="theme-icon">&#x1F319;</span>
+      <span id="theme-label">Dark</span>
+    </button>
+    <!-- Refresh is disabled until authenticated -->
+    <button class="hdr-btn btn-refresh" id="btnRefresh"
+            onclick="refreshDashboard()" title="Reload data from SharePoint"
+            disabled>
+      <span class="btn-icon">&#x21BB;</span> Refresh Data
+    </button>
+  </header>
+
+  <!-- ── Tab Navigation ──────────────────────────────────────────────── -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" id="tab-btn-perf"  onclick="switchTab('performance')">Performance Dashboard</button>
+    <button class="tab-btn"        id="tab-btn-leave" onclick="switchTab('leave')">Leave Planner</button>
+  </nav>
+
+  <!-- ══ PERFORMANCE TAB ═══════════════════════════════════════════════ -->
+  <div id="section-performance" class="tab-section">
+
+  <!-- ── Main grid  (identical to v4) ────────────────────────────────── -->
+  <div class="grid">
+
+    <!-- ═══ CASE PRODUCTIVITY (col 1, full height) ══════════════════════ -->
+    <div class="card card-cp">
+      <div class="card-accent" style="background:#0070F2"></div>
+      <div class="card-head">Case Productivity</div>
+      <div class="card-body">
+
+        <div class="sec-hdr">Closed Case Count</div>
+        <div class="chart-wrap h175"><canvas id="chartCpCount"></canvas></div>
+        <div class="legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>CS Created</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Client Created</div>
+        </div>
+
+        <div class="card-divider"></div>
+        <div class="sec-hdr">MTD Average</div>
+        <div class="chart-wrap h175"><canvas id="chartCpAvg"></canvas></div>
+        <div class="legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>Progressing &lt;1.5</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Successful 1.5&ndash;2.49</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#1B90FF"></div>Outstanding 2.5&ndash;3.49</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Extraordinary 3.5+</div>
+        </div>
+
+        <div class="card-divider"></div>
+        <div class="sec-hdr">Member Summary</div>
+        <table class="cp-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>CS&nbsp;Created</th><th>Client&nbsp;Created</th>
+              <th>Total</th><th>MTD&nbsp;Avg</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="cp-tbody"></tbody>
+        </table>
+
+      </div>
+    </div>
+
+    <!-- ═══ TOUCH BASE (col 2, top) ═════════════════════════════════════ -->
+    <div class="card">
+      <div class="card-accent" style="background:#0070F2"></div>
+      <div class="card-head">Touch Base</div>
+      <div class="card-body">
+        <div class="sec-hdr">Touch Base Emails</div>
+        <div class="chart-wrap h160"><canvas id="chartEmails"></canvas></div>
+        <div class="card-divider"></div>
+        <div class="sec-hdr">Call Conversations</div>
+        <div class="chart-wrap h160"><canvas id="chartCalls"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ═══ CASE SURVEYS (col 3, top) ══════════════════════════════════ -->
+    <div class="card">
+      <div class="card-accent" style="background:#5B738B"></div>
+      <div class="card-head">Case Surveys</div>
+      <div class="card-body">
+        <div class="sec-hdr">Month-on-Month Comparison &mdash; <span id="sv-months"></span></div>
+        <table class="sv-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th id="sv-prev-hdr"></th>
+              <th id="sv-curr-hdr"></th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody id="sv-tbody"></tbody>
+        </table>
+        <div class="card-divider"></div>
+        <div class="sec-hdr">Surveys Received &mdash; <span id="sv-month-rank"></span> Ranking</div>
+        <div class="chart-wrap h160"><canvas id="chartSvRank"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ═══ QUALITY (col 2, bottom) ═════════════════════════════════════ -->
+    <div class="card">
+      <div class="card-accent" style="background:#1B90FF"></div>
+      <div class="card-head">Quality</div>
+      <div class="card-body">
+        <div id="q-note" class="q-note"></div>
+        <div class="sec-hdr">Individual Quality Ranking</div>
+        <div class="chart-wrap h190"><canvas id="chartQuality"></canvas></div>
+        <div class="legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>Target: 100%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>At Target</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Below Target</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PFTC (col 3, bottom) ════════════════════════════════════════ -->
+    <div class="card">
+      <div class="card-accent" style="background:#2CE0BF"></div>
+      <div class="card-head">PFTC</div>
+      <div class="card-body">
+        <div class="sec-hdr">PFTC Leaderboard</div>
+        <div class="chart-wrap h200"><canvas id="chartPftc"></canvas></div>
+        <div class="legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>Appreciate</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Commendation</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+  <div class="footer"><span id="footer-info"></span></div>
+
+  </div><!-- /section-performance -->
+
+  <!-- ══ LEAVE PLANNER TAB ════════════════════════════════════════════ -->
+  <div id="section-leave" class="tab-section hidden">
+    <div class="lp-container">
+
+      <!-- Calendar header -->
+      <div class="lp-header">
+        <button class="lp-nav-btn" onclick="lpPrevMonth()" title="Previous month">&#8249;</button>
+        <span class="lp-month-label" id="lp-month-label"></span>
+        <button class="lp-nav-btn" onclick="lpNextMonth()" title="Next month">&#8250;</button>
+        <button class="lp-today-btn" onclick="lpGoToday()">Today</button>
+        <div class="lp-header-right">
+          <button class="lp-add-btn" onclick="lpOpenAddDialog(null)">+ Add Leave</button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="lp-legend" id="lp-legend"></div>
+
+      <!-- Calendar -->
+      <div class="lp-calendar-wrap">
+        <div class="lp-dow-headers">
+          <div>Sunday</div><div>Monday</div><div>Tuesday</div>
+          <div>Wednesday</div><div>Thursday</div><div>Friday</div><div>Saturday</div>
+        </div>
+        <div class="lp-grid" id="lp-grid"></div>
+      </div>
+
+      <div class="lp-status" id="lp-status"></div>
+    </div>
+  </div><!-- /section-leave -->
+
+  <!-- ══ LEAVE PLANNER DIALOGS ════════════════════════════════════════ -->
+
+  <!-- Add / Edit Leave -->
+  <div id="lp-form-overlay" class="lp-dialog-overlay hidden"
+       onclick="lpOverlayClick(event,'form')">
+    <div class="lp-dialog">
+      <div class="lp-dialog-head">
+        <span id="lp-form-title">Add Leave</span>
+        <button class="lp-dialog-close" onclick="lpCloseForm()">&#x2715;</button>
+      </div>
+      <div class="lp-dialog-body">
+        <div class="lp-field">
+          <label>Name</label>
+          <select id="lp-f-name">
+            <option value="">— Select —</option>
+            <option>Dhean</option><option>Hannah</option><option>Hart</option>
+            <option>Josh</option><option>Oliver</option><option>Rob</option>
+            <option>Roanne</option><option>Thor</option>
+          </select>
+        </div>
+        <div class="lp-field">
+          <label>Leave Type</label>
+          <select id="lp-f-type" onchange="lpTypeChange()">
+            <option value="">— Select —</option>
+            <option>Vacation Leave</option>
+            <option>Sick Leave</option>
+            <option>Solo Parent Leave</option>
+            <option>Maternity/Paternity Leave</option>
+            <option>Unpaid Leave</option>
+            <option>Bereavement Leave</option>
+            <option>Holiday Leave</option>
+            <option>Half-day VL</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="lp-field" id="lp-f-custom-wrap" style="display:none">
+          <label>Specify Leave Type</label>
+          <input type="text" id="lp-f-custom" placeholder="e.g. Emergency Leave">
+        </div>
+        <div class="lp-field">
+          <label>Start Date</label>
+          <input type="date" id="lp-f-start">
+        </div>
+        <div class="lp-field">
+          <label>End Date</label>
+          <input type="date" id="lp-f-end">
+        </div>
+        <div class="lp-field">
+          <label>OOO Buddy</label>
+          <select id="lp-f-buddy" onchange="lpBuddyChange()">
+            <option value="">— Select —</option>
+            <option>Dhean</option><option>Hannah</option><option>Hart</option>
+            <option>Josh</option><option>Oliver</option><option>Rob</option>
+            <option>Roanne</option><option>Thor</option>
+            <option>Others</option>
+          </select>
+        </div>
+        <div class="lp-field" id="lp-f-buddy-custom-wrap" style="display:none">
+          <label>Buddy Name</label>
+          <input type="text" id="lp-f-buddy-custom" placeholder="Enter buddy name">
+        </div>
+      </div>
+      <div class="lp-dialog-footer">
+        <button class="lp-btn-primary"   id="lp-save-btn" onclick="lpSaveLeave()">Save</button>
+        <button class="lp-btn-secondary" onclick="lpCloseForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Leave Details -->
+  <div id="lp-view-overlay" class="lp-dialog-overlay hidden"
+       onclick="lpOverlayClick(event,'view')">
+    <div class="lp-dialog">
+      <div class="lp-dialog-head">
+        <span>Leave Details</span>
+        <button class="lp-dialog-close" onclick="lpCloseView()">&#x2715;</button>
+      </div>
+      <div class="lp-dialog-body" id="lp-view-body"></div>
+      <div class="lp-dialog-footer">
+        <button class="lp-btn-secondary" onclick="lpEditFromView()">Edit</button>
+        <button class="lp-btn-danger"    onclick="lpDeleteFromView()">Delete</button>
+        <button class="lp-btn-secondary" onclick="lpCloseView()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation -->
+  <div id="lp-del-overlay" class="lp-dialog-overlay hidden"
+       onclick="lpOverlayClick(event,'del')">
+    <div class="lp-dialog" style="max-width:320px">
+      <div class="lp-dialog-head">
+        <span>Confirm Delete</span>
+        <button class="lp-dialog-close" onclick="lpCloseDelete()">&#x2715;</button>
+      </div>
+      <div class="lp-dialog-body">
+        <p class="lp-del-msg">Delete this leave entry? This cannot be undone.</p>
+      </div>
+      <div class="lp-dialog-footer">
+        <button class="lp-btn-danger"    id="lp-del-btn" onclick="lpConfirmDelete()">Delete</button>
+        <button class="lp-btn-secondary" onclick="lpCloseDelete()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Sign-in overlay (shown when not authenticated — new in v5) ══ -->
+  <div id="signin-overlay" class="signin-overlay">
+    <div class="signin-card">
+      <img id="signin-logo-img" class="signin-logo-img"
+        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjgiIGZpbGw9IiMwMDcwRjIiLz48dGV4dCB4PSI1MCIgeT0iNjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI1NCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UPC90ZXh0Pjwvc3ZnPg=="
+        alt="Team Josh">
+      <div class="signin-title">Team Josh Executive Dashboard</div>
+      <div class="signin-sub" id="signin-sub">
+        Sign in with your Microsoft 365 account to load live data from SharePoint.
+      </div>
+      <button class="btn-ms-signin" id="signin-btn" onclick="signIn()">
+        Sign in with Microsoft 365
+      </button>
+      <div class="signin-hint">Requires access to the Team Josh Dashboard workbook.</div>
+    </div>
+  </div>
+
+</div><!-- /dashboard -->
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SCRIPT
+════════════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* NOTE: Chart.register(ChartDataLabels) is intentionally deferred to
+   buildCharts() so that a blocked/slow CDN cannot prevent sign-in from
+   working.  Auth is completely independent of the charting library. */
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 1 — CONFIGURATION
+   ════════════════════════════════════════════════════════════════════════════
+   All values are pre-configured. No external libraries required.
+   Auth uses a self-contained OAuth 2.0 PKCE popup — no MSAL.js needed.
+
+   REDIRECT URI registered in Azure AD:
+     Local:        http://localhost:8080/
+     GitHub Pages: https://joshnacional.github.io/team-josh-dashboard/
+   The redirect is built dynamically — same file works in both environments.
+   ════════════════════════════════════════════════════════════════════════════ */
+const CLIENT_ID       = '4358753a-4b60-47a0-a98d-b8d7e22b7f64';
+const EXCEL_SHARE_URL = 'https://sap-my.sharepoint.com/:x:/p/josh_nacional/IQDg9mOkBuWLQKBnUxtI20A6ASMJLnVpsNN-m06cXWLfLx8';
+const LOGO_FILE_NAME  = 'Team Josh Aqua Logo.png';
+const GRAPH_SCOPES    = ['Files.ReadWrite.All'];
+const TENANT_AUTHORITY = 'https://login.microsoftonline.com/42f7676c-f455-423c-82f6-dc2d99791af7';
+/* MSAL_AUTHORITY alias kept so rest of code (graph helpers) still compiles */
+const MSAL_AUTHORITY  = TENANT_AUTHORITY;
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 2 — SELF-CONTAINED OAUTH 2.0 PKCE AUTH  (no external library)
+   ════════════════════════════════════════════════════════════════════════════
+   Implements: popup-based auth code + PKCE flow, token caching in
+   sessionStorage, silent refresh via refresh_token, and the same surface
+   (getToken / signIn / initAuth / updateAuthUI) used by the rest of the app.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── PKCE + random helpers ──────────────────────────────────────────────── */
+function _b64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+async function _pkce() {
+  const v = _b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+  return { verifier: v, challenge: _b64url(d) };
+}
+function _rand() { return _b64url(crypto.getRandomValues(new Uint8Array(16))); }
+
+/* ── Token storage (sessionStorage) ────────────────────────────────────── */
+const TK = {
+  _k: { at:'tj_at', rt:'tj_rt', exp:'tj_exp', name:'tj_name' },
+  save(d) {
+    sessionStorage.setItem(this._k.at,  d.access_token  || '');
+    if (d.refresh_token) sessionStorage.setItem(this._k.rt, d.refresh_token);
+    sessionStorage.setItem(this._k.exp, String(Date.now() + (d.expires_in||3600)*1000));
+    if (d.id_token) {
+      try {
+        const p = d.id_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+        const c = JSON.parse(atob(p));
+        sessionStorage.setItem(this._k.name, c.name || c.preferred_username || '');
+      } catch(e) { /* ok */ }
+    }
+  },
+  clear()     { Object.values(this._k).forEach(k => sessionStorage.removeItem(k)); },
+  isValid()   { return !!this.at() && Date.now() < parseInt(sessionStorage.getItem(this._k.exp)||'0') - 60000; },
+  at()        { return sessionStorage.getItem(this._k.at)   || ''; },
+  rt()        { return sessionStorage.getItem(this._k.rt)   || ''; },
+  name()      { return sessionStorage.getItem(this._k.name) || ''; },
+  hasAny()    { return !!this.at(); },
+};
+
+/* ── Token exchange helpers ─────────────────────────────────────────────── */
+async function _postToken(body) {
+  const resp = await fetch(TENANT_AUTHORITY + '/oauth2/v2.0/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(body)
+  });
+  if (!resp.ok) {
+    const e = await resp.json().catch(() => ({}));
+    throw new Error(e.error_description || ('Token request failed — HTTP ' + resp.status));
+  }
+  return resp.json();
+}
+
+async function _refresh() {
+  const rt = TK.rt();
+  if (!rt) throw new Error('no_refresh_token');
+  const data = await _postToken({
+    client_id:     CLIENT_ID,
+    grant_type:    'refresh_token',
+    refresh_token: rt,
+    scope:         GRAPH_SCOPES.join(' ') + ' openid profile offline_access',
+  });
+  TK.save(data);
+  return TK.at();
+}
+
+/* ── Silent token acquisition ───────────────────────────────────────────── */
+async function getToken() {
+  if (TK.isValid()) return TK.at();
+  try   { return await _refresh(); }
+  catch (e) { TK.clear(); throw new Error('interaction_required'); }
+}
+
+/* ── Popup-based PKCE login ─────────────────────────────────────────────── */
+async function _popupAuth() {
+  const pkce     = await _pkce();
+  const state    = _rand();
+  const nonce    = _rand();
+  /* Build redirect URI dynamically — works on localhost AND GitHub Pages subdirectory.
+     e.g. http://localhost:8080/  OR  https://joshnacional.github.io/team-josh-dashboard/ */
+  const redirect = window.location.origin +
+    window.location.pathname.split('/').slice(0, -1).join('/') + '/';
+
+  const qs = new URLSearchParams({
+    client_id:             CLIENT_ID,
+    response_type:         'code',
+    redirect_uri:          redirect,
+    scope:                 GRAPH_SCOPES.join(' ') + ' openid profile offline_access',
+    state, nonce,
+    code_challenge:        pkce.challenge,
+    code_challenge_method: 'S256',
+    response_mode:         'query',
+    prompt:                'select_account',
+  });
+
+  const popup = window.open(
+    TENANT_AUTHORITY + '/oauth2/v2.0/authorize?' + qs,
+    'tj_auth',
+    'width=520,height=640,menubar=no,toolbar=no,resizable=yes,scrollbars=yes,left=200,top=80'
+  );
+  if (!popup) throw new Error(
+    'Popup blocked. In the browser address bar click the blocked-popup icon and choose "Always allow popups from this site", then try again.'
+  );
+
+  /* Poll until popup lands on our origin, then read the auth code from the URL */
+  const code = await new Promise((resolve, reject) => {
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        reject(new Error('Sign-in popup was closed before completing authentication.'));
+        return;
+      }
+      try {
+        /* Throws cross-origin error while popup is on login.microsoftonline.com — expected */
+        const href = popup.location.href;
+        if (href && href.startsWith(window.location.origin)) {
+          clearInterval(timer);
+          const u  = new URL(href);
+          const c  = u.searchParams.get('code');
+          const s  = u.searchParams.get('state');
+          const er = u.searchParams.get('error');
+          popup.close();
+          if (er) { reject(new Error(u.searchParams.get('error_description') || er)); return; }
+          if (s !== state) { reject(new Error('Auth state mismatch — please try again.')); return; }
+          resolve(c);
+        }
+      } catch(e) { /* still cross-origin — keep polling */ }
+    }, 200);
+    /* Timeout after 5 minutes */
+    setTimeout(() => {
+      clearInterval(timer);
+      if (!popup.closed) popup.close();
+      reject(new Error('Sign-in timed out after 5 minutes.'));
+    }, 300000);
+  });
+
+  /* Exchange auth code for tokens */
+  const data = await _postToken({
+    client_id:     CLIENT_ID,
+    grant_type:    'authorization_code',
+    code,
+    redirect_uri:  redirect,
+    code_verifier: pkce.verifier,
+    scope:         GRAPH_SCOPES.join(' ') + ' openid profile offline_access',
+  });
+  TK.save(data);
+}
+
+/* ── Public auth interface ──────────────────────────────────────────────── */
+let excelDriveId = null;
+let excelItemId  = null;
+
+async function signIn() {
+  const btn = document.getElementById('signin-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+  try {
+    await _popupAuth();
+    updateAuthUI(true, TK.name());
+    hideSignInOverlay();
+    await loadAndBuild();
+  } catch(e) {
+    console.error('[Auth] Sign-in failed:', e);
+    showToast('Sign-in failed — ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign in with Microsoft 365'; }
+  }
+}
+
+async function initAuth() {
+  if (TK.hasAny()) {
+    updateAuthUI(true, TK.name());
+    try {
+      const token = await getToken();
+      await loadAndBuild(token);
+      return;
+    } catch(e) {
+      /* silent failed — show sign-in */
+      TK.clear();
+    }
+  }
+  updateAuthUI(false);
+  showSignInOverlay();
+}
+
+function updateAuthUI(signedIn, displayName) {
+  const btnSignIn  = document.getElementById('btnSignIn');
+  const btnRefresh = document.getElementById('btnRefresh');
+  const userEl     = document.getElementById('hdr-user');
+  if (signedIn) {
+    if (btnSignIn)  btnSignIn.style.display  = 'none';
+    if (btnRefresh) btnRefresh.disabled       = false;
+    if (userEl && displayName) {
+      userEl.textContent = '• ' + (displayName.split(' ')[0] || displayName);
+      userEl.classList.add('visible');
+    }
+  } else {
+    if (btnSignIn)  btnSignIn.style.display  = '';
+    if (btnRefresh) btnRefresh.disabled       = true;
+    if (userEl)     { userEl.textContent = ''; userEl.classList.remove('visible'); }
+  }
+}
+
+function showSignInOverlay() {
+  const el = document.getElementById('signin-overlay');
+  if (el) el.classList.remove('hidden');
+}
+function hideSignInOverlay() {
+  const el = document.getElementById('signin-overlay');
+  if (el) el.classList.add('hidden');
+}
+
+function showConfigError() {
+  const sub = document.getElementById('signin-sub');
+  if (sub) sub.textContent = 'Configuration error — CLIENT_ID is not set.';
+  showSignInOverlay();
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 3 — GRAPH API HELPERS
+════════════════════════════════════════════════════════════════════════════ */
+async function graphGet(path, token) {
+  const resp = await fetch('https://graph.microsoft.com/v1.0' + path, {
+    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+  });
+  if (resp.status === 423) throw new Error(
+    'The Excel workbook is currently locked. Close it in Excel Online / desktop and try again.'
+  );
+  if (!resp.ok) {
+    let detail = '';
+    try { const j = await resp.json(); detail = (j.error && j.error.message) ? j.error.message : JSON.stringify(j); }
+    catch(e2) { detail = await resp.text().catch(() => ''); }
+    throw new Error('Graph ' + resp.status + ': ' + detail.substring(0, 300));
+  }
+  return resp.json();
+}
+
+async function graphGetBinary(path, token) {
+  const resp = await fetch('https://graph.microsoft.com/v1.0' + path, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!resp.ok) throw new Error('Graph binary ' + resp.status);
+  return resp.blob();
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 4 — EXCEL FILE RESOLUTION
+   Converts the SharePoint sharing URL into a driveId + itemId pair,
+   cached for the session so subsequent refreshes skip this step.
+════════════════════════════════════════════════════════════════════════════ */
+async function resolveExcelFile(token) {
+  if (excelDriveId && excelItemId) return; /* already cached */
+  const encoded = btoa(EXCEL_SHARE_URL).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const shareRef = 'u!' + encoded;
+  const item = await graphGet('/shares/' + shareRef + '/driveItem?$select=id,parentReference', token);
+  excelDriveId = item.parentReference.driveId;
+  excelItemId  = item.id;
+  console.log('[Graph] Excel resolved — driveId:', excelDriveId, ' itemId:', excelItemId);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 5 — WORKSHEET READER
+   Reads a worksheet's used range and returns the raw 2-D values array.
+════════════════════════════════════════════════════════════════════════════ */
+async function readSheetValues(sheetName, token) {
+  const enc  = encodeURIComponent(sheetName);
+  const path = '/drives/' + excelDriveId + '/items/' + excelItemId +
+               '/workbook/worksheets/' + enc + '/usedRange(valuesOnly=true)';
+  const data = await graphGet(path, token);
+  return Array.isArray(data.values) ? data.values : [];
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 6 — DATA-PARSER UTILITIES
+════════════════════════════════════════════════════════════════════════════ */
+function parseNum(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  const n = Number(v);
+  return isNaN(n) ? 0 : n;
+}
+
+/* Find the index of the first header that matches any of the candidates
+   (exact first, then case-insensitive substring) */
+function findCol(headers, candidates) {
+  for (const c of candidates) {
+    const i = headers.findIndex(h => h === c);
+    if (i >= 0) return i;
+  }
+  for (const c of candidates) {
+    const i = headers.findIndex(h => h.toLowerCase().includes(c.toLowerCase()));
+    if (i >= 0) return i;
+  }
+  return null;
+}
+
+/* Find the first row index that contains at least one non-empty cell */
+function findHeaderRow(values) {
+  for (let i = 0; i < Math.min(values.length, 10); i++) {
+    if (values[i].some(c => c !== null && c !== undefined && c !== '')) return i;
+  }
+  return 0;
+}
+
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December'
+];
+function getMonthName(m) { return MONTH_NAMES[(m - 1)] || ''; }
+
+/* Excel serial date  → JavaScript Date
+   (Excel epoch = 30 Dec 1899; JS epoch offset = 25569 days) */
+function excelSerialToDate(serial) {
+  return new Date(Math.round((serial - 25569) * 86400000));
+}
+
+function formatDayMonthYear(d) {
+  return String(d.getDate()).padStart(2, '0') + ' ' +
+         MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 7 — DATA PARSERS  (JavaScript port of extract_data_v5.py)
+   Each function receives the raw 2-D values array from the Graph API
+   and returns the exact same structure that buildDashboard(D) expects.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Config ─────────────────────────────────────────────────────────────── */
+function parseConfig(values) {
+  if (!values || !values.length) return _defaultConfig();
+  const kv = {};
+  values.forEach(row => {
+    if (row[0] !== null && row[0] !== undefined && row[0] !== '') {
+      kv[String(row[0]).trim()] = row[1];
+    }
+  });
+
+  const year  = parseInt(kv['Year'])  || new Date().getFullYear();
+  const month = parseInt(kv['Month']) || (new Date().getMonth() + 1);
+
+  /* Data As Of: may be an Excel serial (number) or a pre-formatted string */
+  let dataAsOfStr;
+  const raw = kv['Data As Of'];
+  if (typeof raw === 'number') {
+    dataAsOfStr = formatDayMonthYear(excelSerialToDate(raw));
+  } else if (raw) {
+    dataAsOfStr = String(raw);
+  } else {
+    dataAsOfStr = formatDayMonthYear(new Date());
+  }
+
+  const monthName     = getMonthName(month);
+  const reportDate    = monthName + ' ' + year;
+  const prevMonth     = month > 1 ? month - 1 : 12;
+  const prevYear      = month > 1 ? year : year - 1;
+  const prevMonthName = getMonthName(prevMonth);
+  const prevMonthStr  = prevYear + '-' + String(prevMonth).padStart(2, '0');
+  const currMonthStr  = year     + '-' + String(month).padStart(2, '0');
+  const version       = String(kv['Dashboard Version'] || 'V4.2');
+  const theme         = String(kv['Dashboard Theme']   || 'SAP Horizon Light');
+
+  return {
+    year, month, month_name: monthName, report_date: reportDate,
+    data_as_of: dataAsOfStr, version, theme,
+    prev_month_name: prevMonthName,
+    prev_month_str:  prevMonthStr,
+    curr_month_str:  currMonthStr
+  };
+}
+function _defaultConfig() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth() + 1;
+  const mn = getMonthName(m);
+  const pm = m > 1 ? m - 1 : 12, py = m > 1 ? y : y - 1;
+  return {
+    year: y, month: m, month_name: mn, report_date: mn + ' ' + y,
+    data_as_of: formatDayMonthYear(now), version: 'V4.2', theme: 'SAP Horizon Light',
+    prev_month_name: getMonthName(pm),
+    prev_month_str:  py + '-' + String(pm).padStart(2,'0'),
+    curr_month_str:  y  + '-' + String(m).padStart(2,'0')
+  };
+}
+
+/* ─── Case Productivity ──────────────────────────────────────────────────── */
+function parseCaseProductivity(values) {
+  if (!values || values.length < 2) return [];
+  const hi      = findHeaderRow(values);
+  const headers = values[hi].map(h => h != null ? String(h).trim() : '');
+
+  /* Detect columns by header name — same logic as the Python extractor */
+  const nameIdx   = findCol(headers, ['CSS Name', 'Name', 'Member']) ?? 0;
+  const csIdx     = findCol(headers, ['CS Created Cases', 'CS Created']) ?? 1;
+  const cliIdx    = findCol(headers, ['Client Created Cases', 'Client Created']) ?? 2;
+  const avgIdx    = findCol(headers, ['MTD Average (per weekday)', 'MTD Average', 'Average']) ?? 5;
+  const statusIdx = findCol(headers, ['Status']) ?? 6;
+  /* Leave Days (col 3) and Effective Workdays (col 4) are intentionally skipped */
+
+  const result = [];
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    const name = row[nameIdx];
+    if (!name) continue;
+    const cs  = Math.round(parseNum(row[csIdx]));
+    const cli = Math.round(parseNum(row[cliIdx]));
+    const avg = Math.round(parseNum(row[avgIdx]) * 100) / 100;
+    const status = row[statusIdx] ? String(row[statusIdx]).trim() : 'Progressing';
+    result.push({ name: String(name), cs_created: cs, client_created: cli,
+                  total: cs + cli, avg, status });
+  }
+  return result;
+}
+
+/* ─── Touch Base ─────────────────────────────────────────────────────────── */
+function parseTouchBase(values) {
+  const empty = { raw: [], emails_sorted: [], calls_sorted: [] };
+  if (!values || values.length < 2) return empty;
+  const hi      = findHeaderRow(values);
+  const headers = values[hi].map(h => h != null ? String(h).trim() : '');
+
+  const nameIdx  = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
+  const emailIdx = findCol(headers, ['Touch Base Emails','Emails','Email']) ?? 1;
+  const callsIdx = findCol(headers, ['Call Conversations','Calls','Call']) ?? 2;
+
+  const raw = [];
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[nameIdx]) continue;
+    raw.push({
+      name:   String(row[nameIdx]),
+      emails: Math.round(parseNum(row[emailIdx])),
+      calls:  Math.round(parseNum(row[callsIdx]))
+    });
+  }
+  const emails_sorted = [...raw].sort((a, b) => b.emails - a.emails);
+  const calls_sorted  = [...raw].sort((a, b) => b.calls  - a.calls);
+  return { raw, emails_sorted, calls_sorted };
+}
+
+/* ─── Case Surveys ───────────────────────────────────────────────────────── */
+function parseSurveys(values, config) {
+  const defMeta = {
+    curr_month: config.curr_month_str, prev_month: config.prev_month_str,
+    prev_month_name: config.prev_month_name, curr_month_name: config.month_name
+  };
+  if (!values || values.length < 2) return { raw: [], ranking: [], ...defMeta };
+
+  const hi = findHeaderRow(values);
+
+  /* Group rows by month string: { 'YYYY-MM': { 'Name': count } } */
+  const byMonth = {};
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[0] || row[1] === null || row[1] === undefined) continue;
+
+    const name  = String(row[0]);
+    let   mStr  = row[1];
+    /* Handle month stored as Excel serial date or as text */
+    if (typeof mStr === 'number') {
+      const d = excelSerialToDate(mStr);
+      mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    } else {
+      mStr = String(mStr).trim();
+      /* Normalise e.g. "Aug-26" or "2026/08" → "YYYY-MM" when possible */
+      if (mStr.length !== 7 || mStr[4] !== '-') {
+        const d = new Date(mStr);
+        if (!isNaN(d)) mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      }
+    }
+    const count = Math.round(parseNum(row[2]));
+    if (!byMonth[mStr]) byMonth[mStr] = {};
+    byMonth[mStr][name] = count;
+  }
+
+  const curr  = byMonth[config.curr_month_str] || {};
+  const prev  = byMonth[config.prev_month_str] || {};
+  const names = Object.keys(curr).length ? Object.keys(curr) : Object.keys(prev);
+
+  const raw = names.map(name => {
+    const c = curr[name] ?? 0;
+    const p = prev[name] ?? 0;
+    const v = c - p;
+    let trend, trend_dir;
+    if      (v > 0) { trend = '▲ +' + v; trend_dir = 'up';      }
+    else if (v < 0) { trend = '▼ ' + v;  trend_dir = 'down';    }
+    else            { trend = '— 0';       trend_dir = 'neutral'; }
+    return { name, prev: p, curr: c, variance: v, trend, trend_dir };
+  });
+
+  const ranking = [...raw].sort((a, b) => b.curr - a.curr);
+  return { raw, ranking, ...defMeta };
+}
+
+/* ─── Quality ────────────────────────────────────────────────────────────── */
+function parseQuality(values) {
+  const empty = { raw: [], sorted: [], all_null: true, partial_null: false };
+  if (!values || values.length < 2) return empty;
+  const hi      = findHeaderRow(values);
+  const headers = values[hi].map(h => h != null ? String(h).trim() : '');
+
+  const nameIdx = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
+  const rateIdx = findCol(headers, ['Quality Rating','Rating','Quality','Score']) ?? 1;
+
+  const raw = [];
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[nameIdx]) continue;
+    const rv = row[rateIdx];
+    const isNull = (rv === null || rv === undefined || rv === '');
+    const rating = isNull ? null : parseNum(rv);
+    const pct    = isNull ? 0    : Math.round(rating * 100 * 10) / 10;
+    raw.push({ name: String(row[nameIdx]), rating, pct });
+  }
+
+  const all_null     = raw.every(r => r.rating === null);
+  const partial_null = !all_null && raw.some(r => r.rating === null);
+  const sorted       = [...raw].sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+  return { raw, sorted, all_null, partial_null };
+}
+
+/* ─── PFTC ───────────────────────────────────────────────────────────────── */
+function parsePFTC(values) {
+  if (!values || values.length < 2) return { raw: [], sorted: [] };
+  const hi      = findHeaderRow(values);
+  const headers = values[hi].map(h => h != null ? String(h).trim() : '');
+
+  const nameIdx = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
+  const appIdx  = findCol(headers, ['Appreciate','Appreciations']) ?? 1;
+  const commIdx = findCol(headers, ['Commendation','Commendations']) ?? 2;
+  const totIdx  = findCol(headers, ['Total','Total Points']) ?? 3;
+
+  const raw = [];
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[nameIdx]) continue;
+    const app  = Math.round(parseNum(row[appIdx]));
+    const comm = Math.round(parseNum(row[commIdx]));
+    /* Total is read from Excel (which applies the 1pt + 10pt weighting);
+       fall back to calculated weighted total if the column is absent */
+    const totRaw = row[totIdx];
+    const tot = (totRaw !== null && totRaw !== undefined && totRaw !== '')
+      ? Math.round(parseNum(totRaw))
+      : app + (comm * 10);
+    raw.push({ name: String(row[nameIdx]), appreciate: app, commendation: comm, total: tot });
+  }
+  const sorted = [...raw].sort((a, b) => b.total - a.total);
+  return { raw, sorted };
+}
+
+/* ─── Axis Limits ────────────────────────────────────────────────────────── */
+function computeAxisLimits(data) {
+  const cp  = data.case_productivity || [];
+  const tb  = (data.touch_base && data.touch_base.raw) ? data.touch_base.raw : [];
+  const sv  = (data.surveys    && data.surveys.ranking) ? data.surveys.ranking : [];
+  const ql  = data.quality  || { sorted: [], all_null: true };
+  const pf  = (data.pftc    && data.pftc.sorted) ? data.pftc.sorted : [];
+
+  const ccMax   = cp.reduce((m, r) => Math.max(m, r.total), 0);
+  const avgMax  = cp.reduce((m, r) => Math.max(m, r.avg),   0);
+  const emMax   = tb.reduce((m, r) => Math.max(m, r.emails), 0);
+  const callMax = tb.reduce((m, r) => Math.max(m, r.calls),  0);
+  const svMax   = sv.reduce((m, r) => Math.max(m, r.curr),   0);
+  const qlMax   = (ql.sorted || []).reduce((m, r) => Math.max(m, r.pct), 0);
+  const pfMax   = pf.reduce((m, r) => Math.max(m, r.total), 0);
+  const allNull = ql.all_null || false;
+
+  return {
+    cc_max:  Math.max(Math.ceil(ccMax  * 1.20) + 1, 12),
+    avg_max: Math.max(Math.round(avgMax * 1.35 * 10) / 10, 4.0),
+    em_max:  emMax   > 0 ? Math.max(Math.ceil(emMax   * 1.15) + 2, 10) : 10,
+    call_max:callMax > 0 ? Math.max(Math.ceil(callMax * 1.15) + 1, 4)  : 4,
+    sv_max:  svMax   > 0 ? Math.max(Math.ceil(svMax   * 1.30) + 1, 4)  : 4,
+    ql_min:  (allNull || qlMax < 70) ? 0 : 70,
+    ql_max:  allNull ? 10
+           : qlMax >= 70 ? Math.max(Math.round(qlMax * 1.05), 105)
+           : Math.max(Math.round(qlMax * 1.2) + 5, 20),
+    pf_max:  pfMax   > 0 ? Math.max(Math.ceil(pfMax * 1.30) + 2, 6) : 6,
+    quality_all_null: allNull
+  };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 8 — LOGO LOADER
+   Navigates from the Excel item two levels up to find Team Josh Aqua Logo.png
+   in the A_EKX Team Josh Dashboard parent folder. Non-blocking — failure is
+   handled silently so it never breaks the dashboard.
+════════════════════════════════════════════════════════════════════════════ */
+async function loadLogo(token) {
+  try {
+    /* Step 1: Excel item → get parent folder id (Team Josh Dashboard Data) */
+    const excelMeta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference',
+      token
+    );
+    const dataFolderId = excelMeta.parentReference.id;
+
+    /* Step 2: Data folder → get its parent (A_EKX Team Josh Dashboard) */
+    const dataFolderMeta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + dataFolderId + '?$select=parentReference',
+      token
+    );
+    const logoDirId = dataFolderMeta.parentReference.id;
+
+    /* Step 3: List children of the parent folder and find the logo by name */
+    const children = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + logoDirId +
+      '/children?$select=id,name',
+      token
+    );
+    const logoItem = (children.value || []).find(f => f.name === LOGO_FILE_NAME);
+    if (!logoItem) { console.warn('[Logo] File not found:', LOGO_FILE_NAME); return; }
+
+    /* Step 4: Fetch the binary and swap into every logo element */
+    const blob    = await graphGetBinary('/drives/' + excelDriveId + '/items/' + logoItem.id + '/content', token);
+    const dataUrl = await new Promise(resolve => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.readAsDataURL(blob);
+    });
+
+    ['hdr-logo-img', 'signin-logo-img'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.src = dataUrl;
+    });
+    console.log('[Logo] Loaded:', LOGO_FILE_NAME);
+  } catch(e) {
+    console.warn('[Logo] Could not load logo (non-critical):', e.message);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 9 — DATA FETCHER
+   Resolves the Excel file, reads all 6 sheets in parallel, parses each one,
+   and assembles the data object that buildDashboard(D) expects.
+════════════════════════════════════════════════════════════════════════════ */
+async function fetchDashboardData(token) {
+  await resolveExcelFile(token);
+
+  const sheets = ['Config', 'Case Productivity', 'Touch Base', 'Case Surveys', 'Quality', 'PFTC'];
+  const settled = await Promise.allSettled(sheets.map(s => readSheetValues(s, token)));
+
+  function getValues(result, sheetName) {
+    if (result.status === 'rejected') {
+      console.error('[Graph] Sheet "' + sheetName + '" failed:', result.reason);
+      return [];
+    }
+    return result.value;
+  }
+
+  const configVals = getValues(settled[0], 'Config');
+  const cpVals     = getValues(settled[1], 'Case Productivity');
+  const tbVals     = getValues(settled[2], 'Touch Base');
+  const svVals     = getValues(settled[3], 'Case Surveys');
+  const qlVals     = getValues(settled[4], 'Quality');
+  const pfVals     = getValues(settled[5], 'PFTC');
+
+  const config           = parseConfig(configVals);
+  const case_productivity = parseCaseProductivity(cpVals);
+  const touch_base       = parseTouchBase(tbVals);
+  const surveys          = parseSurveys(svVals, config);
+  const quality          = parseQuality(qlVals);
+  const pftc             = parsePFTC(pfVals);
+
+  const axis_limits = computeAxisLimits({ case_productivity, touch_base, surveys, quality, pftc });
+
+  console.log('[Dashboard] Data assembled — period:', config.report_date,
+              '| CP members:', case_productivity.length,
+              '| as of:', config.data_as_of);
+
+  return { config, case_productivity, touch_base, surveys, quality, pftc, axis_limits };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 10 — FONT CONSTANT  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+const F = '"72","72full",-apple-system,"Segoe UI",Arial,sans-serif';
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 11 — THEME SYSTEM  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+let _lastQlSorted = null;
+
+function isDark() {
+  return document.documentElement.dataset.theme === 'dark';
+}
+
+function themeTickColor()  { return getComputedStyle(document.documentElement).getPropertyValue('--tick').trim();  }
+function themeTickBColor() { return getComputedStyle(document.documentElement).getPropertyValue('--tickb').trim(); }
+function themeGridColor()  { return getComputedStyle(document.documentElement).getPropertyValue('--grid').trim();  }
+function themeDlblColor()  { return getComputedStyle(document.documentElement).getPropertyValue('--dlbl').trim();  }
+function themeQnulColor()  { return getComputedStyle(document.documentElement).getPropertyValue('--qnul').trim();  }
+function themeSvpvColor()  { return getComputedStyle(document.documentElement).getPropertyValue('--svpv').trim();  }
+
+function themeCharts() {
+  const tickC  = themeTickColor();
+  const tickBc = themeTickBColor();
+  const gridC  = themeGridColor();
+  const dlblC  = themeDlblColor();
+  const qnulC  = themeQnulColor();
+  const svpvC  = themeSvpvColor();
+
+  Object.entries(CH).forEach(([id, chart]) => {
+    if (!chart) return;
+
+    chart.options.scales.y.ticks.color = (id === 'chartPftc') ? tickBc : tickC;
+
+    if (chart.options.scales.x.grid) {
+      chart.options.scales.x.grid.color = gridC;
+    }
+
+    const plugDl = chart.options.plugins.datalabels;
+    if (plugDl && typeof plugDl.color === 'string' && plugDl.color !== '#FFFFFF') {
+      plugDl.color = dlblC;
+    }
+
+    chart.data.datasets.forEach(ds => {
+      if (ds.datalabels && typeof ds.datalabels.color === 'string'
+          && ds.datalabels.color !== '#FFFFFF') {
+        ds.datalabels.color = dlblC;
+      }
+    });
+
+    if (id === 'chartSvRank') {
+      chart.data.datasets[0].backgroundColor = svpvC;
+    }
+
+    if (id === 'chartQuality' && _lastQlSorted) {
+      chart.data.datasets[0].backgroundColor =
+        _lastQlSorted.map(r =>
+          r.pct >= 100 ? '#2CE0BF' : (r.pct > 0 ? '#0070F2' : qnulC)
+        );
+    }
+
+    chart.update('none');
+  });
+}
+
+function applyTheme(dark) {
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  const icon  = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if (dark) {
+    icon.textContent  = '☀';
+    label.textContent = 'Light';
+  } else {
+    icon.textContent  = '🌙';
+    label.textContent = 'Dark';
+  }
+  sessionStorage.setItem('tj-theme', dark ? 'dark' : 'light');
+  themeCharts();
+}
+
+function toggleTheme() {
+  applyTheme(!isDark());
+}
+
+function initTheme() {
+  const saved = sessionStorage.getItem('tj-theme');
+  if (saved === 'dark') {
+    document.documentElement.dataset.theme = 'dark';
+    document.getElementById('theme-icon').textContent  = '☀';
+    document.getElementById('theme-label').textContent = 'Light';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 12 — CHART INSTANCES  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+const CH = {};
+function destroyAll() {
+  Object.values(CH).forEach(c => c && c.destroy());
+  Object.keys(CH).forEach(k => delete CH[k]);
+}
+function mkChart(id, cfg) {
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(document.getElementById(id), cfg);
+  return CH[id];
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 13 — TOOLTIP SYSTEM  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+const TT = document.getElementById('chart-tt');
+let ttSticky    = false;
+let ttHideTimer = null;
+
+function ttHide(force) {
+  if (ttSticky && !force) return;
+  clearTimeout(ttHideTimer);
+  TT.style.opacity = '0';
+  TT.classList.remove('sticky');
+  if (force) ttSticky = false;
+}
+
+function ttPosition(clientX, clientY) {
+  TT.style.visibility = 'hidden';
+  TT.style.left = '-9999px';
+  TT.style.top  = '-9999px';
+  TT.style.opacity = '1';
+  requestAnimationFrame(() => {
+    const tw  = TT.offsetWidth;
+    const th  = TT.offsetHeight;
+    const vw  = window.innerWidth;
+    const vh  = window.innerHeight;
+    const pad = 12;
+    let x = clientX + 16;
+    let y = clientY - Math.round(th / 2);
+    if (x + tw > vw - pad) x = clientX - tw - 16;
+    if (x < pad)            x = pad;
+    if (y < pad)            y = pad;
+    if (y + th > vh - pad)  y = vh - th - pad;
+    TT.style.left = x + 'px';
+    TT.style.top  = y + 'px';
+    TT.style.visibility = 'visible';
+  });
+}
+
+function ttShow(html, clientX, clientY, sticky) {
+  clearTimeout(ttHideTimer);
+  TT.innerHTML = html;
+  if (sticky) {
+    ttSticky = true;
+    TT.classList.add('sticky');
+  } else {
+    TT.classList.remove('sticky');
+  }
+  ttPosition(clientX, clientY);
+}
+
+document.addEventListener('click', e => {
+  if (ttSticky && !e.target.closest('canvas') && !e.target.closest('#chart-tt'))
+    ttHide(true);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') ttHide(true);
+});
+document.addEventListener('mousemove', e => {
+  if (!ttSticky && !e.target.closest('.chart-wrap')) {
+    clearTimeout(ttHideTimer);
+    ttHideTimer = setTimeout(() => { if (!ttSticky) TT.style.opacity = '0'; }, 200);
+  }
+});
+
+/* ── Tooltip HTML builders  (v4 — unchanged) ───────────────────────────── */
+function ttRow(color, label, value) {
+  return '<div class="tt-row"><span class="tt-dot" style="background:' + color + '"></span>' +
+         '<span class="tt-lbl">' + label + '</span>' +
+         '<span class="tt-val">' + value + '</span></div>';
+}
+function ttTotal(label, value) {
+  return '<div class="tt-row tt-bold"><span class="tt-dot tt-dot-empty"></span>' +
+         '<span class="tt-lbl">' + label + '</span>' +
+         '<span class="tt-val">' + value + '</span></div>';
+}
+function ttSep()     { return '<div class="tt-sep"></div>'; }
+function ttHdr(name) { return '<div class="tt-hdr">' + name + '</div>'; }
+function ttHint()    { return '<div class="tt-hint">Click to pin &nbsp;&bull;&nbsp; Esc to close</div>'; }
+
+const SC = {
+  Progressing:'#B0C6D6', Successful:'#89D1FF',
+  Outstanding:'#1B90FF', Extraordinary:'#5B738B'
+};
+
+function ttCpCount(chart, di) {
+  const name = chart.data.labels[di];
+  const cs   = chart.data.datasets[0].data[di];
+  const cl   = chart.data.datasets[1].data[di];
+  return ttHdr(name) + ttRow('#0070F2','CS Created',cs)
+       + ttRow('#89D1FF','Client Created',cl) + ttSep() + ttTotal('Total',cs+cl) + ttHint();
+}
+function ttCpAvg(chart, di) {
+  const name = chart.data.labels[di];
+  let avg = 0, status = '';
+  chart.data.datasets.forEach(ds => {
+    if (ds.data[di] > 0) { avg = ds.data[di]; status = ds.label; }
+  });
+  return ttHdr(name)
+       + ttRow(SC[status]||'#999','MTD Average', avg.toFixed(2))
+       + ttRow(SC[status]||'#999','Status', status || 'N/A')
+       + ttHint();
+}
+function ttEmails(chart, di) {
+  return ttHdr(chart.data.labels[di])
+       + ttRow('#0070F2','Touch Base Emails', chart.data.datasets[0].data[di])
+       + ttHint();
+}
+function ttCalls(chart, di) {
+  return ttHdr(chart.data.labels[di])
+       + ttRow('#1B90FF','Call Conversations', chart.data.datasets[0].data[di])
+       + ttHint();
+}
+function ttSvRank(chart, di, prevM, currM) {
+  const prev = chart.data.datasets[0].data[di];
+  const curr = chart.data.datasets[1].data[di];
+  const diff = curr - prev;
+  return ttHdr(chart.data.labels[di])
+       + ttRow(themeSvpvColor(), prevM, prev)
+       + ttRow('#5B738B', currM, curr)
+       + ttSep() + ttTotal('Change', (diff >= 0 ? '+' : '') + diff)
+       + ttHint();
+}
+function ttQuality(chart, di) {
+  const pct = chart.data.datasets[0].data[di];
+  const col = pct >= 100 ? '#2CE0BF' : (pct > 0 ? '#0070F2' : themeQnulColor());
+  return ttHdr(chart.data.labels[di])
+       + ttRow(col, 'Quality Rating', pct > 0 ? pct + '%' : 'Not yet recorded')
+       + ttHint();
+}
+function ttPftc(chart, di) {
+  const raw  = chart.data.labels[di];
+  const name = raw.split(/\s{2,}/)[0].trim();
+  const app  = chart.data.datasets[0].data[di];
+  const com  = chart.data.datasets[1].data[di];
+  return ttHdr(name)
+       + ttRow('#2CE0BF','Appreciate (×1)', app)
+       + ttRow('#5B738B','Commendation (×10)', com)
+       + ttSep() + ttTotal('Total Points', app + com * 10)
+       + ttHint();
+}
+
+/* ── External tooltip handler factory  (v4 — unchanged) ────────────────── */
+function makeExtTT(builder) {
+  return function(ctx) {
+    const { chart, tooltip } = ctx;
+    if (tooltip.opacity === 0) {
+      if (!ttSticky) {
+        clearTimeout(ttHideTimer);
+        ttHideTimer = setTimeout(() => { if (!ttSticky) TT.style.opacity = '0'; }, 80);
+      }
+      return;
+    }
+    if (ttSticky) return;
+    const di   = tooltip.dataPoints[0].dataIndex;
+    const rect = chart.canvas.getBoundingClientRect();
+    ttShow(builder(chart, di), rect.left + tooltip.caretX, rect.top + tooltip.caretY, false);
+  };
+}
+
+/* ── Click handler factory  (v4 — unchanged) ────────────────────────────── */
+function makeClick(builder) {
+  return function(event, elements) {
+    if (!elements || !elements.length) {
+      if (ttSticky) ttHide(true);
+      return;
+    }
+    if (ttSticky) { ttHide(true); return; }
+    const di = elements[0].index;
+    const nx = event.native?.clientX ?? 0;
+    const ny = event.native?.clientY ?? 0;
+    ttShow(builder(this, di), nx, ny, true);
+  };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 14 — CHART CONFIG FACTORIES  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+function baseCfg(labels, datasets, xMax, xMin, ttBuilder) {
+  return {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 380 },
+      layout: { padding: { right:28, left:0, top:2, bottom:2 } },
+      interaction: { mode:'index', intersect:false },
+      onClick: makeClick(ttBuilder),
+      plugins: {
+        legend:     { display:false },
+        tooltip:    { enabled:false, external: makeExtTT(ttBuilder) },
+        datalabels: {
+          anchor:'end', align:'end', clamp:true,
+          color: themeDlblColor(),
+          font:{ family:F, size:9, weight:'600' },
+          display:   ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+          formatter: v   => v > 0 ? v : ''
+        }
+      },
+      scales: {
+        x: {
+          min:xMin, max:xMax, stacked:false,
+          grid: { color: themeGridColor(), lineWidth:0.7 },
+          ticks: { display:false },
+          border: { display:false }
+        },
+        y: {
+          stacked:false, grid: { display:false },
+          ticks: { font:{ family:F, size:9.5 }, color: themeTickColor(), padding:4 },
+          border: { display:false }
+        }
+      }
+    }
+  };
+}
+
+function stackedCfg(labels, datasets, xMax, xMin, ttBuilder) {
+  const cfg = baseCfg(labels, datasets, xMax, xMin, ttBuilder);
+  cfg.options.scales.x.stacked = true;
+  cfg.options.scales.y.stacked = true;
+  cfg.options.layout.padding.right = 8;
+  cfg.options.plugins.datalabels = { display:false };
+  datasets.forEach(ds => {
+    ds.datalabels = {
+      anchor:'center', align:'center', color:'#FFFFFF',
+      font:{ family:F, size:9, weight:'700' },
+      display:   ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+      formatter: v   => v > 0 ? v : ''
+    };
+  });
+  return cfg;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 15 — DATA PROCESSING  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+function processData(D) {
+  const cfg = D.config;
+  const ax  = D.axis_limits;
+
+  const cpA  = [...D.case_productivity].sort((a,b) => a.name.localeCompare(b.name));
+  const cpLb = cpA.map(r => r.name);
+  const cpCs = cpA.map(r => r.cs_created);
+  const cpCl = cpA.map(r => r.client_created);
+  const smap = {};
+  D.case_productivity.forEach(r => smap[r.name] = r);
+  const cpAP = cpLb.map(n => smap[n].status==='Progressing'   ? smap[n].avg : 0);
+  const cpAS = cpLb.map(n => smap[n].status==='Successful'    ? smap[n].avg : 0);
+  const cpAO = cpLb.map(n => smap[n].status==='Outstanding'   ? smap[n].avg : 0);
+  const cpAE = cpLb.map(n => smap[n].status==='Extraordinary' ? smap[n].avg : 0);
+
+  const em = D.touch_base.emails_sorted;
+  const ca = D.touch_base.calls_sorted;
+
+  const svRaw  = D.surveys.raw;
+  const svRank = D.surveys.ranking;
+
+  const ql   = D.quality;
+  _lastQlSorted = ql.sorted;
+  const qLb  = ql.sorted.map(r => r.name);
+  const qPct = ql.sorted.map(r => r.pct);
+  const qCol = ql.sorted.map(r =>
+    r.pct >= 100 ? '#2CE0BF' : (r.pct > 0 ? '#0070F2' : themeQnulColor())
+  );
+  const qMin = ql.all_null ? 0  : 70;
+  const qMax = ql.all_null ? 10 : 105;
+
+  const pf   = D.pftc.sorted;
+  const pfLb = pf.map(r => r.name + '  ' + r.total + ' pts');
+
+  return { cfg, ax, cpA, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
+           em, ca, svRaw, svRank, ql, qLb, qPct, qCol, qMin, qMax,
+           pf, pfLb };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 16 — HTML RENDERERS  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+const STATUS_STYLE = {
+  Progressing:   { bg:'#B0C6D6', fg:'#1D2329' },
+  Successful:    { bg:'#89D1FF', fg:'#00144A' },
+  Outstanding:   { bg:'#1B90FF', fg:'#FFFFFF' },
+  Extraordinary: { bg:'#5B738B', fg:'#FFFFFF' }
+};
+
+function renderHeader(cfg) {
+  document.getElementById('hdr-month').textContent   = cfg.month_name + ' ' + cfg.year;
+  document.getElementById('hdr-version').textContent = cfg.version;
+  document.getElementById('hdr-date').textContent    = cfg.data_as_of;
+}
+
+function renderCpTable(cpA) {
+  document.getElementById('cp-tbody').innerHTML = cpA.map(r => {
+    const s = STATUS_STYLE[r.status] || { bg:'#EEF2F7', fg:'#1D2329' };
+    return '<tr>' +
+      '<td class="cp-name">' + r.name + '</td>' +
+      '<td class="cp-n">'   + r.cs_created     + '</td>' +
+      '<td class="cp-n">'   + r.client_created + '</td>' +
+      '<td class="cp-n">'   + r.total          + '</td>' +
+      '<td class="cp-n">'   + r.avg.toFixed(2) + '</td>' +
+      '<td class="cp-s"><span class="badge" style="background:' + s.bg + ';color:' + s.fg + '">' +
+        r.status + '</span></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderSvTable(svRaw, cfg) {
+  document.getElementById('sv-months').textContent     = cfg.prev_month_name + ' vs ' + cfg.month_name;
+  document.getElementById('sv-month-rank').textContent = cfg.month_name;
+  document.getElementById('sv-prev-hdr').textContent   = cfg.prev_month_name;
+  document.getElementById('sv-curr-hdr').textContent   = cfg.month_name;
+  document.getElementById('sv-tbody').innerHTML = svRaw.map(r => {
+    const col = r.trend_dir==='up' ? '#107E3E' : r.trend_dir==='down' ? '#BB0000' : '#6D7990';
+    return '<tr>' +
+      '<td class="svt-name">' + r.name + '</td>' +
+      '<td class="svt-n">'    + r.prev + '</td>' +
+      '<td class="svt-n">'    + r.curr + '</td>' +
+      '<td class="svt-t"><span style="color:' + col + ';font-weight:600">' + r.trend + '</span></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderQualityNote(ql) {
+  const el = document.getElementById('q-note');
+  if (ql.all_null) {
+    el.textContent = '(Not yet recorded this period)';
+    el.style.display = 'block';
+  } else if (ql.partial_null) {
+    el.textContent = '(Data partial — not all members recorded)';
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function renderFooter(cfg) {
+  document.getElementById('footer-info').textContent =
+    cfg.version + '  •  Team Josh Executive Dashboard  •  ' +
+    cfg.report_date + '  •  Data as of ' + cfg.data_as_of;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 17 — BUILD ALL CHARTS  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+function buildCharts(p) {
+  /* ── Guard: Chart.js must be loaded before we try to build charts ──── */
+  if (typeof Chart === 'undefined') {
+    console.error('[Charts] Chart.js did not load — cdn.jsdelivr.net may be blocked on this network.');
+    showToast('Charts unavailable — Chart.js could not load. Check your network / proxy.');
+    return;
+  }
+  /* Register datalabels plugin (safe to call multiple times — Chart.js deduplicates) */
+  if (typeof ChartDataLabels !== 'undefined') {
+    try { Chart.register(ChartDataLabels); } catch(e) { /* already registered */ }
+  }
+
+  const { cfg, ax, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
+          em, ca, svRank, ql, qLb, qPct, qCol, qMin, qMax,
+          pf, pfLb } = p;
+
+  /* ── Case Count ────────────────────────────────────────────────────── */
+  mkChart('chartCpCount', stackedCfg(
+    cpLb,
+    [
+      { label:'CS Created',     data:cpCs, backgroundColor:'#0070F2', borderRadius:2 },
+      { label:'Client Created', data:cpCl, backgroundColor:'#89D1FF', borderRadius:2 }
+    ],
+    ax.cc_max, 0, ttCpCount
+  ));
+
+  /* ── MTD Average ───────────────────────────────────────────────────── */
+  const avgDs = [
+    { label:'Progressing',   data:cpAP, backgroundColor:'#B0C6D6', borderRadius:2 },
+    { label:'Successful',    data:cpAS, backgroundColor:'#89D1FF', borderRadius:2 },
+    { label:'Outstanding',   data:cpAO, backgroundColor:'#1B90FF', borderRadius:2 },
+    { label:'Extraordinary', data:cpAE, backgroundColor:'#5B738B', borderRadius:2 }
+  ];
+  const avgCfg = stackedCfg(cpLb, avgDs, ax.avg_max, 0, ttCpAvg);
+  avgDs.forEach(ds => {
+    ds.datalabels = {
+      anchor:'center', align:'center', color:'#FFFFFF',
+      font:{ family:F, size:9, weight:'700' },
+      display:   ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+      formatter: v   => v > 0 ? v.toFixed(2) : ''
+    };
+  });
+  mkChart('chartCpAvg', avgCfg);
+
+  /* ── Touch Base Emails ─────────────────────────────────────────────── */
+  mkChart('chartEmails', baseCfg(
+    em.map(r => r.name),
+    [{ label:'Emails', data:em.map(r=>r.emails), backgroundColor:'#0070F2',
+       borderRadius:2, barThickness:14 }],
+    ax.em_max, 0, ttEmails
+  ));
+
+  /* ── Call Conversations ────────────────────────────────────────────── */
+  mkChart('chartCalls', baseCfg(
+    ca.map(r => r.name),
+    [{ label:'Calls', data:ca.map(r=>r.calls), backgroundColor:'#1B90FF',
+       borderRadius:2, barThickness:14 }],
+    ax.call_max, 0, ttCalls
+  ));
+
+  /* ── Survey Ranking ────────────────────────────────────────────────── */
+  const svCfg = baseCfg(
+    svRank.map(r => r.name),
+    [
+      { label:cfg.prev_month_name, data:svRank.map(r=>r.prev),
+        backgroundColor: themeSvpvColor(), borderRadius:2, barThickness:10 },
+      { label:cfg.month_name,      data:svRank.map(r=>r.curr),
+        backgroundColor:'#5B738B', borderRadius:2, barThickness:10 }
+    ],
+    ax.sv_max, 0,
+    (chart, di) => ttSvRank(chart, di, cfg.prev_month_name, cfg.month_name)
+  );
+  svCfg.options.plugins.datalabels = {
+    anchor:'end', align:'end', clamp:true, color: themeDlblColor(),
+    font:{ family:F, size:9, weight:'600' },
+    display:   ctx => ctx.datasetIndex === 1 && ctx.dataset.data[ctx.dataIndex] > 0,
+    formatter: v   => v > 0 ? v : ''
+  };
+  mkChart('chartSvRank', svCfg);
+
+  /* ── Quality ───────────────────────────────────────────────────────── */
+  const qCfg = baseCfg(
+    qLb,
+    [{ label:'Quality %', data:qPct, backgroundColor:qCol, borderRadius:2, barThickness:14 }],
+    qMax, qMin, ttQuality
+  );
+  qCfg.options.plugins.datalabels = {
+    anchor:'end', align:'end', clamp:true, color: themeDlblColor(),
+    font:{ family:F, size:9, weight:'600' },
+    display:   ctx => ctx.dataset.data[ctx.dataIndex] > 0,
+    formatter: v   => v > 0 ? v + '%' : ''
+  };
+  mkChart('chartQuality', qCfg);
+
+  /* ── PFTC ──────────────────────────────────────────────────────────── */
+  const pfCfg = stackedCfg(
+    pfLb,
+    [
+      { label:'Appreciate',   data:pf.map(r=>r.appreciate),   backgroundColor:'#2CE0BF', borderRadius:2 },
+      { label:'Commendation', data:pf.map(r=>r.commendation), backgroundColor:'#5B738B', borderRadius:2 }
+    ],
+    ax.pf_max, 0, ttPftc
+  );
+  pfCfg.options.scales.y.ticks.font  = { family:F, size:9.5, weight:'700' };
+  pfCfg.options.scales.y.ticks.color = themeTickBColor();
+  mkChart('chartPftc', pfCfg);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 18 — DASHBOARD ORCHESTRATOR  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+function buildDashboard(D) {
+  const p = processData(D);
+  renderHeader(p.cfg);
+  renderCpTable(p.cpA);
+  renderSvTable(p.svRaw, p.cfg);
+  renderQualityNote(p.ql);
+  renderFooter(p.cfg);
+  buildCharts(p);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 19 — TOAST  (v4 — unchanged)
+════════════════════════════════════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 20 — ORCHESTRATION  (updated for Graph API)
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Set or update the "Last refreshed" line in the header meta */
+function setLastRefresh() {
+  const el = document.getElementById('last-refresh');
+  if (!el) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit', hour12:true });
+  const date = now.toLocaleDateString('en-AU', { day:'2-digit', month:'short' });
+  el.textContent = 'Last refreshed: ' + date + ' ' + time;
+  el.classList.add('visible');
+}
+
+/* Load data from Graph and render — called after sign-in and from Refresh */
+async function loadAndBuild(token) {
+  const t = token || await getToken();
+  destroyAll();
+  const D = await fetchDashboardData(t);
+  buildDashboard(D);
+  hideSignInOverlay();
+  setLastRefresh();
+  /* Load the real logo in the background — non-blocking */
+  loadLogo(t).catch(() => {});
+}
+
+/* Refresh button handler */
+async function refreshDashboard() {
+  const btn = document.getElementById('btnRefresh');
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  btn.innerHTML = '<span class="btn-icon">&#x21BB;</span> Refreshing…';
+  ttHide(true);
+  try {
+    const token = await getToken();
+    await loadAndBuild(token);
+    const D_config = document.getElementById('hdr-date')?.textContent;
+    showToast('Dashboard refreshed — ' + (D_config || ''));
+  } catch(e) {
+    console.error('[Dashboard] Refresh error:', e);
+    if (e.message && (e.message.includes('interaction_required') ||
+                       e.message.includes('login_required') ||
+                       e.message.includes('no_refresh_token'))) {
+      updateAuthUI(false);
+      showSignInOverlay();
+      showToast('Session expired — please sign in again.');
+    } else {
+      showToast('Refresh failed: ' + (e.message || 'unknown error'));
+    }
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+    btn.innerHTML = '<span class="btn-icon">&#x21BB;</span> Refresh Data';
+  }
+}
+
+/* ── Initialise on DOM ready ─────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  initTheme();      /* restore saved theme BEFORE building charts */
+  await initAuth(); /* check Microsoft 365 session and auto-load if available */
+});
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 21 — LEAVE PLANNER
+   Storage  : team-josh-leaves.json stored in the same OneDrive folder as the
+              Excel workbook. Read / written via Files.ReadWrite.All — the
+              same permission already used by the Performance Dashboard.
+              No additional Azure AD permissions are required.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Data file name ──────────────────────────────────────────────────────── */
+const LP_DATA_FILE = 'team-josh-leaves.json';
+
+const LP_META = {
+  'Vacation Leave':            { bg:'#0070F2', fg:'#FFFFFF', abbr:'VL'    },
+  'Sick Leave':                { bg:'#BB0000', fg:'#FFFFFF', abbr:'SL'    },
+  'Solo Parent Leave':         { bg:'#7B2FBE', fg:'#FFFFFF', abbr:'SPL'   },
+  'Maternity/Paternity Leave': { bg:'#C0197D', fg:'#FFFFFF', abbr:'ML/PL' },
+  'Unpaid Leave':              { bg:'#6D7990', fg:'#FFFFFF', abbr:'UL'    },
+  'Bereavement Leave':         { bg:'#3D4F5D', fg:'#FFFFFF', abbr:'BL'    },
+  'Holiday Leave':             { bg:'#107E3E', fg:'#FFFFFF', abbr:'HL'    },
+  'Half-day VL':               { bg:'#71B9FF', fg:'#00144A', abbr:'HDVL'  },
+  'Other':                     { bg:'#2CE0BF', fg:'#1D2329', abbr:null    }
+};
+
+function lpGetMeta(leaveType, customType) {
+  const m = LP_META[leaveType] || LP_META['Other'];
+  if (m.abbr) return m;
+  /* For "Other", derive a short abbreviation from the custom label */
+  let abbr = '';
+  if (customType) {
+    abbr = customType.split(/\s+/).map(w => w[0]).join('').toUpperCase().substring(0,4);
+    if (!abbr) abbr = customType.substring(0,3).toUpperCase();
+  }
+  return { ...m, abbr: abbr || 'OTH' };
+}
+
+function lpBuddyDisplay(buddy, customBuddy) {
+  return buddy === 'Others' ? (customBuddy || 'Others') : (buddy || '—');
+}
+
+/* ── State ───────────────────────────────────────────────────────────────── */
+let lpYear     = new Date().getFullYear();
+let lpMonth    = new Date().getMonth();   /* 0-indexed */
+let lpLeaves   = [];
+let lpDataFolderId = null;   /* OneDrive folder containing the Excel file  */
+let lpLoaded   = false;
+let lpEditId   = null;
+let lpDeleteId = null;
+let lpViewId   = null;
+
+/* ════════════════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+════════════════════════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  const perf  = document.getElementById('section-performance');
+  const leave = document.getElementById('section-leave');
+  const pBtn  = document.getElementById('tab-btn-perf');
+  const lBtn  = document.getElementById('tab-btn-leave');
+
+  if (tab === 'performance') {
+    perf.classList.remove('hidden');
+    leave.classList.add('hidden');
+    pBtn.classList.add('active');
+    lBtn.classList.remove('active');
+  } else {
+    perf.classList.add('hidden');
+    leave.classList.remove('hidden');
+    pBtn.classList.remove('active');
+    lBtn.classList.add('active');
+    /* Lazy-load leave data on first visit to the tab */
+    if (!lpLoaded) {
+      if (TK.hasAny()) {
+        lpInitAndLoad();
+      } else {
+        lpSetStatus('Please sign in using the Performance Dashboard tab first.');
+        lpShowMessage('Sign in to view the Leave Planner.');
+      }
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   INITIALISE + LOAD
+════════════════════════════════════════════════════════════════════════════ */
+async function lpInitAndLoad() {
+  lpSetStatus('Loading leave data…');
+  lpShowSpinner();
+  try {
+    const token = await getToken();
+    /* Ensure the Excel drive/item is resolved first */
+    if (!excelDriveId) await resolveExcelFile(token);
+    /* Find the folder that holds the Excel workbook */
+    await lpResolveDataFolder(token);
+    /* Read leave data from the JSON file in that folder */
+    await lpReadLeavesFile(token);
+    lpLoaded = true;
+    lpBuildLegend();
+    lpRenderCalendar();
+    lpSetStatus('');
+  } catch(e) {
+    console.error('[LP] Init error:', e);
+    lpSetStatus('Could not load leave data: ' + e.message);
+    lpShowMessage(
+      '<div style="text-align:center;padding:16px;font-size:11.5px">' +
+      '<div style="color:#BB0000;margin-bottom:8px">Could not load leave data.</div>' +
+      '<div style="color:var(--cm);margin-bottom:14px;font-size:10.5px">' + e.message + '</div>' +
+      '<button class="lp-btn-secondary" onclick="lpInitAndLoad()">Retry</button>' +
+      '</div>'
+    );
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DATA FOLDER RESOLUTION
+   Finds the OneDrive folder that contains the Excel workbook — the JSON
+   data file will be stored alongside it in the same folder.
+════════════════════════════════════════════════════════════════════════════ */
+async function lpResolveDataFolder(token) {
+  if (lpDataFolderId) return;
+  const item = await graphGet(
+    '/drives/' + excelDriveId + '/items/' + excelItemId +
+    '?$select=parentReference',
+    token
+  );
+  if (!item.parentReference || !item.parentReference.id) {
+    throw new Error('Cannot determine the OneDrive folder for the Excel file.');
+  }
+  lpDataFolderId = item.parentReference.id;
+  console.log('[LP] Data folder resolved:', lpDataFolderId);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   READ  —  GET team-josh-leaves.json from OneDrive
+════════════════════════════════════════════════════════════════════════════ */
+async function lpReadLeavesFile(token) {
+  const url = 'https://graph.microsoft.com/v1.0/drives/' + excelDriveId +
+    '/items/' + lpDataFolderId + ':/' + LP_DATA_FILE + ':/content';
+  const resp = await fetch(url, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (resp.status === 404) {
+    /* File does not exist yet — first run, start with empty array */
+    lpLeaves = [];
+    console.log('[LP] Data file not found — starting with empty leave list.');
+    return;
+  }
+  if (!resp.ok) throw new Error('Could not read leave data: HTTP ' + resp.status);
+  const data = await resp.json();
+  lpLeaves = Array.isArray(data.leaves) ? data.leaves : [];
+  console.log('[LP] Loaded', lpLeaves.length, 'leave entries.');
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WRITE  —  PUT entire lpLeaves array back to team-josh-leaves.json
+   Re-reads the latest file first (optimistic concurrency), applies the
+   pending change, then writes — minimising overwrite conflicts.
+════════════════════════════════════════════════════════════════════════════ */
+async function lpWriteLeavesFile(token) {
+  const url = 'https://graph.microsoft.com/v1.0/drives/' + excelDriveId +
+    '/items/' + lpDataFolderId + ':/' + LP_DATA_FILE + ':/content';
+  const payload = JSON.stringify({ leaves: lpLeaves }, null, 2);
+  const resp = await fetch(url, {
+    method:  'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type':  'application/octet-stream'
+    },
+    body: payload
+  });
+  if (!resp.ok) throw new Error('Could not save leave data: HTTP ' + resp.status);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   UNIQUE ID GENERATOR  (replaces SharePoint's auto-generated item id)
+════════════════════════════════════════════════════════════════════════════ */
+function lpNewId() {
+  return 'lp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PHILIPPINE HOLIDAYS
+   Fixed entries repeat every year (month + day).
+   byYear entries cover moveable feasts and proclaimed holidays.
+   Add new year blocks as proclamations are issued each December.
+   Islamic holidays (Eid'l Fitr, Eid'l Adha) are listed per year because
+   their dates are determined by moon sighting proclamation.
+════════════════════════════════════════════════════════════════════════════ */
+const PH_HOLIDAYS = {
+  fixed: [
+    { month:1,  day:1,  name:"New Year's Day",              type:'regular' },
+    { month:4,  day:9,  name:"Araw ng Kagitingan",          type:'regular' },
+    { month:5,  day:1,  name:"Labor Day",                   type:'regular' },
+    { month:6,  day:12, name:"Independence Day",            type:'regular' },
+    { month:8,  day:21, name:"Ninoy Aquino Day",            type:'special' },
+    { month:11, day:1,  name:"All Saints' Day",             type:'regular' },
+    { month:11, day:2,  name:"All Souls' Day",              type:'special' },
+    { month:11, day:30, name:"Bonifacio Day",               type:'regular' },
+    { month:12, day:8,  name:"Immaculate Conception",       type:'special' },
+    { month:12, day:25, name:"Christmas Day",               type:'regular' },
+    { month:12, day:30, name:"Rizal Day",                   type:'regular' },
+    { month:12, day:31, name:"New Year's Eve",              type:'special' }
+  ],
+  byYear: {
+    2025: [
+      { date:'2025-01-29', name:"Chinese New Year",         type:'special' },
+      { date:'2025-02-25', name:"EDSA Anniversary",         type:'special' },
+      { date:'2025-03-31', name:"Eid'l Fitr",               type:'regular' },
+      { date:'2025-04-17', name:"Maundy Thursday",          type:'regular' },
+      { date:'2025-04-18', name:"Good Friday",              type:'regular' },
+      { date:'2025-04-19', name:"Black Saturday",           type:'special' },
+      { date:'2025-06-07', name:"Eid'l Adha",               type:'regular' },
+      { date:'2025-08-25', name:"National Heroes Day",      type:'regular' },
+      { date:'2025-12-24', name:"Christmas Eve",            type:'special' }
+    ],
+    2026: [
+      { date:'2026-02-17', name:"Chinese New Year",         type:'special' },
+      { date:'2026-02-25', name:"EDSA Anniversary",         type:'special' },
+      { date:'2026-03-20', name:"Eid'l Fitr",               type:'regular' },
+      { date:'2026-04-02', name:"Maundy Thursday",          type:'regular' },
+      { date:'2026-04-03', name:"Good Friday",              type:'regular' },
+      { date:'2026-04-04', name:"Black Saturday",           type:'special' },
+      { date:'2026-05-27', name:"Eid'l Adha",               type:'regular' },
+      { date:'2026-08-31', name:"National Heroes Day",      type:'regular' },
+      { date:'2026-12-24', name:"Christmas Eve",            type:'special' }
+    ],
+    2027: [
+      { date:'2027-02-06', name:"Chinese New Year",         type:'special' },
+      { date:'2027-02-25', name:"EDSA Anniversary",         type:'special' },
+      { date:'2027-03-09', name:"Eid'l Fitr",               type:'regular' },
+      { date:'2027-03-25', name:"Maundy Thursday",          type:'regular' },
+      { date:'2027-03-26', name:"Good Friday",              type:'regular' },
+      { date:'2027-03-27', name:"Black Saturday",           type:'special' },
+      { date:'2027-05-16', name:"Eid'l Adha",               type:'regular' },
+      { date:'2027-08-30', name:"National Heroes Day",      type:'regular' },
+      { date:'2027-12-24', name:"Christmas Eve",            type:'special' }
+    ]
+  }
+};
+
+function lpHolidaysForDate(dateStr) {
+  const parts = dateStr.split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  const d = parseInt(parts[2], 10);
+  const results = [];
+  PH_HOLIDAYS.fixed.forEach(h => {
+    if (h.month === m && h.day === d) results.push(h);
+  });
+  (PH_HOLIDAYS.byYear[y] || []).forEach(h => {
+    if (h.date === dateStr) results.push(h);
+  });
+  return results;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CALENDAR RENDERING
+════════════════════════════════════════════════════════════════════════════ */
+function lpRenderCalendar() {
+  /* Update month label */
+  const label = document.getElementById('lp-month-label');
+  if (label) label.textContent = MONTH_NAMES[lpMonth] + ' ' + lpYear;
+
+  const grid = document.getElementById('lp-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  const firstDOW     = new Date(lpYear, lpMonth, 1).getDay(); /* 0=Sun */
+  const daysInMonth  = new Date(lpYear, lpMonth + 1, 0).getDate();
+  const daysInPrev   = new Date(lpYear, lpMonth, 0).getDate();
+  const totalCells   = Math.ceil((firstDOW + daysInMonth) / 7) * 7;
+
+  for (let i = 0; i < totalCells; i++) {
+    let day, m, y, isOther;
+
+    if (i < firstDOW) {
+      day = daysInPrev - firstDOW + i + 1;
+      m   = lpMonth - 1; y = lpYear;
+      if (m < 0) { m = 11; y--; }
+      isOther = true;
+    } else if (i < firstDOW + daysInMonth) {
+      day = i - firstDOW + 1;
+      m   = lpMonth; y = lpYear;
+      isOther = false;
+    } else {
+      day = i - firstDOW - daysInMonth + 1;
+      m   = lpMonth + 1; y = lpYear;
+      if (m > 11) { m = 0; y++; }
+      isOther = true;
+    }
+
+    const dateStr = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+    const isToday = dateStr === todayStr;
+
+    /* Build cell */
+    const cell = document.createElement('div');
+    cell.className = 'lp-day' +
+      (isOther ? ' other-month' : '') +
+      (isToday ? ' today'       : '');
+    cell.dataset.date = dateStr;
+
+    /* Day number */
+    const num = document.createElement('div');
+    num.className   = 'lp-day-num';
+    num.textContent = day;
+    cell.appendChild(num);
+
+    /* Philippine holiday badges — rendered above leave entries, not clickable */
+    lpHolidaysForDate(dateStr).forEach(h => {
+      const badge = document.createElement('div');
+      badge.className = 'lp-holiday' + (h.type === 'special' ? ' lp-holiday-special' : '');
+      badge.textContent = '\uD83C\uDDF5\uD83C\uDDED ' + h.name;
+      badge.title = h.name + (h.type === 'regular' ? ' (Regular Holiday)' : ' (Special Non-Working)');
+      cell.appendChild(badge);
+    });
+
+    /* Leave entry pills */
+    const entriesDiv = document.createElement('div');
+    entriesDiv.className = 'lp-day-entries';
+
+    lpLeavesForDate(dateStr).forEach(lv => {
+      const meta = lpGetMeta(lv.leaveType, lv.customType);
+      const pill = document.createElement('div');
+      pill.className            = 'lp-entry';
+      pill.style.background     = meta.bg;
+      pill.style.color          = meta.fg;
+      pill.textContent          = lv.name + ' \u2013 ' + meta.abbr;
+      const tipType = lv.leaveType === 'Other'
+        ? (lv.customType || 'Other')
+        : lv.leaveType;
+      pill.title = lv.name + ' \u2014 ' + tipType +
+        (lv.startDate !== lv.endDate
+          ? ' (' + lpFmtDate(lv.startDate) + ' \u2013 ' + lpFmtDate(lv.endDate) + ')'
+          : '');
+      pill.addEventListener('click', e => { e.stopPropagation(); lpOpenView(lv.id); });
+      entriesDiv.appendChild(pill);
+    });
+
+    cell.appendChild(entriesDiv);
+
+    /* Click empty space in current-month cell → add leave */
+    if (!isOther) {
+      cell.addEventListener('click', () => lpOpenAddDialog(dateStr));
+    }
+
+    grid.appendChild(cell);
+  }
+}
+
+function lpLeavesForDate(dateStr) {
+  return lpLeaves.filter(lv =>
+    lv.startDate && lv.endDate &&
+    lv.startDate <= dateStr && lv.endDate >= dateStr
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LEGEND
+════════════════════════════════════════════════════════════════════════════ */
+function lpBuildLegend() {
+  const el = document.getElementById('lp-legend');
+  if (!el) return;
+  el.innerHTML = Object.entries(LP_META)
+    .map(([type, m]) =>
+      '<div class="lp-leg-item">' +
+      '<div class="lp-leg-dot" style="background:' + m.bg + '"></div>' +
+      '<span class="lp-leg-abbr">' + (m.abbr || 'OTH') + '</span>' +
+      '<span>' + type + '</span>' +
+      '</div>'
+    ).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MONTH NAVIGATION
+════════════════════════════════════════════════════════════════════════════ */
+function lpPrevMonth() {
+  lpMonth--; if (lpMonth < 0)  { lpMonth = 11; lpYear--; }
+  lpRenderCalendar();
+}
+function lpNextMonth() {
+  lpMonth++; if (lpMonth > 11) { lpMonth = 0;  lpYear++; }
+  lpRenderCalendar();
+}
+function lpGoToday() {
+  const n = new Date();
+  lpYear  = n.getFullYear();
+  lpMonth = n.getMonth();
+  lpRenderCalendar();
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   STATUS / LOADING
+════════════════════════════════════════════════════════════════════════════ */
+function lpSetStatus(msg) {
+  const el = document.getElementById('lp-status');
+  if (el) el.textContent = msg;
+}
+function lpShowSpinner() {
+  const el = document.getElementById('lp-grid');
+  if (el) el.innerHTML =
+    '<div class="lp-loading" style="grid-column:1/-1">' +
+    '<div class="lp-spinner"></div>' +
+    '<span>Loading leave data from SharePoint…</span>' +
+    '</div>';
+  const lbl = document.getElementById('lp-month-label');
+  if (lbl) lbl.textContent = MONTH_NAMES[lpMonth] + ' ' + lpYear;
+}
+function lpShowMessage(msg) {
+  const el = document.getElementById('lp-grid');
+  if (el) el.innerHTML =
+    '<div class="lp-loading" style="grid-column:1/-1"><span>' + msg + '</span></div>';
+  const lbl = document.getElementById('lp-month-label');
+  if (lbl) lbl.textContent = MONTH_NAMES[lpMonth] + ' ' + lpYear;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ADD / EDIT DIALOG
+════════════════════════════════════════════════════════════════════════════ */
+function lpOpenAddDialog(dateStr) {
+  if (!TK.hasAny()) {
+    showToast('Please sign in first.');
+    return;
+  }
+  lpEditId = null;
+  document.getElementById('lp-form-title').textContent = 'Add Leave';
+  document.getElementById('lp-save-btn').textContent   = 'Save';
+
+  /* Reset all fields */
+  document.getElementById('lp-f-name').value         = '';
+  document.getElementById('lp-f-type').value         = '';
+  document.getElementById('lp-f-custom').value       = '';
+  document.getElementById('lp-f-start').value        = dateStr || '';
+  document.getElementById('lp-f-end').value          = dateStr || '';
+  document.getElementById('lp-f-buddy').value        = '';
+  document.getElementById('lp-f-buddy-custom').value = '';
+
+  document.getElementById('lp-f-custom-wrap').style.display      = 'none';
+  document.getElementById('lp-f-buddy-custom-wrap').style.display = 'none';
+
+  document.getElementById('lp-form-overlay').classList.remove('hidden');
+}
+
+function lpOpenEditDialog(id) {
+  const lv = lpLeaves.find(l => l.id === id);
+  if (!lv) return;
+  lpEditId = id;
+
+  document.getElementById('lp-form-title').textContent = 'Edit Leave';
+  document.getElementById('lp-save-btn').textContent   = 'Update';
+
+  document.getElementById('lp-f-name').value         = lv.name;
+  document.getElementById('lp-f-type').value         = lv.leaveType;
+  document.getElementById('lp-f-custom').value       = lv.customType;
+  document.getElementById('lp-f-start').value        = lv.startDate;
+  document.getElementById('lp-f-end').value          = lv.endDate;
+  document.getElementById('lp-f-buddy').value        = lv.buddy;
+  document.getElementById('lp-f-buddy-custom').value = lv.customBuddy;
+
+  document.getElementById('lp-f-custom-wrap').style.display =
+    lv.leaveType === 'Other' ? 'flex' : 'none';
+  document.getElementById('lp-f-buddy-custom-wrap').style.display =
+    lv.buddy === 'Others' ? 'flex' : 'none';
+
+  document.getElementById('lp-form-overlay').classList.remove('hidden');
+}
+
+function lpCloseForm() {
+  document.getElementById('lp-form-overlay').classList.add('hidden');
+}
+
+function lpTypeChange() {
+  const v = document.getElementById('lp-f-type').value;
+  document.getElementById('lp-f-custom-wrap').style.display =
+    v === 'Other' ? 'flex' : 'none';
+}
+function lpBuddyChange() {
+  const v = document.getElementById('lp-f-buddy').value;
+  document.getElementById('lp-f-buddy-custom-wrap').style.display =
+    v === 'Others' ? 'flex' : 'none';
+}
+
+async function lpSaveLeave() {
+  /* Guard: data folder must be resolved before we can write */
+  if (!lpDataFolderId) {
+    showToast('Leave Planner is still loading — please wait a moment and try again.');
+    return;
+  }
+
+  const name  = document.getElementById('lp-f-name').value.trim();
+  const type  = document.getElementById('lp-f-type').value;
+  const cust  = document.getElementById('lp-f-custom').value.trim();
+  const sDate = document.getElementById('lp-f-start').value;
+  const eDate = document.getElementById('lp-f-end').value;
+  const buddy = document.getElementById('lp-f-buddy').value;
+  const bcust = document.getElementById('lp-f-buddy-custom').value.trim();
+
+  /* Validation */
+  if (!name)               { showToast('Please select a name.');         return; }
+  if (!type)               { showToast('Please select a leave type.');   return; }
+  if (type === 'Other' && !cust)
+                           { showToast('Please specify the leave type.'); return; }
+  if (!sDate)              { showToast('Please enter a start date.');    return; }
+  if (!buddy)              { showToast('Please select an OOO buddy.');   return; }
+  if (buddy === 'Others' && !bcust)
+                           { showToast('Please enter the buddy name.');  return; }
+
+  /* Default end = start (single day) */
+  const endDate = eDate || sDate;
+  if (endDate < sDate)     { showToast('End date cannot be before start date.'); return; }
+
+  const fields = {
+    name,
+    leaveType:   type,
+    customType:  type === 'Other'    ? cust  : '',
+    startDate:   sDate,
+    endDate,
+    buddy,
+    customBuddy: buddy === 'Others'  ? bcust : ''
+  };
+
+  const saveBtn = document.getElementById('lp-save-btn');
+  saveBtn.disabled    = true;
+  saveBtn.textContent = lpEditId ? 'Updating…' : 'Saving…';
+
+  try {
+    const token = await getToken();
+
+    if (lpEditId) {
+      /* Edit: update the entry in memory then persist */
+      const idx = lpLeaves.findIndex(l => l.id === lpEditId);
+      if (idx >= 0) lpLeaves[idx] = { ...lpLeaves[idx], ...fields };
+      await lpWriteLeavesFile(token);
+      showToast('Leave entry updated.');
+    } else {
+      /* Add: push new entry with generated id then persist */
+      lpLeaves.push({
+        id:         lpNewId(),
+        ...fields,
+        addedBy:    TK.name() || 'Dashboard User',
+        addedAt:    new Date().toISOString()
+      });
+      await lpWriteLeavesFile(token);
+      showToast('Leave entry saved.');
+    }
+
+    lpCloseForm();
+    lpCloseView();
+    lpRenderCalendar();
+  } catch(e) {
+    console.error('[LP] Save error:', e);
+    showToast('Save failed: ' + e.message);
+  } finally {
+    saveBtn.disabled    = false;
+    saveBtn.textContent = lpEditId ? 'Update' : 'Save';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   VIEW DIALOG
+════════════════════════════════════════════════════════════════════════════ */
+function lpOpenView(id) {
+  const lv = lpLeaves.find(l => l.id === id);
+  if (!lv) return;
+  lpViewId = id;
+
+  const meta      = lpGetMeta(lv.leaveType, lv.customType);
+  const typeLabel = lv.leaveType === 'Other'
+    ? (lv.customType || 'Other')
+    : lv.leaveType;
+  const buddyLabel = lpBuddyDisplay(lv.buddy, lv.customBuddy);
+  const dateRange  = lv.startDate === lv.endDate
+    ? lpFmtDate(lv.startDate)
+    : lpFmtDate(lv.startDate) + ' \u2013 ' + lpFmtDate(lv.endDate);
+
+  const body = document.getElementById('lp-view-body');
+  body.innerHTML =
+    lpVRow('Date',
+      '<strong>' + dateRange + '</strong>') +
+    lpVRow('Name',
+      lv.name) +
+    lpVRow('Leave Type',
+      '<span style="display:inline-flex;align-items:center;gap:6px">' +
+      '<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:' + meta.bg + '"></span>' +
+      typeLabel +
+      '</span>') +
+    lpVRow('OOO Buddy', buddyLabel) +
+    (lv.addedBy ? lpVRow('Added By', lv.addedBy) : '');
+
+  document.getElementById('lp-view-overlay').classList.remove('hidden');
+}
+
+function lpVRow(lbl, val) {
+  return '<div class="lp-view-row">' +
+    '<span class="lp-view-lbl">' + lbl + '</span>' +
+    '<span class="lp-view-val">' + val + '</span>' +
+    '</div>';
+}
+
+function lpFmtDate(s) {
+  if (!s) return '';
+  const p = s.split('-');
+  if (p.length !== 3) return s;
+  return parseInt(p[2], 10) + ' ' + MONTH_NAMES[parseInt(p[1], 10) - 1] + ' ' + p[0];
+}
+
+function lpCloseView() {
+  document.getElementById('lp-view-overlay').classList.add('hidden');
+  lpViewId = null;
+}
+
+function lpEditFromView() {
+  const id = lpViewId;
+  lpCloseView();
+  lpOpenEditDialog(id);
+}
+
+function lpDeleteFromView() {
+  lpDeleteId = lpViewId;
+  document.getElementById('lp-del-overlay').classList.remove('hidden');
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DELETE CONFIRM
+════════════════════════════════════════════════════════════════════════════ */
+function lpCloseDelete() {
+  document.getElementById('lp-del-overlay').classList.add('hidden');
+  lpDeleteId = null;
+}
+
+async function lpConfirmDelete() {
+  if (!lpDeleteId) return;
+  const btn = document.getElementById('lp-del-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Deleting…'; }
+  try {
+    const token = await getToken();
+    lpLeaves = lpLeaves.filter(l => l.id !== lpDeleteId);
+    await lpWriteLeavesFile(token);
+    showToast('Leave entry deleted.');
+    lpCloseDelete();
+    lpCloseView();
+    lpRenderCalendar();
+  } catch(e) {
+    console.error('[LP] Delete error:', e);
+    showToast('Delete failed: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Delete'; }
+    lpDeleteId = null;
+  }
+}
+
+/* Overlay background click closes the dialog */
+function lpOverlayClick(e, which) {
+  if (e.target !== e.currentTarget) return;
+  if (which === 'form') lpCloseForm();
+  else if (which === 'view') lpCloseView();
+  else if (which === 'del')  lpCloseDelete();
+}
+
+</script>
+</body>
+</html>
