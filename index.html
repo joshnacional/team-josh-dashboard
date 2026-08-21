@@ -7,6 +7,7 @@
 <!-- MSAL.js 2.x (browser) for delegated Microsoft 365 authentication -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 <style>
 /* ════════════════════════════════════════════════════════════════════════════
    APPROVED COLOR PALETTE  (v10 — explicitly declared)
@@ -46,8 +47,8 @@
   --cf:    #8C9BAC;
   --rh:    #F7F9FC;
   --rb:    #F0F2F5;
-  --ds:    0 4px 24px rgba(0,0,0,.18);
-  --cs:    0 1px 4px  rgba(0,0,0,.08);
+  --ds:    0 8px 32px rgba(0,0,0,.13),0 2px 8px rgba(0,0,0,.07);
+  --cs:    0 2px 8px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
   --ttbg:  #FFFFFF;
   --ttbd:  #D0D8E6;
   --tthc:  #00144A;
@@ -78,8 +79,8 @@ html[data-theme="dark"] {
   --cf:    #4A6278;
   --rh:    #1C2840;
   --rb:    #1E2D3D;
-  --ds:    0 4px 28px rgba(0,0,0,.55);
-  --cs:    0 1px 6px  rgba(0,0,0,.40);
+  --ds:    0 8px 40px rgba(0,0,0,.52),0 2px 10px rgba(0,0,0,.28);
+  --cs:    0 2px 10px rgba(0,0,0,.38),0 1px 3px rgba(0,0,0,.22);
   --ttbg:  #172030;
   --ttbd:  #2E4560;
   --tthc:  #BDD2E6;
@@ -120,7 +121,7 @@ body{
   width:100%;
   max-width:1440px;
   background:var(--db);
-  border-radius:6px;
+  border-radius:14px;
   overflow:hidden;
   box-shadow:var(--ds);
   transition:background .25s, box-shadow .25s;
@@ -161,24 +162,36 @@ body{
 }
 .hdr-user.visible{display:block}
 
-/* ── Header buttons (shared base style — v4 unchanged) ─────────────────── */
+/* ── Header buttons (premium mini-tile — same design language as nav tiles) */
 .hdr-btn{
-  background:rgba(255,255,255,.13);
-  border:1px solid rgba(255,255,255,.38);
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.28);
   color:#fff;
-  padding:5px 11px;
-  border-radius:4px;
+  padding:6px 13px;
+  border-radius:8px;
   font-size:10.5px;
   font-family:inherit;
   cursor:pointer;
   display:flex;
   align-items:center;
   gap:5px;
-  transition:background .15s, border-color .15s;
+  box-shadow:0 1px 3px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.20);
+  transition:background .15s,border-color .15s,box-shadow .15s,transform .15s ease;
+  will-change:transform;
   white-space:nowrap;
   flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
 }
-.hdr-btn:hover:not(:disabled){background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.60)}
+.hdr-btn:hover:not(:disabled){
+  background:rgba(255,255,255,.26);
+  border-color:rgba(255,255,255,.52);
+  box-shadow:0 3px 8px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.26);
+  transform:scale(1.04) translateY(-1px);
+}
+.hdr-btn:active:not(:disabled){
+  transform:scale(0.97) translateY(0px);
+  box-shadow:0 1px 2px rgba(0,0,0,.10),inset 0 1px 0 rgba(255,255,255,.15);
+}
 .hdr-btn:disabled{opacity:.45;cursor:not-allowed}
 
 /* Refresh button */
@@ -189,6 +202,9 @@ body{
 
 /* Theme toggle */
 .btn-theme{margin-left:6px;min-width:72px;justify-content:center}
+
+/* Screenshot button */
+.btn-screenshot{margin-left:4px}
 
 /* Sign-in button (header — shown only when not authenticated) */
 .btn-signin{
@@ -222,7 +238,7 @@ body{
 .signin-logo-img{
   height:58px;
   margin-bottom:20px;
-  border-radius:4px;
+  border-radius:10px;
 }
 .signin-title{
   font-size:17px;
@@ -244,7 +260,7 @@ body{
   color:#fff;
   border:none;
   padding:10px 26px;
-  border-radius:4px;
+  border-radius:10px;
   font-size:13px;
   font-family:inherit;
   font-weight:600;
@@ -269,18 +285,18 @@ body{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   grid-template-rows:auto auto;
-  gap:8px;
-  padding:8px;
+  gap:10px;
+  padding:10px;
 }
 .card-cp{grid-row:1/3}
 
 /* ════════════════════════════════════════════════════════════════════════════
    CARDS  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
-.card{background:var(--cb);border-radius:5px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--cs);transition:background .25s, box-shadow .25s}
+.card{background:var(--cb);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--cs);transition:background .25s, box-shadow .25s}
 .card-accent{height:4px;flex-shrink:0}
 .card-head{background:var(--ch);padding:6px 10px 5px;font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--ct);text-transform:uppercase;border-bottom:1px solid var(--cd);flex-shrink:0;transition:background .25s, color .25s, border-color .25s}
-.card-body{padding:8px 10px 6px;flex:1;display:flex;flex-direction:column;min-height:0}
+.card-body{padding:10px 12px 8px;flex:1;display:flex;flex-direction:column;min-height:0}
 .card-divider{height:1px;background:var(--cd);margin:6px -10px;flex-shrink:0;transition:background .25s}
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -342,6 +358,55 @@ body{
 .q-note{font-size:9px;font-style:italic;color:var(--cm);text-align:center;padding:3px 4px;margin-bottom:2px;flex-shrink:0;display:none;transition:color .25s}
 
 /* ════════════════════════════════════════════════════════════════════════════
+   IRT / ORT COMPLIANCE SECTION
+════════════════════════════════════════════════════════════════════════════ */
+.irt-section{padding:0 10px 10px}
+.irt-body{display:grid;grid-template-columns:1fr 308px;gap:10px;align-items:start}
+.irt-comp-wrap{display:flex;flex-direction:column;gap:4px}
+
+/* ── Violations box (preserved) ─── */
+.irt-viol-box{background:var(--ch);border-radius:10px;padding:8px 10px;text-align:center;margin-top:3px;transition:background .25s}
+.irt-viol-lbl{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--cm);margin-bottom:2px;transition:color .25s}
+.irt-viol-val{font-size:24px;font-weight:700;color:var(--ct);line-height:1;transition:color .25s}
+
+/* ── Compliance legend ─── */
+.irt-legend{display:flex;gap:6px 14px;flex-wrap:wrap;margin-top:6px;padding-top:6px;border-top:1px solid var(--cd);transition:border-color .25s}
+
+/* ── Premium individual compliance scorecard ─────────────────────────────── */
+.irt-sc-table{width:100%;border-collapse:collapse;font-size:9px;table-layout:fixed}
+.irt-sc-table colgroup col:nth-child(1){width:22%}
+.irt-sc-table colgroup col:nth-child(2){width:24%}
+.irt-sc-table colgroup col:nth-child(3){width:24%}
+.irt-sc-table colgroup col:nth-child(4){width:30%}
+.irt-sc-table th{font-size:8px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--cm);padding:3px 4px 4px;border-bottom:1.5px solid var(--cd);text-align:center;transition:color .25s,border-color .25s;white-space:nowrap}
+.irt-sc-table th:first-child{text-align:left}
+.irt-sc-table th.irt-th-comb{color:var(--ct);background:var(--ch);border-radius:6px 6px 0 0;transition:color .25s,background .25s}
+.irt-sc-table td{padding:3px 5px;border-bottom:1px solid var(--cg);vertical-align:middle;transition:border-color .25s}
+.irt-sc-table td:first-child{font-weight:700;font-size:9.5px;color:var(--ct);transition:color .25s}
+.irt-sc-table td.irt-td-comb{background:rgba(0,112,242,.03);border-left:1px solid var(--cd);transition:background .25s,border-color .25s}
+.irt-sc-table tr:last-child td{border-bottom:none}
+.irt-sc-table tr:hover td{background:var(--rh);transition:background .12s}
+.irt-sc-table tr:hover td.irt-td-comb{background:var(--ch)}
+
+/* ── Full-width inline progress bars (individual compliance) ── */
+.irt-pbar{position:relative;height:17px;border-radius:5px;background:var(--cg);overflow:hidden;transition:background .25s}
+.irt-pbar-fill{position:absolute;top:0;left:0;height:100%;min-width:40px;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.irt-pbar-lbl{font-size:7.5px;font-weight:700;color:#fff;white-space:nowrap;letter-spacing:.15px;text-shadow:0 1px 2px rgba(0,0,0,.22)}
+/* Combined column bar — slightly taller for visual emphasis */
+.irt-td-comb .irt-pbar{height:19px}
+.irt-td-comb .irt-pbar-lbl{font-size:8px}
+
+/* ── Team overall — 3 metric cards ───────────────────────────────────────── */
+.irt-team-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:2px}
+.irt-tc{background:var(--ch);border-radius:8px;padding:7px 5px 6px;text-align:center;border-top:2px solid transparent;transition:background .25s,border-color .25s;display:flex;flex-direction:column;align-items:center;gap:1px}
+.irt-tc-lbl{font-size:7px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--cm);line-height:1.3;transition:color .25s}
+.irt-tc-val{font-size:15px;font-weight:700;line-height:1.1;transition:color .25s;margin-top:2px}
+.irt-tc-status{font-size:7.5px;font-weight:600;line-height:1;margin-top:1px;transition:color .25s}
+.irt-tc-comb .irt-tc-val{font-size:17px}
+.irt-tc-bar{width:100%;height:2px;border-radius:2px;background:var(--cg);overflow:hidden;margin-top:3px;transition:background .25s}
+.irt-tc-bar-fill{height:2px;border-radius:2px}
+
+/* ════════════════════════════════════════════════════════════════════════════
    FOOTER  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
 .footer{text-align:center;color:var(--cf);font-size:9.5px;padding:8px 0 4px;transition:color .25s}
@@ -369,43 +434,67 @@ body{
 .tt-hint{font-size:8.5px;color:var(--ttic);margin-top:5px;padding-top:4px;border-top:1px solid var(--tths);text-align:center;transition:color .25s, border-color .25s}
 
 /* ════════════════════════════════════════════════════════════════════════════
-   TAB NAVIGATION
+   TAB NAVIGATION — iOS-inspired premium floating tiles
+   justify-content:center keeps tiles centered for any number of tabs.
 ════════════════════════════════════════════════════════════════════════════ */
 .tab-nav{
   display:flex;
   align-items:center;
+  justify-content:center;
   background:var(--db);
   border-bottom:1px solid var(--cd);
-  padding:8px 16px;
-  gap:8px;
+  padding:13px 16px;
+  gap:10px;
   flex-shrink:0;
-  transition:background .25s, border-color .25s;
+  transition:background .25s,border-color .25s;
 }
 .tab-btn{
   background:var(--cb);
   border:1px solid var(--cd);
-  color:var(--cm);
-  padding:5px 16px;
-  border-radius:20px;
+  color:var(--cx);
+  padding:10px 24px;
+  border-radius:12px;
   font-family:inherit;
   font-size:11.5px;
   font-weight:600;
   cursor:pointer;
-  letter-spacing:.2px;
-  transition:background .15s, border-color .15s, color .15s, box-shadow .15s;
+  letter-spacing:.15px;
   white-space:nowrap;
-  line-height:1.6;
+  line-height:1.5;
+  box-shadow:0 2px 8px rgba(0,0,0,.09),0 1px 2px rgba(0,0,0,.04),inset 0 1px 0 rgba(255,255,255,.70);
+  transition:background .2s,border-color .2s,color .2s,box-shadow .2s,transform .18s ease;
+  will-change:transform;
+  outline:none;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
+/* SAP pictogram inside nav tile */
+.tab-icon{
+  width:28px;height:28px;object-fit:contain;flex-shrink:0;
+  display:none;transition:filter .2s ease;
+}
+.tab-icon.loaded{display:block}
+/* Active tile: invert icon to white (works for any dark SAP pictogram) */
+.tab-btn.active .tab-icon.loaded{filter:brightness(0) invert(1)}
+/* Dark mode inactive tile: icon must be light enough to read on dark surface */
+html[data-theme="dark"] .tab-icon.loaded{filter:brightness(0) invert(1) opacity(.68)}
+html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) invert(1)}
+/* Hover: subtle scale-up + lift */
 .tab-btn:hover:not(.active){
-  border-color:#0070F2;
+  transform:scale(1.045) translateY(-2px);
+  box-shadow:0 8px 22px rgba(0,0,0,.12),0 3px 6px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.70);
+  border-color:rgba(0,112,242,.28);
   color:#0070F2;
-  background:var(--ch);
 }
+/* Active: blue gradient + elevated shadow + subtle inset highlight */
 .tab-btn.active{
-  background:#0070F2;
-  border-color:#0070F2;
-  color:#FFFFFF;
-  box-shadow:0 2px 8px rgba(0,112,242,.25);
+  background:linear-gradient(140deg,#0070F2 0%,#0057C2 100%);
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 4px 16px rgba(0,112,242,.42),0 1px 4px rgba(0,112,242,.18),inset 0 1px 0 rgba(255,255,255,.18);
+  transform:translateY(-1px);
 }
 .tab-section{display:block}
 .tab-section.hidden{display:none}
@@ -419,7 +508,7 @@ body{
 .lp-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
 .lp-nav-btn{
   background:var(--cb);border:1px solid var(--cd);color:var(--ct);
-  width:30px;height:30px;border-radius:4px;font-size:20px;line-height:1;
+  width:30px;height:30px;border-radius:8px;font-size:20px;line-height:1;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:background .15s,border-color .15s;flex-shrink:0;font-family:inherit;
 }
@@ -431,14 +520,14 @@ body{
 .lp-header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .lp-add-btn{
   background:#0070F2;color:#fff;border:none;
-  padding:6px 14px;border-radius:4px;font-size:11.5px;
+  padding:6px 14px;border-radius:8px;font-size:11.5px;
   font-family:inherit;font-weight:600;cursor:pointer;
   transition:background .15s;white-space:nowrap;
 }
 .lp-add-btn:hover{background:#0057C2}
 .lp-today-btn{
   background:var(--cb);border:1px solid var(--cd);color:var(--ct);
-  padding:5px 12px;border-radius:4px;font-size:11px;font-family:inherit;
+  padding:5px 12px;border-radius:8px;font-size:11px;font-family:inherit;
   cursor:pointer;transition:background .15s,border-color .15s;
 }
 .lp-today-btn:hover{background:var(--ch);border-color:#0070F2}
@@ -446,7 +535,7 @@ body{
 /* ── LP Legend ────────────────────────────────────────────────────────────── */
 .lp-legend{
   display:flex;flex-wrap:wrap;gap:5px 14px;margin-bottom:10px;
-  background:var(--cb);border:1px solid var(--cd);border-radius:4px;
+  background:var(--cb);border:1px solid var(--cd);border-radius:10px;
   padding:7px 12px;transition:background .25s,border-color .25s;
 }
 .lp-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--cx);transition:color .25s}
@@ -455,7 +544,7 @@ body{
 
 /* ── Calendar wrapper ─────────────────────────────────────────────────────── */
 .lp-calendar-wrap{
-  background:var(--cb);border:1px solid var(--cd);border-radius:5px;
+  background:var(--cb);border:1px solid var(--cd);border-radius:10px;
   overflow:hidden;transition:background .25s,border-color .25s;
 }
 .lp-dow-headers{display:grid;grid-template-columns:repeat(7,1fr);background:#0070F2}
@@ -543,8 +632,8 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 }
 .lp-dialog-overlay.hidden{display:none}
 .lp-dialog{
-  background:var(--cb);border-radius:6px;
-  box-shadow:0 8px 32px rgba(0,0,0,.28);
+  background:var(--cb);border-radius:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.28);
   width:100%;max-width:380px;
   display:flex;flex-direction:column;
   transition:background .25s;margin:16px;
@@ -570,7 +659,7 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 .lp-field select,
 .lp-field input[type="text"],
 .lp-field input[type="date"]{
-  background:var(--db);border:1px solid var(--cd);border-radius:4px;
+  background:var(--db);border:1px solid var(--cd);border-radius:8px;
   color:var(--cx);font-family:inherit;font-size:12px;padding:6px 8px;
   outline:none;width:100%;
   transition:border-color .15s,background .25s,color .25s;
@@ -585,20 +674,20 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 }
 .lp-btn-primary{
   background:#0070F2;color:#fff;border:none;padding:7px 18px;
-  border-radius:4px;font-family:inherit;font-size:11.5px;font-weight:600;
+  border-radius:8px;font-family:inherit;font-size:11.5px;font-weight:600;
   cursor:pointer;transition:background .15s;
 }
 .lp-btn-primary:hover{background:#0057C2}
 .lp-btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .lp-btn-secondary{
   background:var(--cb);color:var(--ct);border:1px solid var(--cd);
-  padding:7px 14px;border-radius:4px;font-family:inherit;font-size:11.5px;
+  padding:7px 14px;border-radius:8px;font-family:inherit;font-size:11.5px;
   cursor:pointer;transition:background .15s,border-color .15s;
 }
 .lp-btn-secondary:hover{background:var(--ch);border-color:var(--ct)}
 .lp-btn-danger{
   background:#BB0000;color:#fff;border:none;padding:7px 14px;
-  border-radius:4px;font-family:inherit;font-size:11.5px;font-weight:600;
+  border-radius:8px;font-family:inherit;font-size:11.5px;font-weight:600;
   cursor:pointer;transition:background .15s;
 }
 .lp-btn-danger:hover{background:#990000}
@@ -620,6 +709,441 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 
 /* Delete confirm */
 .lp-del-msg{font-size:12px;color:var(--cx);padding:4px 0;line-height:1.6;transition:color .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 22 — CLIENT ASSIGNMENT FILE  (CAF)
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Container ─────────────────────────────────────────────────────────── */
+.caf-container{padding:12px 14px 20px}
+
+/* ── Header row ─────────────────────────────────────────────────────────── */
+.caf-hdr{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;gap:12px;flex-wrap:wrap}
+.caf-hdr-left{display:flex;align-items:center;gap:8px}
+.caf-hdr-title{font-size:12px;font-weight:700;color:var(--ct);
+  letter-spacing:.3px;text-transform:uppercase;transition:color .25s}
+.caf-month-pill{background:#0070F2;color:#fff;font-size:9px;font-weight:700;
+  letter-spacing:.5px;padding:2px 9px;border-radius:20px;
+  text-transform:uppercase;line-height:1.6}
+.caf-search{background:var(--cb);border:1.5px solid var(--cd);border-radius:8px;
+  color:var(--cx);font-family:inherit;font-size:11px;padding:5px 12px;
+  outline:none;width:210px;transition:border-color .15s,background .25s,color .25s;
+  flex-shrink:0}
+.caf-search:focus{border-color:#0070F2;box-shadow:0 0 0 3px rgba(0,112,242,.10)}
+.caf-search::placeholder{color:var(--cm)}
+
+/* ── CSS Member tiles ───────────────────────────────────────────────────── */
+.caf-css-wrap{margin-bottom:12px}
+.caf-css-row{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;justify-content:center}
+.caf-tile{
+  flex:0 0 auto;min-width:88px;
+  background:var(--cb);border:1.5px solid var(--cd);border-radius:10px;
+  padding:10px 14px;text-align:center;cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03),
+             inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform .15s ease,box-shadow .15s ease,
+             background .2s,border-color .2s,opacity .2s;
+  will-change:transform;-webkit-tap-highlight-color:transparent;user-select:none}
+.caf-tile:hover:not(.caf-tile-active){
+  transform:scale(1.04) translateY(-2px);
+  box-shadow:0 6px 18px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06),
+             inset 0 1px 0 rgba(255,255,255,.55);
+  border-color:rgba(0,112,242,.30)}
+.caf-tile-active{
+  background:linear-gradient(140deg,#0070F2 0%,#0057C2 100%);
+  border-color:transparent;
+  box-shadow:0 4px 14px rgba(0,112,242,.40),0 1px 4px rgba(0,112,242,.18),
+             inset 0 1px 0 rgba(255,255,255,.16);
+  transform:translateY(-1px)}
+.caf-tile-muted{opacity:.38;box-shadow:none;transform:none !important}
+.caf-tile:active:not(.caf-tile-active){transform:scale(.97) translateY(0) !important}
+.caf-tile-name{font-size:11px;font-weight:700;color:var(--ct);
+  letter-spacing:.05px;margin-bottom:3px;transition:color .2s;line-height:1.2}
+.caf-tile-active .caf-tile-name{color:#fff}
+.caf-tile-muted .caf-tile-name{color:var(--cm)}
+.caf-tile-count{font-size:10px;font-weight:600;color:var(--cm);
+  transition:color .2s;line-height:1.3}
+.caf-tile-active .caf-tile-count{color:rgba(255,255,255,.82)}
+.caf-tile-all-sub{font-size:9.5px;font-weight:500;color:var(--cm);
+  transition:color .2s}
+.caf-tile-active .caf-tile-all-sub{color:rgba(255,255,255,.75)}
+.caf-tile-muted .caf-tile-count,.caf-tile-muted .caf-tile-all-sub{color:var(--cf)}
+
+/* ── Summary cards ──────────────────────────────────────────────────────── */
+.caf-summary{display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:12px}
+@media(max-width:640px){.caf-summary{grid-template-columns:repeat(2,1fr)}}
+.caf-sum-card{background:var(--cb);border-radius:10px;padding:12px 14px;
+  border-top:2.5px solid var(--cd);
+  box-shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03);
+  transition:background .25s,border-color .25s,box-shadow .25s}
+.caf-sum-lbl{font-size:8px;font-weight:700;letter-spacing:.55px;
+  text-transform:uppercase;color:var(--cm);margin-bottom:5px;transition:color .25s}
+.caf-sum-val{font-size:26px;font-weight:700;line-height:1;transition:color .25s}
+.caf-sum-sub{font-size:9px;color:var(--cm);margin-top:3px;transition:color .25s}
+
+/* ── Table card ─────────────────────────────────────────────────────────── */
+.caf-tbl-card{background:var(--cb);border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03);overflow:hidden}
+.caf-tbl-bar{display:flex;align-items:center;gap:8px;padding:10px 12px 8px;
+  border-bottom:1px solid var(--cd);flex-wrap:wrap;transition:border-color .25s}
+.caf-tbl-bar-title{font-size:9.5px;font-weight:700;color:var(--ct);
+  letter-spacing:.4px;text-transform:uppercase;flex:1;transition:color .25s}
+.caf-row-badge{background:var(--ch);color:var(--ct);font-size:9px;font-weight:700;
+  padding:2px 9px;border-radius:20px;white-space:nowrap;
+  transition:background .25s,color .25s}
+.caf-clear-btn{background:var(--ch);border:1px solid var(--cd);color:var(--ct);
+  font-family:inherit;font-size:9.5px;font-weight:600;padding:4px 11px;
+  border-radius:6px;cursor:pointer;white-space:nowrap;
+  transition:background .15s,border-color .15s,color .15s}
+.caf-clear-btn:hover{background:var(--cg);border-color:var(--cf)}
+.caf-tbl-wrap{overflow-x:auto;max-height:500px;overflow-y:auto}
+.caf-tbl{width:100%;border-collapse:collapse;font-size:10px;min-width:500px}
+.caf-tbl thead{position:sticky;top:0;z-index:2}
+.caf-tbl th{background:var(--ch);color:var(--ct);font-weight:700;
+  font-size:8px;letter-spacing:.35px;text-transform:uppercase;
+  padding:6px 9px;text-align:left;border-bottom:1.5px solid var(--cd);
+  white-space:nowrap;cursor:pointer;user-select:none;
+  transition:background .25s,color .25s,border-color .25s}
+.caf-tbl th:hover{background:var(--cg);color:#0070F2}
+.caf-tbl th.caf-sort-asc,.caf-tbl th.caf-sort-desc{color:#0070F2}
+.caf-sort-icon{font-size:8px;margin-left:3px;opacity:.40;display:inline-block;
+  transition:opacity .15s}
+.caf-tbl th.caf-sort-asc .caf-sort-icon,
+.caf-tbl th.caf-sort-desc .caf-sort-icon{opacity:1}
+.caf-filter-row th{background:var(--db);padding:3px 6px;
+  border-bottom:1.5px solid var(--cd);cursor:default}
+.caf-filter-row th:hover{background:var(--db);color:var(--ct)}
+.caf-fi{width:100%;background:var(--cb);border:1px solid var(--cd);
+  border-radius:4px;color:var(--cx);font-family:inherit;font-size:9px;
+  padding:3px 6px;outline:none;box-sizing:border-box;
+  transition:border-color .15s,background .25s,color .25s}
+.caf-fi:focus{border-color:#0070F2;box-shadow:0 0 0 2px rgba(0,112,242,.10)}
+.caf-fi::placeholder{color:var(--cf)}
+.caf-tbl td{padding:6px 9px;border-bottom:1px solid var(--rb);color:var(--cx);
+  vertical-align:top;word-break:break-word;max-width:200px;
+  transition:border-color .25s,color .25s,background .12s}
+.caf-tbl tr:last-child td{border-bottom:none}
+.caf-tbl tbody tr:hover td{background:var(--rh)}
+/* Status badges */
+.caf-s{display:inline-block;font-size:8.5px;font-weight:700;
+  padding:2px 8px;border-radius:8px;white-space:nowrap;line-height:1.5}
+.caf-s-active{background:#E1F4FF;color:#004A93}
+.caf-s-inactive{background:var(--cg);color:var(--cm)}
+html[data-theme="dark"] .caf-s-active{background:#0A2545;color:#89D1FF}
+html[data-theme="dark"] .caf-s-inactive{background:#1E2D3D;color:#5C7890}
+/* Touchbase badges */
+.caf-tb{display:inline-block;font-size:8.5px;font-weight:700;
+  padding:2px 8px;border-radius:8px;white-space:nowrap;line-height:1.5}
+.caf-tb-call{background:#E3F1D9;color:#2C6E1A}
+.caf-tb-email{background:#FFF0E0;color:#8A4500}
+html[data-theme="dark"] .caf-tb-call{background:#1B3D12;color:#7FCC4A}
+html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
+/* CSS assignment pill in table */
+.caf-css-pill{display:inline-block;font-size:8.5px;font-weight:700;
+  padding:2px 8px;border-radius:8px;white-space:nowrap;line-height:1.5;
+  background:var(--ch);color:var(--ct)}
+/* Empty / loading states */
+.caf-empty{text-align:center;padding:36px 20px;color:var(--cm);
+  font-size:11px;font-style:italic;transition:color .25s}
+.caf-loading-state{display:flex;align-items:center;justify-content:center;
+  min-height:56px;color:var(--cm);font-size:11px;font-style:italic;
+  transition:color .25s}
+
+/* ── Summary card premium hover (Issue 1) ───────────────────────────────── */
+.caf-sum-card{
+  cursor:default;
+  transition:background .25s,border-color .25s,box-shadow .25s,transform .15s ease;
+  will-change:transform}
+.caf-sum-card:hover{
+  transform:scale(1.025) translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.11),0 2px 6px rgba(0,0,0,.07)}
+
+/* ── Touchbase percentage (Issue 2) ─────────────────────────────────────── */
+.caf-pct{font-size:12px;font-weight:600;opacity:.72;margin-top:2px;
+  line-height:1.2;transition:color .25s}
+
+/* ── Action column & Request Update button ──────────────────────────────── */
+.caf-th-action{background:var(--ch);color:var(--ct);font-weight:700;
+  font-size:8px;letter-spacing:.35px;text-transform:uppercase;
+  padding:6px 9px;border-bottom:1.5px solid var(--cd);white-space:nowrap;
+  cursor:default;user-select:none;text-align:center;
+  transition:background .25s,color .25s,border-color .25s}
+.caf-fh-action{background:var(--db);padding:3px 6px;
+  border-bottom:1.5px solid var(--cd)}
+.caf-td-action{padding:4px 8px;border-bottom:1px solid var(--rb);
+  text-align:center;vertical-align:middle;
+  transition:border-color .25s,background .12s;white-space:nowrap}
+.caf-tbl tr:hover .caf-td-action{background:var(--rh)}
+.caf-req-btn{background:#DF1278;border:none;color:#fff;
+  font-family:inherit;font-size:8.5px;font-weight:700;
+  padding:3px 9px;border-radius:6px;cursor:pointer;white-space:nowrap;
+  box-shadow:0 2px 6px rgba(223,18,120,.25);
+  transition:background .15s,transform .1s ease,box-shadow .12s;
+  will-change:transform}
+.caf-req-btn:hover{background:#C50F68;
+  transform:scale(1.04) translateY(-1px);
+  box-shadow:0 4px 14px rgba(223,18,120,.35)}
+.caf-req-btn:active{transform:scale(.97) translateY(0);box-shadow:none}
+
+/* ── Request Update overlay + dialog ────────────────────────────────────── */
+.caf-dlg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1200;padding:16px;box-sizing:border-box}
+.caf-dlg-overlay.hidden{display:none}
+.caf-dlg{background:var(--cb);border-radius:14px;
+  box-shadow:0 24px 64px rgba(0,0,0,.22),0 6px 20px rgba(0,0,0,.12);
+  width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;
+  overflow:hidden;transition:background .25s}
+.caf-dlg-hd{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 12px;border-bottom:1px solid var(--cd);
+  transition:border-color .25s;flex-shrink:0}
+.caf-dlg-title{font-size:13px;font-weight:700;color:var(--ct);
+  letter-spacing:.2px;transition:color .25s}
+.caf-dlg-close{background:var(--cg);border:none;border-radius:6px;
+  color:var(--cm);font-size:14px;cursor:pointer;padding:3px 8px;
+  line-height:1;transition:background .15s,color .15s}
+.caf-dlg-close:hover{background:var(--cd);color:var(--ct)}
+.caf-dlg-body{padding:16px 20px;overflow-y:auto;flex:1}
+.caf-dlg-client{background:var(--ch);border-radius:8px;padding:10px 14px;
+  margin-bottom:14px;transition:background .25s}
+.caf-dlg-client-lbl{font-size:8px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--cm);margin-bottom:3px;
+  transition:color .25s}
+.caf-dlg-client-val{font-size:13px;font-weight:700;color:var(--ct);
+  transition:color .25s}
+.caf-dlg-prompt{font-size:11.5px;font-weight:700;color:var(--ct);
+  margin-bottom:3px;transition:color .25s}
+.caf-dlg-prompt-sub{font-size:10px;color:var(--cm);margin-bottom:10px;
+  transition:color .25s}
+.caf-dlg-selall{display:flex;align-items:center;gap:7px;
+  padding:6px 0 8px;border-bottom:1px solid var(--cd);
+  margin-bottom:8px;transition:border-color .25s}
+.caf-dlg-selall label{font-size:10.5px;font-weight:700;color:var(--ct);
+  cursor:pointer;transition:color .25s}
+.caf-dlg-checks{display:grid;grid-template-columns:1fr 1fr;
+  gap:4px 12px;margin-bottom:16px}
+@media(max-width:480px){.caf-dlg-checks{grid-template-columns:1fr}}
+.caf-dlg-chk-lbl{display:flex;align-items:center;gap:6px;font-size:10px;
+  color:var(--cx);cursor:pointer;padding:3px 0;border-radius:4px;
+  transition:color .25s}
+.caf-dlg-chk-lbl:hover{color:var(--ct)}
+.caf-dlg-chk-lbl input[type=checkbox]{accent-color:#0070F2;
+  width:13px;height:13px;flex-shrink:0;cursor:pointer}
+.caf-dlg-validation{font-size:9.5px;color:#BB0000;margin-bottom:8px;
+  display:none}
+.caf-dlg-validation.visible{display:block}
+.caf-dlg-foot{display:flex;align-items:center;justify-content:flex-end;
+  gap:8px;padding:12px 20px;border-top:1px solid var(--cd);
+  flex-shrink:0;transition:border-color .25s}
+.caf-dlg-cancel{background:var(--ch);border:1px solid var(--cd);
+  color:var(--ct);font-family:inherit;font-size:10px;font-weight:600;
+  padding:6px 14px;border-radius:7px;cursor:pointer;
+  transition:background .15s,border-color .15s}
+.caf-dlg-cancel:hover{background:var(--cg)}
+.caf-dlg-primary{background:linear-gradient(140deg,#0070F2,#0057C2);
+  border:none;color:#fff;font-family:inherit;font-size:10px;font-weight:700;
+  padding:6px 16px;border-radius:7px;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,112,242,.28);
+  transition:box-shadow .15s,transform .1s ease}
+.caf-dlg-primary:hover{box-shadow:0 4px 14px rgba(0,112,242,.40);
+  transform:translateY(-1px)}
+.caf-dlg-primary:active{transform:scale(.97)}
+/* Template preview dialog */
+.caf-tmpl-pre{background:var(--db);border:1px solid var(--cd);
+  border-radius:8px;padding:14px;font-family:monospace;font-size:10px;
+  color:var(--cx);white-space:pre-wrap;word-break:break-word;
+  line-height:1.6;max-height:320px;overflow-y:auto;
+  margin-bottom:12px;transition:background .25s,border-color .25s,color .25s}
+.caf-tmpl-guide{font-size:11px;color:var(--cx);line-height:1.65;
+  margin-bottom:14px;background:var(--ch);border-radius:6px;
+  padding:10px 14px;border-left:3px solid #0070F2;
+  transition:background .25s,color .25s}
+.caf-tmpl-guide a{color:#0070F2;text-decoration:none;font-weight:600}
+.caf-tmpl-guide a:hover{text-decoration:underline}
+.caf-copy-btn{background:linear-gradient(140deg,#0070F2,#0057C2);
+  border:none;color:#fff;font-family:inherit;font-size:10.5px;font-weight:700;
+  padding:8px 20px;border-radius:8px;cursor:pointer;width:100%;
+  box-shadow:0 2px 8px rgba(0,112,242,.28);
+  transition:box-shadow .15s,transform .1s ease,background .2s}
+.caf-copy-btn:hover{box-shadow:0 4px 16px rgba(0,112,242,.38);
+  transform:translateY(-1px)}
+.caf-copy-btn:active{transform:scale(.97)}
+.caf-copy-btn.copied{background:linear-gradient(140deg,#107E3E,#0B6B34);
+  box-shadow:0 2px 8px rgba(16,126,62,.28)}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CAF PART 1 — TEMPLATE PREVIEW + DIALOG EXTRAS
+───────────────────────────────────────────────────────────────────────── */
+/* Template dialog slightly wider */
+#caf-tmpl-overlay .caf-dlg{max-width:600px}
+/* Email preview container */
+.caf-tmpl-preview{background:var(--db);border:1px solid var(--cd);
+  border-radius:8px;padding:16px;margin-bottom:12px;
+  font-size:11px;line-height:1.65;color:var(--cx);
+  transition:background .25s,border-color .25s,color .25s}
+.caf-tmpl-para{margin-bottom:6px}
+.caf-tmpl-for{margin:10px 0;font-weight:600;font-size:11.5px}
+.caf-tmpl-entity{color:var(--cm);font-weight:400;font-size:.9em}
+.caf-tmpl-closing{margin-top:10px}
+/* Preview table */
+.caf-tmpl-tbl{width:100%;border-collapse:collapse;font-size:10.5px;margin:8px 0}
+.caf-tmpl-tbl-hd{background:var(--ch);color:var(--ct);font-weight:700;
+  font-size:8px;letter-spacing:.35px;text-transform:uppercase;
+  padding:6px 10px;text-align:left;border:1px solid var(--cd);
+  transition:background .25s,color .25s,border-color .25s}
+.caf-tmpl-tbl-hd-upd{color:var(--cm);font-style:italic}
+.caf-tmpl-tbl-cell{padding:6px 10px;border:1px solid var(--cd);
+  color:var(--cx);vertical-align:top;word-break:break-word;
+  transition:border-color .25s,color .25s}
+.caf-tmpl-tbl-empty{background:repeating-linear-gradient(
+  -45deg,transparent,transparent 4px,rgba(0,0,0,.025) 4px,rgba(0,0,0,.025) 8px);
+  color:var(--cf);font-style:italic;font-size:9px}
+/* Template action bar (Back / Copy / Done) */
+.caf-tmpl-actions{display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:12px 20px;border-top:1px solid var(--cd);
+  flex-shrink:0;transition:border-color .25s}
+.caf-tmpl-actions-right{display:flex;align-items:center;gap:8px}
+.caf-tmpl-actions .caf-copy-btn{width:auto;font-size:10px;padding:6px 16px}
+/* Clear Selection link inside Select All row */
+.caf-dlg-clear-lnk{margin-left:auto;background:none;border:none;
+  font-family:inherit;font-size:10px;font-weight:700;
+  color:#BB0000;cursor:pointer;padding:0;
+  transition:color .15s;line-height:1}
+.caf-dlg-clear-lnk:hover{color:#8B0000;text-decoration:underline}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   eLEARNING COMPLIANCE SECTION
+───────────────────────────────────────────────────────────────────────── */
+.el-container{padding:12px 14px 24px}
+.el-hdr{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.el-hdr-title{font-size:16px;font-weight:800;color:var(--ct);
+  letter-spacing:.2px;transition:color .25s}
+.el-hdr-sub{font-size:9.5px;color:var(--cm);transition:color .25s}
+/* CS filter tiles */
+.el-cs-wrap{margin-bottom:12px}
+.el-cs-row{display:flex;flex-wrap:wrap;gap:8px;
+  align-items:stretch;justify-content:center}
+.el-loading-state{display:flex;align-items:center;justify-content:center;
+  min-height:48px;width:100%;color:var(--cm);font-size:11px;
+  font-style:italic;transition:color .25s}
+.el-tile{flex:0 0 auto;min-width:88px;
+  background:var(--cb);border:1.5px solid var(--cd);border-radius:10px;
+  padding:10px 14px;text-align:center;cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03),
+             inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform .15s ease,box-shadow .15s ease,
+             background .2s,border-color .2s,opacity .2s;
+  will-change:transform;user-select:none}
+.el-tile:hover:not(.el-tile-active){
+  transform:scale(1.04) translateY(-2px);
+  box-shadow:0 6px 18px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+  border-color:rgba(0,112,242,.30)}
+.el-tile-active{
+  background:linear-gradient(140deg,#0070F2 0%,#0057C2 100%);
+  border-color:transparent;
+  box-shadow:0 4px 14px rgba(0,112,242,.40),0 1px 4px rgba(0,112,242,.18);
+  transform:translateY(-1px)}
+.el-tile-muted{opacity:.38;box-shadow:none;transform:none !important}
+.el-tile-muted:hover{opacity:.70;transform:scale(1.02) translateY(-1px) !important}
+.el-tile-name{font-size:11px;font-weight:700;color:var(--ct);
+  letter-spacing:.05px;margin-bottom:3px;transition:color .2s;line-height:1.2}
+.el-tile-active .el-tile-name{color:#fff}
+.el-tile-muted .el-tile-name{color:var(--cm)}
+.el-tile-pct{font-size:10px;font-weight:700;transition:color .2s}
+.el-tile-active .el-tile-pct{color:rgba(255,255,255,.85) !important}
+/* Summary cards */
+.el-summary{display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:12px}
+@media(max-width:640px){.el-summary{grid-template-columns:repeat(2,1fr)}}
+.el-sum-card{background:var(--cb);border-radius:10px;padding:12px 14px 10px;
+  border-top:3px solid;
+  box-shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03);
+  display:flex;flex-direction:column;gap:2px;cursor:default;
+  transition:background .25s,border-color .25s,box-shadow .25s,transform .15s ease;
+  will-change:transform}
+.el-sum-card:hover{
+  transform:scale(1.025) translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.11),0 2px 6px rgba(0,0,0,.07)}
+.el-sum-lbl{font-size:8.5px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;color:var(--cm);transition:color .25s}
+.el-sum-val{font-size:22px;font-weight:800;letter-spacing:-.5px;
+  line-height:1.1;transition:color .25s}
+.el-sum-sub{font-size:9px;color:var(--cm);margin-top:2px;transition:color .25s}
+/* Section cards */
+.el-section-card{background:var(--cb);border-radius:10px;overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03);
+  margin-bottom:12px;transition:background .25s}
+.el-card-bar{display:flex;align-items:center;padding:10px 12px 8px;
+  border-bottom:1px solid var(--cd);transition:border-color .25s}
+.el-card-bar-title{font-size:9.5px;font-weight:700;color:var(--ct);
+  letter-spacing:.4px;text-transform:uppercase;flex:1;transition:color .25s}
+/* Course compliance table */
+.el-tbl-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
+.el-tbl{width:100%;border-collapse:collapse;font-size:10px;min-width:500px}
+.el-tbl thead{position:sticky;top:0;z-index:2}
+.el-tbl th{background:var(--ch);color:var(--ct);font-weight:700;
+  font-size:8px;letter-spacing:.35px;text-transform:uppercase;
+  padding:6px 10px;text-align:left;border-bottom:1.5px solid var(--cd);
+  white-space:nowrap;
+  transition:background .25s,color .25s,border-color .25s}
+.el-th-intdead{color:#E76500 !important}
+.el-th-sapdead{color:#0070F2 !important}
+.el-tbl td{padding:6px 10px;border-bottom:1px solid var(--rb);
+  color:var(--cx);vertical-align:middle;
+  transition:border-color .25s,color .25s}
+.el-tbl tr:last-child td{border-bottom:none}
+.el-tbl tbody tr:hover td{background:var(--rh)}
+.el-td-course{font-weight:600;min-width:180px}
+.el-td-intdead,.el-td-sapdead{white-space:nowrap;min-width:100px}
+.el-td-status{text-align:center;min-width:90px}
+/* Status pills */
+.el-status{display:inline-block;font-size:8.5px;font-weight:700;
+  padding:2px 9px;border-radius:8px;white-space:nowrap;line-height:1.5}
+.el-status-completed{background:#E3F1D9;color:#2C6E1A}
+.el-status-pending{background:#FFF0E0;color:#8A4500}
+.el-status-other{background:var(--cg);color:var(--cm)}
+html[data-theme="dark"] .el-status-completed{background:#1B3D12;color:#7FCC4A}
+html[data-theme="dark"] .el-status-pending{background:#3D2000;color:#FFB366}
+/* Lower two-column row */
+.el-lower{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:720px){.el-lower{grid-template-columns:1fr}}
+/* Pending / Upcoming bodies */
+.el-pending-body,.el-upcoming-body{padding:10px 12px;min-height:80px;
+  font-size:10.5px;color:var(--cx);transition:color .25s}
+.el-empty-state{color:var(--cm);font-style:italic;font-size:10.5px;
+  padding:16px 0;text-align:center;transition:color .25s}
+/* Pending table */
+.el-pending-tbl{width:100%;border-collapse:collapse;font-size:10px}
+.el-pending-tbl th{background:var(--ch);color:var(--ct);font-weight:700;
+  font-size:8px;letter-spacing:.35px;text-transform:uppercase;
+  padding:5px 8px;text-align:left;border-bottom:1.5px solid var(--cd);
+  transition:background .25s,color .25s,border-color .25s}
+.el-pending-tbl td{padding:5px 8px;border-bottom:1px solid var(--rb);
+  color:var(--cx);transition:border-color .25s,color .25s}
+.el-pending-tbl tr:last-child td{border-bottom:none}
+.el-pending-tbl tbody tr:hover td{background:var(--rh)}
+.el-cs-name-badge{display:inline-block;background:var(--ch);color:var(--ct);
+  font-size:8.5px;font-weight:700;padding:2px 8px;border-radius:6px;
+  transition:background .25s,color .25s}
+.el-deadline-int{color:#E76500;white-space:nowrap}
+.el-deadline-sap{color:#0070F2;white-space:nowrap}
+/* Upcoming rows */
+.el-upcoming-row{display:flex;align-items:center;gap:8px;
+  padding:6px 0;border-bottom:1px solid var(--rb);transition:border-color .25s}
+.el-upcoming-row:last-child{border-bottom:none}
+.el-upcoming-name{flex:1;font-weight:600;font-size:10px;color:var(--cx);
+  transition:color .25s}
+.el-upcoming-metas{font-size:8.5px;color:var(--cm);white-space:nowrap;
+  transition:color .25s}
+.el-upcoming-meta-sep{margin:0 4px;opacity:.5}
+.el-upcoming-meta-int{color:#E76500}
+.el-upcoming-meta-sap{color:#0070F2}
+.el-upcoming-badge{font-size:8.5px;font-weight:700;padding:2px 8px;
+  border-radius:8px;white-space:nowrap}
+.el-pending-badge{background:#FFF0E0;color:#8A4500}
+html[data-theme="dark"] .el-pending-badge{background:#3D2000;color:#FFB366}
 </style>
 </head>
 <body>
@@ -662,12 +1186,31 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
             disabled>
       <span class="btn-icon">&#x21BB;</span> Refresh Data
     </button>
+    <!-- Screenshot: captures the full dashboard to PNG -->
+    <button class="hdr-btn btn-screenshot" id="btnScreenshot"
+            onclick="takeScreenshot()" title="Download full dashboard as PNG">
+      <span class="btn-icon">&#x1F4F7;</span> Screenshot
+    </button>
   </header>
 
   <!-- ── Tab Navigation ──────────────────────────────────────────────── -->
   <nav class="tab-nav">
-    <button class="tab-btn active" id="tab-btn-perf"  onclick="switchTab('performance')">Performance Dashboard</button>
-    <button class="tab-btn"        id="tab-btn-leave" onclick="switchTab('leave')">Leave Planner</button>
+    <button class="tab-btn active" id="tab-btn-perf" onclick="switchTab('performance')">
+      <img class="tab-icon" id="tab-icon-perf" src="" alt="" aria-hidden="true">
+      <span>Performance Dashboard</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-leave" onclick="switchTab('leave')">
+      <img class="tab-icon" id="tab-icon-leave" src="" alt="" aria-hidden="true">
+      <span>Leave Planner</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-caf" onclick="switchTab('caf')">
+      <img class="tab-icon" id="tab-icon-caf" src="" alt="" aria-hidden="true">
+      <span>Client Assignment File</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-el" onclick="switchTab('el')">
+      <img class="tab-icon" id="tab-icon-el" src="" alt="" aria-hidden="true">
+      <span>eLearning Compliance</span>
+    </button>
   </nav>
 
   <!-- ══ PERFORMANCE TAB ═══════════════════════════════════════════════ -->
@@ -759,9 +1302,11 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
         <div class="sec-hdr">Individual Quality Ranking</div>
         <div class="chart-wrap h190"><canvas id="chartQuality"></canvas></div>
         <div class="legend">
-          <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>Target: 100%</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>At Target</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Below Target</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>Extraordinary — 100%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>Outstanding — 98–99.99%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Successful — 96–97.99%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Progressing — 94–95.99%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>Insufficient — below 94%</div>
         </div>
       </div>
     </div>
@@ -773,14 +1318,97 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
       <div class="card-body">
         <div class="sec-hdr">PFTC Leaderboard</div>
         <div class="chart-wrap h200"><canvas id="chartPftc"></canvas></div>
-        <div class="legend">
-          <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>Appreciate</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Commendation</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:0 12px;margin-top:4px">
+          <!-- Performance Ratings -->
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div style="font-size:9px;font-weight:700;color:var(--ct);letter-spacing:.3px;margin-bottom:1px;text-transform:uppercase">Performance Ratings</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>Extraordinary — 22+ pts</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>Outstanding — 20–21 pts</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Successful — 17–19 pts</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Progressing — 14–16 pts (1 Esc.)</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>Insufficient — ≤13 pts (2+ Esc.)</div>
+          </div>
+          <!-- Points Guide -->
+          <div style="display:flex;flex-direction:column;gap:3px;border-left:1px solid var(--cd);padding-left:10px;transition:border-color .25s">
+            <div style="font-size:9px;font-weight:700;color:var(--ct);letter-spacing:.3px;margin-bottom:1px;text-transform:uppercase">Points Guide</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>1 pt — Appreciate</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>10 pts — Commendation</div>
+          </div>
         </div>
       </div>
     </div>
 
   </div><!-- /grid -->
+
+  <!-- ═══ IRT / ORT COMPLIANCE ════════════════════════════════════════════ -->
+  <div class="irt-section">
+    <div class="card">
+      <div class="card-accent" style="background:#0070F2"></div>
+      <div class="card-head">IRT / ORT Compliance</div>
+      <div class="card-body">
+        <div class="irt-body">
+
+          <!-- Left: violation stacked bar -->
+          <div>
+            <div class="sec-hdr">Violations by CS</div>
+            <div class="chart-wrap h200"><canvas id="chartIrtOrt"></canvas></div>
+            <div class="legend" style="margin-top:5px">
+              <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>IRT Violations</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>ORT Violations</div>
+            </div>
+          </div>
+
+          <!-- Right: individual compliance + team overall -->
+          <div class="irt-comp-wrap">
+
+            <!-- Individual Compliance -->
+            <div class="sec-hdr">Individual Compliance</div>
+            <table class="irt-sc-table">
+              <colgroup>
+                <col><col><col><col>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>CS</th>
+                  <th>Client</th>
+                  <th class="irt-th-comb">Combined</th>
+                </tr>
+              </thead>
+              <tbody id="irt-ind-tbody"></tbody>
+            </table>
+
+            <!-- Team Overall -->
+            <div class="sec-hdr" style="margin-top:7px">Team Overall</div>
+            <div id="irt-team-overall"></div>
+            <div class="irt-viol-box" style="margin-top:5px">
+              <div class="irt-viol-lbl">Total Combined Violations</div>
+              <div class="irt-viol-val" id="irt-total-viol">—</div>
+            </div>
+
+          </div>
+
+        </div><!-- /irt-body -->
+
+        <!-- Compliance legend -->
+        <div class="irt-legend">
+          <div class="leg-item">
+            <div class="leg-dot" style="background:#0070F2"></div>
+            <strong>97%+</strong>&nbsp;Passing
+          </div>
+          <div class="leg-item">
+            <div class="leg-dot" style="background:#E76500"></div>
+            <strong>90–96.99%</strong>&nbsp;Needs Attention
+          </div>
+          <div class="leg-item">
+            <div class="leg-dot" style="background:#D20A0A"></div>
+            <strong>Below 90%</strong>&nbsp;Critical
+          </div>
+        </div>
+
+      </div><!-- /card-body -->
+    </div><!-- /card -->
+  </div><!-- /irt-section -->
 
   <div class="footer"><span id="footer-info"></span></div>
 
@@ -816,6 +1444,125 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
       <div class="lp-status" id="lp-status"></div>
     </div>
   </div><!-- /section-leave -->
+
+  <!-- ══ CLIENT ASSIGNMENT FILE TAB ══════════════════════════════════════ -->
+  <div id="section-caf" class="tab-section hidden">
+    <div class="caf-container">
+
+      <!-- ── Header row: title + month pill + search ────────────────────── -->
+      <div class="caf-hdr">
+        <div class="caf-hdr-left">
+          <span class="caf-hdr-title">Client Assignment File</span>
+          <span class="caf-month-pill" id="caf-month-pill" style="display:none"></span>
+        </div>
+        <input class="caf-search" id="caf-search" type="search"
+               placeholder="Search all columns…" autocomplete="off">
+      </div>
+
+      <!-- ── CSS Member filter tiles ────────────────────────────────────── -->
+      <div class="caf-css-wrap">
+        <div class="caf-css-row" id="caf-css-row">
+          <div class="caf-loading-state">Loading assignment data…</div>
+        </div>
+      </div>
+
+      <!-- ── Team Summary cards ─────────────────────────────────────────── -->
+      <div class="caf-summary" id="caf-summary"></div>
+
+      <!-- ── Client records table ───────────────────────────────────────── -->
+      <div class="caf-tbl-card">
+        <div class="caf-tbl-bar">
+          <span class="caf-tbl-bar-title">Client Records</span>
+          <span class="caf-row-badge" id="caf-row-badge">—</span>
+          <button class="caf-clear-btn" id="caf-clear-btn">&#x21BA; Clear Filters</button>
+        </div>
+        <div class="caf-tbl-wrap">
+          <table class="caf-tbl" id="caf-tbl"></table>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /section-caf -->
+
+  <!-- ══ REQUEST UPDATE — Field selection dialog ══════════════════════════ -->
+  <div id="caf-req-overlay" class="caf-dlg-overlay hidden">
+    <div class="caf-dlg" role="dialog" aria-modal="true"
+         aria-labelledby="caf-req-dlg-title">
+      <div class="caf-dlg-hd">
+        <span class="caf-dlg-title" id="caf-req-dlg-title">Request Data Update</span>
+        <button class="caf-dlg-close" id="caf-req-close" title="Close">&#x2715;</button>
+      </div>
+      <div class="caf-dlg-body" id="caf-req-body">
+        <!-- Populated by cafOpenRequestUpdate() -->
+      </div>
+    </div>
+  </div><!-- /caf-req-overlay -->
+
+  <!-- ══ REQUEST UPDATE — Generated template dialog ═══════════════════════ -->
+  <div id="caf-tmpl-overlay" class="caf-dlg-overlay hidden">
+    <div class="caf-dlg" role="dialog" aria-modal="true"
+         aria-labelledby="caf-tmpl-dlg-title">
+      <div class="caf-dlg-hd">
+        <span class="caf-dlg-title" id="caf-tmpl-dlg-title">Update Request Template</span>
+        <button class="caf-dlg-close" id="caf-tmpl-close" title="Close">&#x2715;</button>
+      </div>
+      <div class="caf-dlg-body" id="caf-tmpl-body">
+        <!-- Populated by cafGenerateTemplate() -->
+      </div>
+    </div>
+  </div><!-- /caf-tmpl-overlay -->
+
+  <!-- ══ eLEARNING COMPLIANCE TAB ════════════════════════════════════════ -->
+  <div id="section-el" class="tab-section hidden">
+    <div class="el-container">
+
+      <!-- ── Header ────────────────────────────────────────────────────── -->
+      <div class="el-hdr">
+        <div class="el-hdr-title">eLearning Compliance</div>
+        <div class="el-hdr-sub" id="el-hdr-sub"></div>
+      </div>
+
+      <!-- ── CS Filter Tiles ───────────────────────────────────────────── -->
+      <div class="el-cs-wrap">
+        <div class="el-cs-row" id="el-cs-row">
+          <div class="el-loading-state">Loading eLearning data…</div>
+        </div>
+      </div>
+
+      <!-- ── Team Summary cards ────────────────────────────────────────── -->
+      <div class="el-summary" id="el-summary"></div>
+
+      <!-- ── Course Compliance Table ──────────────────────────────────── -->
+      <div class="el-section-card">
+        <div class="el-card-bar">
+          <span class="el-card-bar-title">Course Compliance</span>
+        </div>
+        <div class="el-tbl-wrap">
+          <table class="el-tbl" id="el-tbl"></table>
+        </div>
+      </div>
+
+      <!-- ── Lower: Pending + Upcoming ────────────────────────────────── -->
+      <div class="el-lower">
+
+        <div class="el-section-card">
+          <div class="el-card-bar">
+            <span class="el-card-bar-title">Pending eLearning</span>
+          </div>
+          <div class="el-pending-body" id="el-pending-body"></div>
+        </div>
+
+        <div class="el-section-card">
+          <div class="el-card-bar">
+            <span class="el-card-bar-title">Upcoming Deadlines</span>
+          </div>
+          <div class="el-upcoming-body" id="el-upcoming-body"></div>
+        </div>
+
+      </div><!-- /el-lower -->
+
+    </div><!-- /el-container -->
+  </div><!-- /section-el -->
 
   <!-- ══ LEAVE PLANNER DIALOGS ════════════════════════════════════════ -->
 
@@ -1330,7 +2077,7 @@ function parseConfig(values) {
   const prevMonthName = getMonthName(prevMonth);
   const prevMonthStr  = prevYear + '-' + String(prevMonth).padStart(2, '0');
   const currMonthStr  = year     + '-' + String(month).padStart(2, '0');
-  const version       = String(kv['Dashboard Version'] || 'V4.2');
+  const version       = String(kv['Dashboard Version'] || 'V9');
   const theme         = String(kv['Dashboard Theme']   || 'SAP Horizon Light');
 
   return {
@@ -1348,7 +2095,7 @@ function _defaultConfig() {
   const pm = m > 1 ? m - 1 : 12, py = m > 1 ? y : y - 1;
   return {
     year: y, month: m, month_name: mn, report_date: mn + ' ' + y,
-    data_as_of: formatDayMonthYear(now), version: 'V4.2', theme: 'SAP Horizon Light',
+    data_as_of: formatDayMonthYear(now), version: 'V9', theme: 'SAP Horizon Light',
     prev_month_name: getMonthName(pm),
     prev_month_str:  py + '-' + String(pm).padStart(2,'0'),
     curr_month_str:  y  + '-' + String(m).padStart(2,'0')
@@ -1367,7 +2114,25 @@ function parseCaseProductivity(values) {
   const cliIdx    = findCol(headers, ['Client Created Cases', 'Client Created']) ?? 2;
   const avgIdx    = findCol(headers, ['MTD Average (per weekday)', 'MTD Average', 'Average']) ?? 5;
   const statusIdx = findCol(headers, ['Status']) ?? 6;
-  /* Leave Days (col 3) and Effective Workdays (col 4) are intentionally skipped */
+  /* IRT / ORT columns (optional — null if not present in sheet) */
+  const irtCsIdx    = findCol(headers, ['IRT Violation (CS Created)',     'IRT Violation CS']);
+  const ortCsIdx    = findCol(headers, ['ORT Violation (CS Created)',     'ORT Violation CS']);
+  const compCsIdx   = findCol(headers, ['IRT/ORT Compliance % (CS Created)',     'Compliance % (CS Created)']);
+  const irtCliIdx   = findCol(headers, ['IRT Violation (Client Created)', 'IRT Violation Client']);
+  const ortCliIdx   = findCol(headers, ['ORT Violation (Client Created)', 'ORT Violation Client']);
+  const compCliIdx  = findCol(headers, ['IRT/ORT Compliance % (Client Created)', 'Compliance % (Client Created)']);
+  const totViolIdx  = findCol(headers, ['Total Combined Violations',      'Total Violations']);
+  const compCombIdx = findCol(headers, ['IRT/ORT Compliance % (Combined)','Compliance % (Combined)']);
+
+  /* Helper: read compliance % — Excel may store as decimal (0.985) or % (98.5).
+     Clamped to [0, 100] — negative values (more violations than cases) become 0. */
+  function toCompPct(v) {
+    if (v === null || v === undefined || v === '') return null;
+    const n = Number(v);
+    if (isNaN(n)) return null;
+    const pct = n <= 1 ? Math.round(n * 1000) / 10 : Math.round(n * 10) / 10;
+    return Math.min(100, Math.max(0, pct));
+  }
 
   const result = [];
   for (let i = hi + 1; i < values.length; i++) {
@@ -1378,8 +2143,22 @@ function parseCaseProductivity(values) {
     const cli = Math.round(parseNum(row[cliIdx]));
     const avg = Math.round(parseNum(row[avgIdx]) * 100) / 100;
     const status = row[statusIdx] ? String(row[statusIdx]).trim() : 'Progressing';
-    result.push({ name: String(name), cs_created: cs, client_created: cli,
-                  total: cs + cli, avg, status });
+    /* IRT / ORT */
+    const irt_cs   = irtCsIdx   !== null ? Math.round(parseNum(row[irtCsIdx]))   : 0;
+    const ort_cs   = ortCsIdx   !== null ? Math.round(parseNum(row[ortCsIdx]))   : 0;
+    const comp_cs  = compCsIdx  !== null ? toCompPct(row[compCsIdx])             : null;
+    const irt_cli  = irtCliIdx  !== null ? Math.round(parseNum(row[irtCliIdx]))  : 0;
+    const ort_cli  = ortCliIdx  !== null ? Math.round(parseNum(row[ortCliIdx]))  : 0;
+    const comp_cli = compCliIdx !== null ? toCompPct(row[compCliIdx])            : null;
+    const tot_viol = totViolIdx !== null
+      ? Math.round(parseNum(row[totViolIdx]))
+      : irt_cs + ort_cs + irt_cli + ort_cli;
+    const comp_comb = compCombIdx !== null ? toCompPct(row[compCombIdx]) : null;
+    result.push({
+      name: String(name), cs_created: cs, client_created: cli,
+      total: cs + cli, avg, status,
+      irt_cs, ort_cs, comp_cs, irt_cli, ort_cli, comp_cli, tot_viol, comp_comb
+    });
   }
   return result;
 }
@@ -1536,6 +2315,8 @@ function computeAxisLimits(data) {
   const qlMax   = (ql.sorted || []).reduce((m, r) => Math.max(m, r.pct), 0);
   const pfMax   = pf.reduce((m, r) => Math.max(m, r.total), 0);
   const allNull = ql.all_null || false;
+  /* IRT/ORT: max stacked violations (irt_cs + ort_cs + irt_cli + ort_cli) per member */
+  const irtMax  = cp.reduce((m, r) => Math.max(m, (r.irt_cs||0) + (r.ort_cs||0) + (r.irt_cli||0) + (r.ort_cli||0)), 0);
 
   return {
     cc_max:  Math.max(Math.ceil(ccMax  * 1.20) + 1, 12),
@@ -1548,6 +2329,7 @@ function computeAxisLimits(data) {
            : qlMax >= 70 ? Math.max(Math.round(qlMax * 1.05), 105)
            : Math.max(Math.round(qlMax * 1.2) + 5, 20),
     pf_max:  pfMax   > 0 ? Math.max(Math.ceil(pfMax * 1.30) + 2, 6) : 6,
+    irt_max: irtMax  > 0 ? Math.max(Math.ceil(irtMax * 1.40) + 1, 4) : 4,
     quality_all_null: allNull
   };
 }
@@ -1558,46 +2340,127 @@ function computeAxisLimits(data) {
    in the A_EKX Team Josh Dashboard parent folder. Non-blocking — failure is
    handled silently so it never breaks the dashboard.
 ════════════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 8b — ASSET LOADER
+   Loads logo + nav pictograms from OneDrive.
+   Navigation path: Excel file → parent (data folder) → parent (root dir).
+   Asset lookup order:
+     1. Logos/ subfolder inside root dir  (new preferred location)
+     2. Root dir directly                 (backward-compatible fallback)
+   All failures are silent so they never break the dashboard.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Helper: Blob → data URL */
+function blobToDataUrl(blob) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.readAsDataURL(blob);
+  });
+}
+
+/* Helper: find a file by name in an item list and fetch its data URL */
+async function fetchAssetDataUrl(items, filename, token) {
+  const item = (items || []).find(f => f.name === filename);
+  if (!item) return null;
+  try {
+    const blob = await graphGetBinary(
+      '/drives/' + excelDriveId + '/items/' + item.id + '/content', token
+    );
+    return blobToDataUrl(blob);
+  } catch(e) {
+    console.warn('[Asset] Failed to fetch', filename, e.message);
+    return null;
+  }
+}
+
 async function loadLogo(token) {
   try {
-    /* Step 1: Excel item → get parent folder id (Team Josh Dashboard Data) */
+    /* Step 1: Excel item → parent folder (Team Josh Dashboard Data) */
     const excelMeta = await graphGet(
       '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference',
       token
     );
     const dataFolderId = excelMeta.parentReference.id;
 
-    /* Step 2: Data folder → get its parent (A_EKX Team Josh Dashboard) */
+    /* Step 2: Data folder → parent (A_EKX Team Josh Dashboard) */
     const dataFolderMeta = await graphGet(
       '/drives/' + excelDriveId + '/items/' + dataFolderId + '?$select=parentReference',
       token
     );
-    const logoDirId = dataFolderMeta.parentReference.id;
+    const rootDirId = dataFolderMeta.parentReference.id;
 
-    /* Step 3: List children of the parent folder and find the logo by name */
-    const children = await graphGet(
-      '/drives/' + excelDriveId + '/items/' + logoDirId +
-      '/children?$select=id,name',
+    /* Step 3: List root dir children; look for a Logos subfolder */
+    const rootResp  = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + rootDirId + '/children?$select=id,name',
       token
     );
-    const logoItem = (children.value || []).find(f => f.name === LOGO_FILE_NAME);
-    if (!logoItem) { console.warn('[Logo] File not found:', LOGO_FILE_NAME); return; }
+    const rootItems   = rootResp.value || [];
+    const logosFolder = rootItems.find(f => f.name === 'Logos');
 
-    /* Step 4: Fetch the binary and swap into every logo element */
-    const blob    = await graphGetBinary('/drives/' + excelDriveId + '/items/' + logoItem.id + '/content', token);
-    const dataUrl = await new Promise(resolve => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result);
-      r.readAsDataURL(blob);
-    });
+    /* Resolve which item list to use for asset lookups */
+    let assetItems = rootItems; /* fallback: root dir (old location) */
+    if (logosFolder) {
+      const logosResp = await graphGet(
+        '/drives/' + excelDriveId + '/items/' + logosFolder.id + '/children?$select=id,name',
+        token
+      );
+      assetItems = logosResp.value || [];
+      console.log('[Assets] Using Logos subfolder.');
+    }
 
-    ['hdr-logo-img', 'signin-logo-img'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.src = dataUrl;
-    });
-    console.log('[Logo] Loaded:', LOGO_FILE_NAME);
+    /* Step 4: Load Team Josh logo */
+    const logoUrl = await fetchAssetDataUrl(assetItems, LOGO_FILE_NAME, token);
+    if (logoUrl) {
+      ['hdr-logo-img', 'signin-logo-img'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.src = logoUrl;
+      });
+      console.log('[Logo] Loaded:', LOGO_FILE_NAME);
+    } else {
+      console.warn('[Logo] File not found:', LOGO_FILE_NAME);
+    }
+
+    /* Step 5: Load nav pictograms (only from Logos subfolder) */
+    if (logosFolder) {
+      const troUrl = await fetchAssetDataUrl(assetItems, '301620_Trophy_R.png', token);
+      if (troUrl) {
+        const el = document.getElementById('tab-icon-perf');
+        if (el) { el.src = troUrl; el.classList.add('loaded'); }
+        console.log('[NavIcon] Loaded: 301620_Trophy_R.png');
+      } else {
+        console.warn('[NavIcon] Not found: 301620_Trophy_R.png');
+      }
+
+      const calUrl = await fetchAssetDataUrl(assetItems, '299600_Calendar_R.png', token);
+      if (calUrl) {
+        const el = document.getElementById('tab-icon-leave');
+        if (el) { el.src = calUrl; el.classList.add('loaded'); }
+        console.log('[NavIcon] Loaded: 299600_Calendar_R.png');
+      } else {
+        console.warn('[NavIcon] Not found: 299600_Calendar_R.png');
+      }
+
+      const arcUrl = await fetchAssetDataUrl(assetItems, '301613_Archive_R.png', token);
+      if (arcUrl) {
+        const el = document.getElementById('tab-icon-caf');
+        if (el) { el.src = arcUrl; el.classList.add('loaded'); }
+        console.log('[NavIcon] Loaded: 301613_Archive_R.png');
+      } else {
+        console.warn('[NavIcon] Not found: 301613_Archive_R.png');
+      }
+
+      const elrnUrl = await fetchAssetDataUrl(assetItems, '301616_Learning_R.png', token);
+      if (elrnUrl) {
+        const elIcon = document.getElementById('tab-icon-el');
+        if (elIcon) { elIcon.src = elrnUrl; elIcon.classList.add('loaded'); }
+        console.log('[NavIcon] Loaded: 301616_Learning_R.png');
+      } else {
+        console.warn('[NavIcon] Not found: 301616_Learning_R.png (optional)');
+      }
+    }
   } catch(e) {
-    console.warn('[Logo] Could not load logo (non-critical):', e.message);
+    console.warn('[Assets] Could not load assets (non-critical):', e.message);
   }
 }
 
@@ -1651,7 +2514,61 @@ const F = '"72","72full",-apple-system,"Segoe UI",Arial,sans-serif';
 /* ════════════════════════════════════════════════════════════════════════════
    SECTION 11 — THEME SYSTEM  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
-let _lastQlSorted = null;
+let _lastQlSorted   = null;
+let _lastPftcSorted = null;
+
+/* ── PFTC badge color helper ────────────────────────────────────────────── */
+function pftcBadgeColors(pts) {
+  if (pts >= 22) return { bg:'#0070F2', fg:'#FFFFFF' }; /* Extraordinary */
+  if (pts >= 20) return { bg:'#2CE0BF', fg:'#1D2329' }; /* Outstanding   */
+  if (pts >= 17) return { bg:'#89D1FF', fg:'#00144A' }; /* Successful    */
+  if (pts >= 14) return { bg:'#5B738B', fg:'#FFFFFF' }; /* Progressing   */
+  return              { bg:'#B0C6D6', fg:'#1D2329' };   /* Insufficient  */
+}
+
+/* ── PFTC rating badge plugin (afterDraw — draws colored pills on canvas) ─ */
+const pftcBadgePlugin = {
+  id: 'pftcBadge',
+  afterDraw(chart) {
+    if (chart.canvas.id !== 'chartPftc') return;
+    if (!_lastPftcSorted || !_lastPftcSorted.length) return;
+    const ctx    = chart.ctx;
+    const yScale = chart.scales.y;
+    const xRight = chart.chartArea.right;
+    ctx.save();
+    _lastPftcSorted.forEach((member, i) => {
+      const { bg, fg } = pftcBadgeColors(member.total);
+      const text = member.total + ' pts';
+      ctx.font = '700 9px "72","72full",Arial,sans-serif';
+      const tw  = ctx.measureText(text).width;
+      const bw  = tw + 12;
+      const bh  = 14;
+      const bx  = xRight + 5;
+      const by  = yScale.getPixelForTick(i) - bh / 2;
+      const r   = 7;
+      /* Draw pill */
+      ctx.beginPath();
+      ctx.moveTo(bx + r, by);
+      ctx.lineTo(bx + bw - r, by);
+      ctx.arcTo(bx + bw, by,      bx + bw, by + r,      r);
+      ctx.lineTo(bx + bw, by + bh - r);
+      ctx.arcTo(bx + bw, by + bh, bx + bw - r, by + bh, r);
+      ctx.lineTo(bx + r, by + bh);
+      ctx.arcTo(bx,      by + bh, bx,      by + bh - r, r);
+      ctx.lineTo(bx, by + r);
+      ctx.arcTo(bx,      by,      bx + r,  by,          r);
+      ctx.closePath();
+      ctx.fillStyle = bg;
+      ctx.fill();
+      /* Draw label */
+      ctx.fillStyle    = fg;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, bx + bw / 2, by + bh / 2 + 0.5);
+    });
+    ctx.restore();
+  }
+};
 
 function isDark() {
   return document.documentElement.dataset.theme === 'dark';
@@ -1699,9 +2616,7 @@ function themeCharts() {
 
     if (id === 'chartQuality' && _lastQlSorted) {
       chart.data.datasets[0].backgroundColor =
-        _lastQlSorted.map(r =>
-          r.pct >= 100 ? '#2CE0BF' : (r.pct > 0 ? '#0070F2' : qnulC)
-        );
+        _lastQlSorted.map(r => qlRatingColor(r.pct));
     }
 
     chart.update('none');
@@ -1733,6 +2648,79 @@ function initTheme() {
     document.documentElement.dataset.theme = 'dark';
     document.getElementById('theme-icon').textContent  = '☀';
     document.getElementById('theme-label').textContent = 'Light';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SCREENSHOT  (v12)
+   Captures the full .dashboard element to PNG via html2canvas.
+   • Temporarily removes overflow:hidden so the full scroll-height is visible.
+   • Resets to top-of-page scroll, waits one frame, then restores everything.
+   • Filename: "Team Josh Dashboard - <Month Year>.png"
+════════════════════════════════════════════════════════════════════════════ */
+async function takeScreenshot() {
+  if (typeof html2canvas === 'undefined') {
+    showToast('Screenshot library still loading — please try again in a moment.');
+    return;
+  }
+  const btn      = document.getElementById('btnScreenshot');
+  const origHTML = btn.innerHTML;
+  btn.disabled   = true;
+  btn.innerHTML  = '<span class="btn-icon">&#x23F3;</span> Capturing…';
+
+  const el = document.querySelector('.dashboard');
+
+  /* Remove overflow:hidden + border-radius so html2canvas sees full height */
+  const origOverflow  = el.style.overflow;
+  const origBR        = el.style.borderRadius;
+  el.style.overflow   = 'visible';
+  el.style.borderRadius = '0';
+
+  /* Scroll to top so the entire element is in the capture window */
+  const origScrollY = window.scrollY;
+  window.scrollTo(0, 0);
+
+  /* One-frame pause for the browser to repaint */
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  try {
+    const canvas = await html2canvas(el, {
+      scale       : 2,
+      useCORS     : true,
+      allowTaint  : false,
+      logging     : false,
+      scrollX     : 0,
+      scrollY     : 0,
+      width       : el.offsetWidth,
+      height      : el.scrollHeight,
+      windowWidth : el.offsetWidth,
+      windowHeight: el.scrollHeight,
+    });
+
+    /* Filename from the dashboard's displayed month/year */
+    const monthEl = document.getElementById('hdr-month');
+    const month   = monthEl && monthEl.textContent.trim()
+                    ? monthEl.textContent.trim() : 'Dashboard';
+    const fname   = 'Team Josh Dashboard - ' + month + '.png';
+
+    const link = document.createElement('a');
+    link.download = fname;
+    link.href     = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Saved: ' + fname);
+  } catch(err) {
+    console.error('[Screenshot]', err);
+    showToast('Screenshot failed — please try again.');
+  } finally {
+    /* Always restore original state */
+    el.style.overflow     = origOverflow;
+    el.style.borderRadius = origBR;
+    window.scrollTo(0, origScrollY);
+    btn.innerHTML = origHTML;
+    btn.disabled  = false;
   }
 }
 
@@ -1829,6 +2817,36 @@ function ttSep()     { return '<div class="tt-sep"></div>'; }
 function ttHdr(name) { return '<div class="tt-hdr">' + name + '</div>'; }
 function ttHint()    { return '<div class="tt-hint">Click to pin &nbsp;&bull;&nbsp; Esc to close</div>'; }
 
+/* ── Quality & IRT/ORT rating helpers ───────────────────────────────────── */
+function qlRatingColor(pct) {
+  if (!pct || pct <= 0) return themeQnulColor();
+  if (pct >= 100) return '#0070F2';
+  if (pct >= 98)  return '#2CE0BF';
+  if (pct >= 96)  return '#89D1FF';
+  if (pct >= 94)  return '#5B738B';
+  return '#B0C6D6';
+}
+function qlRatingName(pct) {
+  if (!pct || pct <= 0) return 'Not recorded';
+  if (pct >= 100) return 'Extraordinary';
+  if (pct >= 98)  return 'Outstanding';
+  if (pct >= 96)  return 'Successful';
+  if (pct >= 94)  return 'Progressing';
+  return 'Insufficient';
+}
+function irtCompColor(pct) {
+  if (pct === null || pct === undefined) return '#6D7990';
+  if (pct >= 97) return '#0070F2';
+  if (pct >= 90) return '#E76500';
+  return '#D20A0A';
+}
+function irtCompLabel(pct) {
+  if (pct === null || pct === undefined) return '';
+  if (pct >= 97) return 'Passing';
+  if (pct >= 90) return 'Needs Attention';
+  return 'Critical';
+}
+
 const SC = {
   Progressing:'#B0C6D6', Successful:'#89D1FF',
   Outstanding:'#1B90FF', Extraordinary:'#5B738B'
@@ -1874,9 +2892,11 @@ function ttSvRank(chart, di, prevM, currM) {
 }
 function ttQuality(chart, di) {
   const pct = chart.data.datasets[0].data[di];
-  const col = pct >= 100 ? '#2CE0BF' : (pct > 0 ? '#0070F2' : themeQnulColor());
+  const col  = qlRatingColor(pct);
+  const name = qlRatingName(pct);
   return ttHdr(chart.data.labels[di])
        + ttRow(col, 'Quality Rating', pct > 0 ? pct + '%' : 'Not yet recorded')
+       + (pct > 0 ? ttRow(col, 'Rating', name) : '')
        + ttHint();
 }
 function ttPftc(chart, di) {
@@ -1889,6 +2909,24 @@ function ttPftc(chart, di) {
        + ttRow('#5B738B','Commendation (×10)', com)
        + ttSep() + ttTotal('Total Points', app + com * 10)
        + ttHint();
+}
+function ttIrtOrt(chart, di, cpMap) {
+  const name = chart.data.labels[di];
+  const irt  = chart.data.datasets[0].data[di];
+  const ort  = chart.data.datasets[1].data[di];
+  const m    = cpMap ? cpMap[name] : null;
+  let html   = ttHdr(name)
+    + ttRow('#5B738B','IRT Violations', irt)
+    + ttRow('#B0C6D6','ORT Violations', ort)
+    + ttSep() + ttTotal('Total Violations', irt + ort);
+  if (m) {
+    html += ttSep();
+    if (m.comp_cs   !== null) html += ttRow(irtCompColor(m.comp_cs),   'CS Compliance',     m.comp_cs.toFixed(1)   + '%');
+    if (m.comp_cli  !== null) html += ttRow(irtCompColor(m.comp_cli),  'Client Compliance', m.comp_cli.toFixed(1)  + '%');
+    if (m.comp_comb !== null) html += ttRow(irtCompColor(m.comp_comb), 'Combined',          m.comp_comb.toFixed(1) + '%');
+  }
+  html += ttHint();
+  return html;
 }
 
 /* ── External tooltip handler factory  (v4 — unchanged) ────────────────── */
@@ -2012,18 +3050,42 @@ function processData(D) {
   _lastQlSorted = ql.sorted;
   const qLb  = ql.sorted.map(r => r.name);
   const qPct = ql.sorted.map(r => r.pct);
-  const qCol = ql.sorted.map(r =>
-    r.pct >= 100 ? '#2CE0BF' : (r.pct > 0 ? '#0070F2' : themeQnulColor())
-  );
+  const qCol = ql.sorted.map(r => qlRatingColor(r.pct));
   const qMin = ql.all_null ? 0  : 70;
   const qMax = ql.all_null ? 10 : 105;
 
   const pf   = D.pftc.sorted;
-  const pfLb = pf.map(r => r.name + '  ' + r.total + ' pts');
+  const pfLb = pf.map(r => r.name);
+  _lastPftcSorted = pf; /* used by pftcBadgePlugin afterDraw */
+
+  /* ── IRT / ORT ─────────────────────────────────────────────────────────── */
+  const irtAlpha = [...D.case_productivity].sort((a, b) => a.name.localeCompare(b.name));
+  const irtCpMap = {};
+  let totCsCases = 0, totCliCases = 0;
+  let totIrtCs = 0, totOrtCs = 0, totIrtCli = 0, totOrtCli = 0, totViol = 0;
+  irtAlpha.forEach(r => {
+    irtCpMap[r.name] = { comp_cs: r.comp_cs, comp_cli: r.comp_cli, comp_comb: r.comp_comb };
+    totCsCases  += r.cs_created;
+    totCliCases += r.client_created;
+    totIrtCs    += r.irt_cs  || 0;
+    totOrtCs    += r.ort_cs  || 0;
+    totIrtCli   += r.irt_cli || 0;
+    totOrtCli   += r.ort_cli || 0;
+    totViol     += r.tot_viol || 0;
+  });
+  const teamCsComp   = totCsCases  > 0
+    ? Math.round(((totCsCases  - totIrtCs  - totOrtCs)  / totCsCases)  * 1000) / 10 : 100;
+  const teamCliComp  = totCliCases > 0
+    ? Math.round(((totCliCases - totIrtCli - totOrtCli) / totCliCases) * 1000) / 10 : 100;
+  const totAllCases  = totCsCases + totCliCases;
+  const teamCombComp = totAllCases > 0
+    ? Math.round(((totAllCases - totViol) / totAllCases) * 1000) / 10 : 100;
 
   return { cfg, ax, cpA, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
            em, ca, svRaw, svRank, ql, qLb, qPct, qCol, qMin, qMax,
-           pf, pfLb };
+           pf, pfLb,
+           irtAlpha, irtCpMap, totViol,
+           teamCsComp, teamCliComp, teamCombComp };
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -2092,6 +3154,66 @@ function renderFooter(cfg) {
     cfg.report_date + '  •  Data as of ' + cfg.data_as_of;
 }
 
+function renderIrtOrt(p) {
+  /* ── Helper: full-width progress bar cell ────────────────────────────── */
+  function pbarCell(pct, isComb) {
+    const tdCls = 'irt-td' + (isComb ? ' irt-td-comb' : '');
+    if (pct === null || pct === undefined) {
+      return '<td class="' + tdCls + '" style="text-align:center">' +
+             '<span style="color:var(--cm);font-size:9px">—</span></td>';
+    }
+    const col = irtCompColor(pct);
+    const w   = Math.min(100, Math.max(0, pct)).toFixed(1);
+    return '<td class="' + tdCls + '" style="padding:3px 5px">' +
+      '<div class="irt-pbar">' +
+        '<div class="irt-pbar-fill" style="width:' + w + '%;background:' + col + '">' +
+          '<span class="irt-pbar-lbl">' + pct.toFixed(1) + '%</span>' +
+        '</div>' +
+      '</div>' +
+    '</td>';
+  }
+
+  /* ── Individual Compliance Scorecard ──────────────────────────────────── */
+  const tbody = document.getElementById('irt-ind-tbody');
+  if (tbody) {
+    tbody.innerHTML = p.irtAlpha.map(r =>
+      '<tr>' +
+      '<td>' + r.name + '</td>' +
+      pbarCell(r.comp_cs,   false) +
+      pbarCell(r.comp_cli,  false) +
+      pbarCell(r.comp_comb, true)  +
+      '</tr>'
+    ).join('');
+  }
+
+  /* ── Team Overall — 3 metric cards ───────────────────────────────────── */
+  const overall = document.getElementById('irt-team-overall');
+  if (overall) {
+    function metricCard(label, pct, isComb) {
+      if (pct === null || pct === undefined) return '';
+      const col    = irtCompColor(pct);
+      const tag    = irtCompLabel(pct);
+      const cls    = 'irt-tc' + (isComb ? ' irt-tc-comb' : '');
+      const barW   = Math.min(100, Math.max(0, pct)).toFixed(1);
+      return '<div class="' + cls + '" style="border-top-color:' + col + '">' +
+        '<div class="irt-tc-lbl">' + label + '</div>' +
+        '<div class="irt-tc-val" style="color:' + col + '">' + pct.toFixed(1) + '%</div>' +
+        '<div class="irt-tc-status" style="color:' + col + '">' + tag + '</div>' +
+        '<div class="irt-tc-bar"><div class="irt-tc-bar-fill" style="width:' + barW + '%;background:' + col + '"></div></div>' +
+        '</div>';
+    }
+    overall.innerHTML = '<div class="irt-team-cards">' +
+      metricCard('CS Created',    p.teamCsComp,   false) +
+      metricCard('Client',        p.teamCliComp,  false) +
+      metricCard('Combined',      p.teamCombComp, true)  +
+      '</div>';
+  }
+
+  /* ── Total violations ─────────────────────────────────────────────────── */
+  const vBox = document.getElementById('irt-total-viol');
+  if (vBox) vBox.textContent = p.totViol;
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    SECTION 17 — BUILD ALL CHARTS  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
@@ -2106,10 +3228,13 @@ function buildCharts(p) {
   if (typeof ChartDataLabels !== 'undefined') {
     try { Chart.register(ChartDataLabels); } catch(e) { /* already registered */ }
   }
+  /* Register PFTC badge plugin */
+  try { Chart.register(pftcBadgePlugin); } catch(e) { /* already registered */ }
 
   const { cfg, ax, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
           em, ca, svRank, ql, qLb, qPct, qCol, qMin, qMax,
-          pf, pfLb } = p;
+          pf, pfLb,
+          irtAlpha, irtCpMap } = p;
 
   /* ── Case Count ────────────────────────────────────────────────────── */
   mkChart('chartCpCount', stackedCfg(
@@ -2198,9 +3323,34 @@ function buildCharts(p) {
     ],
     ax.pf_max, 0, ttPftc
   );
+  pfCfg.options.layout.padding.right = 58; /* space for pts badge drawn by pftcBadgePlugin */
   pfCfg.options.scales.y.ticks.font  = { family:F, size:9.5, weight:'700' };
   pfCfg.options.scales.y.ticks.color = themeTickBColor();
   mkChart('chartPftc', pfCfg);
+
+  /* ── IRT / ORT Violations ──────────────────────────────────────────────── */
+  if (irtAlpha && irtAlpha.length) {
+    const hasIrtData = irtAlpha.some(r => (r.irt_cs||0) + (r.ort_cs||0) + (r.irt_cli||0) + (r.ort_cli||0) > 0);
+    const irtIrt = irtAlpha.map(r => (r.irt_cs||0) + (r.irt_cli||0));
+    const irtOrt = irtAlpha.map(r => (r.ort_cs||0) + (r.ort_cli||0));
+    const irtCfg = stackedCfg(
+      irtAlpha.map(r => r.name),
+      [
+        { label:'IRT Violations', data: irtIrt, backgroundColor:'#5B738B', borderRadius:2 },
+        { label:'ORT Violations', data: irtOrt, backgroundColor:'#B0C6D6', borderRadius:2 }
+      ],
+      ax.irt_max, 0,
+      (chart, di) => ttIrtOrt(chart, di, irtCpMap)
+    );
+    /* Show '0' labels when there are no violations — use dash instead */
+    irtCfg.options.plugins.datalabels = {
+      anchor:'center', align:'center', color:'#FFFFFF',
+      font:{ family:F, size:9, weight:'700' },
+      display: ctx => hasIrtData && ctx.dataset.data[ctx.dataIndex] > 0,
+      formatter: v => v > 0 ? v : ''
+    };
+    mkChart('chartIrtOrt', irtCfg);
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -2213,6 +3363,7 @@ function buildDashboard(D) {
   renderSvTable(p.svRaw, p.cfg);
   renderQualityNote(p.ql);
   renderFooter(p.cfg);
+  renderIrtOrt(p);
   buildCharts(p);
 }
 
@@ -2251,6 +3402,10 @@ async function loadAndBuild(token) {
   setLastRefresh();
   /* Load the real logo in the background — non-blocking */
   loadLogo(t).catch(() => {});
+  /* Load CAF data in the background — non-blocking */
+  cafLoad(t).catch(e => console.warn('[CAF] Background load failed:', e.message));
+  /* Load eLearning data in the background — non-blocking */
+  elLoad(t).catch(e => console.warn('[EL] Background load failed:', e.message));
 }
 
 /* Refresh button handler */
@@ -2285,8 +3440,9 @@ async function refreshDashboard() {
 
 /* ── Initialise on DOM ready ─────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  initTheme();      /* restore saved theme BEFORE building charts */
-  await initAuth(); /* check Microsoft 365 session and auto-load if available */
+  initTheme();           /* restore saved theme BEFORE building charts */
+  cafInitListeners();    /* attach static CAF event listeners           */
+  await initAuth();      /* check Microsoft 365 session and auto-load   */
 });
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -2344,19 +3500,24 @@ let lpViewId   = null;
 function switchTab(tab) {
   const perf  = document.getElementById('section-performance');
   const leave = document.getElementById('section-leave');
+  const caf   = document.getElementById('section-caf');
+  const el    = document.getElementById('section-el');
   const pBtn  = document.getElementById('tab-btn-perf');
   const lBtn  = document.getElementById('tab-btn-leave');
+  const cBtn  = document.getElementById('tab-btn-caf');
+  const eBtn  = document.getElementById('tab-btn-el');
+
+  /* Hide all sections; deactivate all buttons */
+  [perf, leave, caf, el].forEach(s => s && s.classList.add('hidden'));
+  [pBtn, lBtn, cBtn, eBtn].forEach(b => b && b.classList.remove('active'));
 
   if (tab === 'performance') {
-    perf.classList.remove('hidden');
-    leave.classList.add('hidden');
-    pBtn.classList.add('active');
-    lBtn.classList.remove('active');
-  } else {
-    perf.classList.add('hidden');
-    leave.classList.remove('hidden');
-    pBtn.classList.remove('active');
-    lBtn.classList.add('active');
+    perf && perf.classList.remove('hidden');
+    pBtn && pBtn.classList.add('active');
+
+  } else if (tab === 'leave') {
+    leave && leave.classList.remove('hidden');
+    lBtn  && lBtn.classList.add('active');
     /* Lazy-load leave data on first visit to the tab */
     if (!lpLoaded) {
       if (TK.hasAny()) {
@@ -2365,6 +3526,24 @@ function switchTab(tab) {
         lpSetStatus('Please sign in using the Performance Dashboard tab first.');
         lpShowMessage('Sign in to view the Leave Planner.');
       }
+    }
+
+  } else if (tab === 'caf') {
+    caf  && caf.classList.remove('hidden');
+    cBtn && cBtn.classList.add('active');
+    /* If data is already parsed, render now; otherwise loading state is shown */
+    if (cafParsed) cafRender();
+
+  } else if (tab === 'el') {
+    el   && el.classList.remove('hidden');
+    eBtn && eBtn.classList.add('active');
+    /* If data is already parsed, render; otherwise load triggers render on completion */
+    if (elData) {
+      elRender();
+    } else if (TK.hasAny()) {
+      getToken()
+        .then(t => elLoad(t))
+        .catch(e => console.warn('[EL] Tab load failed:', e.message));
     }
   }
 }
@@ -2949,6 +4128,1347 @@ function lpOverlayClick(e, which) {
   else if (which === 'view') lpCloseView();
   else if (which === 'del')  lpCloseDelete();
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 22 — CLIENT ASSIGNMENT FILE  (CAF)
+   Source  : Team Josh CAF.xlsx  stored in the same OneDrive data folder as
+             Team Josh Dashboard Data.xlsx.
+   Logic   : Reads all historical monthly columns; the rightmost month column
+             is treated as the current CSS assignment.  No month is hard-coded.
+             Each source row is an independent client-assignment record —
+             duplicate Account Names across different CSS members are kept.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Constants ───────────────────────────────────────────────────────────── */
+const CAF_FILE_NAME = 'Team Josh CAF.xlsx';
+const CAF_CSS = ['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor'];
+
+/* ── File resolution cache ───────────────────────────────────────────────── */
+let cafDriveId = null;
+let cafItemId  = null;
+
+/* ── Parsed data (set after load) ────────────────────────────────────────── */
+let cafParsed = null;
+/*  cafParsed shape:
+    {
+      rows        : Array<{[colKey]: string}>,   // one object per source row
+      displayCols : Array<{key, label, isCssCol}>, // cols shown in table
+      latestMonth : string | null,               // e.g. 'October'
+      statusCol   : string | null,               // 'CAF Status Updated'
+      tbCol       : string | null,               // 'Touchbase (Call/Email)'
+      acctCol     : string | null,               // 'Account Name'
+    }
+*/
+
+/* ── UI state ────────────────────────────────────────────────────────────── */
+let cafSelected    = 'ALL';   // which CSS tile is active
+let cafColFilters  = {};      // { colKey: filterString }
+let cafSearchQ     = '';      // global search term
+let cafSortCol     = null;    // colKey being sorted, or null
+let cafSortDir     = 'asc';   // 'asc' | 'desc'
+
+/* ════════════════════════════════════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* Is this header cell a month name? */
+function cafIsMonth(s) {
+  /* Match plain month names AND "Month Year" / "Month-YY" / "Month/YY" variants.
+     Examples that all return true:
+       "August"  "august"  "Aug"  "August 2025"  "Aug 2025"  "Aug-25"  "Aug/25" */
+  const full  = ['january','february','march','april','may','june',
+                 'july','august','september','october','november','december'];
+  const short = ['jan','feb','mar','apr','may','jun',
+                 'jul','aug','sep','oct','nov','dec'];
+  const n = String(s || '').trim().toLowerCase();
+  if (full.includes(n) || short.includes(n)) return true;
+  /* Prefix match — month name followed by a non-alpha char (space, -, /, digit) */
+  for (const m of [...full, ...short]) {
+    if (n.startsWith(m) && n.length > m.length) {
+      const next = n[m.length];
+      if (next === ' ' || next === '-' || next === '/' || /\d/.test(next)) return true;
+    }
+  }
+  return false;
+}
+
+/* Returns true if a CSS assignment cell value belongs to the given CSS member.
+   Handles exact first-name match AND full-name "Oliver Reyes" style values. */
+function cafMatchCss(cellValue, memberName) {
+  const cv = String(cellValue || '').trim().toLowerCase();
+  const mn = memberName.trim().toLowerCase();
+  if (!cv || !mn) return false;
+  if (cv === mn) return true;
+  /* Full-name: "Oliver Reyes", "Oliver A.", "Oliver," etc.
+     Accept if cell starts with the first name followed by a word-boundary char */
+  if (cv.startsWith(mn)) {
+    const next = cv[mn.length];
+    if (next === ' ' || next === '.' || next === ',' || next === '_' || next === '-') return true;
+  }
+  return false;
+}
+
+/* Encode / decode column key for data-col attributes (handles special chars) */
+function cafEnc(k){ return encodeURIComponent(k); }
+function cafDec(k){ return decodeURIComponent(k); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   EXCEL FILE RESOLUTION
+════════════════════════════════════════════════════════════════════════════ */
+
+async function cafResolveFile(token) {
+  if (cafItemId) return;                          /* already cached */
+  if (!excelItemId) await resolveExcelFile(token);/* ensure main Excel is resolved */
+
+  /* CAF lives in the same folder as the main Excel workbook */
+  const meta = await graphGet(
+    '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference',
+    token
+  );
+  const folderId = meta.parentReference.id;
+
+  const children = await graphGet(
+    '/drives/' + excelDriveId + '/items/' + folderId +
+    '/children?$select=id,name',
+    token
+  );
+  const item = (children.value || []).find(f => f.name === CAF_FILE_NAME);
+  if (!item) throw new Error(CAF_FILE_NAME + ' not found in the data folder.');
+
+  cafDriveId = excelDriveId;   /* same drive as the main Excel */
+  cafItemId  = item.id;
+  console.log('[CAF] Resolved — itemId:', cafItemId);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SHEET READER
+════════════════════════════════════════════════════════════════════════════ */
+
+async function cafFetchSheet(token) {
+  await cafResolveFile(token);
+
+  /* List worksheets; use the first one */
+  const sheetsResp = await graphGet(
+    '/drives/' + cafDriveId + '/items/' + cafItemId + '/workbook/worksheets',
+    token
+  );
+  const sheets = sheetsResp.value || [];
+  if (!sheets.length) throw new Error('Team Josh CAF.xlsx has no worksheets.');
+
+  const sn   = encodeURIComponent(sheets[0].name);
+  /* Request both text (Excel-formatted display strings) and values (raw).
+     We prefer `text` because it preserves the exact format the user sees in
+     Excel (e.g. dates as "11/1/2017" rather than a serial number). */
+  const resp = await graphGet(
+    '/drives/' + cafDriveId + '/items/' + cafItemId +
+    '/workbook/worksheets/' + sn + '/usedRange?$select=text,values',
+    token
+  );
+  /* Use text rows where available; fall back to values row-by-row */
+  const textGrid  = Array.isArray(resp.text)   ? resp.text   : [];
+  const valueGrid = Array.isArray(resp.values) ? resp.values : [];
+  const rows = textGrid.length ? textGrid : valueGrid;
+  return rows;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DATA PARSER
+   Rules:
+   - Header row  = first non-empty row
+   - Month cols  = any header matching a full or abbreviated month name
+   - Latest month = rightmost month column (user always appends new months)
+   - Historical month cols are excluded from the display table
+   - Each source row is kept as-is — no deduplication on Account Name
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafParse(values) {
+  const empty = {
+    rows:[], displayCols:[], latestMonth:null,
+    statusCol:null, tbCol:null, acctCol:null
+  };
+  if (!values || values.length < 2) return empty;
+
+  /* Locate header row (skip leading blank rows) */
+  let hi = 0;
+  while (hi < values.length - 1 &&
+         values[hi].every(c => c === null || c === '')) hi++;
+
+  const rawHeaders = values[hi].map(h => h != null ? String(h).trim() : '');
+
+  /* Identify ALL month columns; track which is the rightmost (= latest) */
+  let latestMonthIdx = -1;
+  let latestMonth    = null;
+  const histMonthSet = new Set();   /* indices of non-latest month cols */
+
+  rawHeaders.forEach((h, i) => {
+    if (h && cafIsMonth(h)) {
+      if (latestMonthIdx >= 0) histMonthSet.add(latestMonthIdx); /* previous latest → historical */
+      latestMonthIdx = i;
+      latestMonth    = h;
+    }
+  });
+
+  /* Case-insensitive column finder (exact first, then partial) */
+  function fc(...cands) {
+    for (const c of cands) {
+      const i = rawHeaders.findIndex(h => h.toLowerCase() === c.toLowerCase());
+      if (i >= 0) return rawHeaders[i];
+    }
+    for (const c of cands) {
+      const i = rawHeaders.findIndex(h => h.toLowerCase().includes(c.toLowerCase()));
+      if (i >= 0) return rawHeaders[i];
+    }
+    return null;
+  }
+
+  const acctCol   = fc('Account Name','Account','Client Name','Client');
+  const statusCol = fc('CAF Status Updated','Status Updated','CAF Status','Status');
+  const tbCol     = fc('Touchbase (Call/Email)','Touchbase','Touch Base (Call/Email)',
+                       'Touchbase Type','Touch Base');
+
+  /* Build display column list:
+     - exclude historical month columns (keep only latest month)
+     - rename latest month column to show "Current CSS (MonthName)" */
+  const displayCols = rawHeaders
+    .map((h, i) => {
+      if (!h)                  return null;   /* skip blank headers */
+      if (histMonthSet.has(i)) return null;   /* skip historical months */
+      return {
+        key      : h,
+        label    : i === latestMonthIdx ? 'Current CSS (' + h + ')' : h,
+        isCssCol : i === latestMonthIdx,
+      };
+    })
+    .filter(Boolean);
+
+  /* Parse data rows — keep every row, no deduplication */
+  const rows = [];
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row || row.every(c => c === null || c === '')) continue;
+    const obj = {};
+    rawHeaders.forEach((h, j) => {
+      if (h) obj[h] = row[j] != null ? String(row[j]).trim() : '';
+    });
+    rows.push(obj);
+  }
+
+  return { rows, displayCols, latestMonth, statusCol, tbCol, acctCol };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FILTERED / SORTED ROW ACCESSORS
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Returns all rows assigned to the given CSS in the latest month */
+function cafRowsForCss(css) {
+  if (!cafParsed || !cafParsed.rows.length) return [];
+  if (css === 'ALL') return cafParsed.rows;
+  if (!cafParsed.latestMonth) return cafParsed.rows;
+  /* Use prefix-aware match so "Oliver Reyes" in cell matches "Oliver" tile */
+  return cafParsed.rows.filter(r => {
+    const cv = (r[cafParsed.latestMonth] || '').trim();
+    return cafMatchCss(cv, css);
+  });
+}
+
+/* Applies CSS filter + column filters + search */
+function cafGetRows() {
+  let rows = cafRowsForCss(cafSelected);
+
+  /* Column-level filters */
+  Object.entries(cafColFilters).forEach(([col, val]) => {
+    if (!val) return;
+    const v = val.toLowerCase();
+    rows = rows.filter(r => String(r[col] || '').toLowerCase().includes(v));
+  });
+
+  /* Global search */
+  if (cafSearchQ) {
+    const s = cafSearchQ.toLowerCase();
+    rows = rows.filter(r =>
+      Object.values(r).some(v => String(v || '').toLowerCase().includes(s))
+    );
+  }
+
+  return rows;
+}
+
+/* Sort a row array by the current sort column */
+function cafSortRows(rows) {
+  if (!cafSortCol) return rows;
+  return [...rows].sort((a, b) => {
+    const av = String(a[cafSortCol] || '').toLowerCase();
+    const bv = String(b[cafSortCol] || '').toLowerCase();
+    const c  = av.localeCompare(bv, undefined, { numeric:true, sensitivity:'base' });
+    return cafSortDir === 'asc' ? c : -c;
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   COUNTS FOR TILES & SUMMARY
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Active client count per CSS member (for tile display) */
+function cafCssCounts() {
+  const counts = {};
+  CAF_CSS.forEach(m => { counts[m.toLowerCase()] = 0; });
+  if (!cafParsed || !cafParsed.latestMonth) return counts;
+  cafParsed.rows.forEach(r => {
+    const cv   = (r[cafParsed.latestMonth] || '').trim();
+    const stat = cafParsed.statusCol
+      ? (r[cafParsed.statusCol] || '').trim().toLowerCase() : '';
+    if (stat !== 'active') return;
+    /* Use prefix-aware match so "Oliver Reyes" counts for "Oliver" */
+    for (const m of CAF_CSS) {
+      if (cafMatchCss(cv, m)) { counts[m.toLowerCase()]++; break; }
+    }
+  });
+  return counts;
+}
+
+/* Summary stats for a given row set */
+function cafSumStats(rows) {
+  const out = { total:rows.length, active:0, call:0, email:0 };
+  rows.forEach(r => {
+    if (cafParsed.statusCol) {
+      if ((r[cafParsed.statusCol] || '').trim().toLowerCase() === 'active') out.active++;
+    }
+    if (cafParsed.tbCol) {
+      const tb = (r[cafParsed.tbCol] || '').trim().toLowerCase();
+      if (tb === 'call')  out.call++;
+      if (tb === 'email') out.email++;
+    }
+  });
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CELL RENDERER
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafCellHtml(col, row) {
+  const v = row[col.key];
+  if (v === null || v === undefined || v === '') {
+    return '<span style="color:var(--cf)">—</span>';
+  }
+  const vs = String(v);
+  const lv = vs.toLowerCase();
+
+  /* Status badge */
+  if (cafParsed.statusCol && col.key === cafParsed.statusCol) {
+    const cls = lv === 'active' ? 'caf-s caf-s-active' : 'caf-s caf-s-inactive';
+    return '<span class="' + cls + '">' + cafEsc(vs) + '</span>';
+  }
+
+  /* Touchbase badge */
+  if (cafParsed.tbCol && col.key === cafParsed.tbCol) {
+    if (lv === 'call')  return '<span class="caf-tb caf-tb-call">'  + cafEsc(vs) + '</span>';
+    if (lv === 'email') return '<span class="caf-tb caf-tb-email">' + cafEsc(vs) + '</span>';
+  }
+
+  /* Current CSS pill */
+  if (col.isCssCol && vs) {
+    return '<span class="caf-css-pill">' + cafEsc(vs) + '</span>';
+  }
+
+  return cafEsc(vs);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   RENDER — CSS MEMBER TILES
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafRenderTiles() {
+  const container = document.getElementById('caf-css-row');
+  if (!container) return;
+
+  const counts   = cafCssCounts();
+  const allSel   = cafSelected === 'ALL';
+  const members  = ['ALL', ...CAF_CSS];
+
+  container.innerHTML = members.map(m => {
+    const isAll    = m === 'ALL';
+    const isActive = cafSelected === m;
+    const isMuted  = !allSel && !isActive;
+    let cls = 'caf-tile';
+    if (isActive) cls += ' caf-tile-active';
+    if (isMuted)  cls += ' caf-tile-muted';
+
+    let sub;
+    if (isAll) {
+      const totalActive = Object.values(counts).reduce((a,b) => a+b, 0);
+      sub = '<div class="caf-tile-all-sub">' + totalActive + ' Active</div>';
+    } else {
+      sub = '<div class="caf-tile-count">' + (counts[m.toLowerCase()] || 0) + ' Active</div>';
+    }
+    return '<div class="' + cls + '" data-css="' + cafEsc(m) + '">' +
+           '<div class="caf-tile-name">' + cafEsc(m) + '</div>' + sub + '</div>';
+  }).join('');
+
+  /* Attach click listeners after injection */
+  container.querySelectorAll('.caf-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      cafSelected = tile.dataset.css;
+      cafRender();
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   RENDER — TEAM SUMMARY CARDS
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafRenderSummary(rows) {
+  const el = document.getElementById('caf-summary');
+  if (!el) return;
+  const s   = cafSumStats(rows);
+  const tot = s.total || 0;
+
+  /* Percentage helper — avoids division-by-zero */
+  const pct = (n) => tot > 0 ? (n / tot * 100).toFixed(1) + '%' : '0.0%';
+
+  const cards = [
+    {
+      lbl : 'Total Clients',
+      val : s.total,
+      pct : null,
+      sub : 'Records in current view',
+      acc : '#0070F2'
+    },
+    {
+      lbl : 'Active Clients',
+      val : s.active,
+      pct : null,
+      sub : 'CAF Status = Active',
+      acc : '#2CE0BF'
+    },
+    {
+      lbl : 'Touchbase \u2014 Call',
+      val : s.call,
+      pct : pct(s.call),
+      sub : 'Touchbase = Call',
+      acc : '#5B738B'
+    },
+    {
+      lbl : 'Touchbase \u2014 Email',
+      val : s.email,
+      pct : pct(s.email),
+      sub : 'Touchbase = Email',
+      acc : '#89D1FF'
+    },
+  ];
+  el.innerHTML = cards.map(c =>
+    '<div class="caf-sum-card" style="border-top-color:' + c.acc + '">' +
+      '<div class="caf-sum-lbl">' + c.lbl + '</div>' +
+      '<div class="caf-sum-val" style="color:' + c.acc + '">' + c.val +
+        (c.pct !== null
+          ? ' <span class="caf-pct" style="color:' + c.acc + '">[' + c.pct + ']</span>'
+          : '') +
+      '</div>' +
+      '<div class="caf-sum-sub">' + c.sub + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   RENDER — CLIENT RECORDS TABLE
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafRenderTable(rows) {
+  const tbl = document.getElementById('caf-tbl');
+  if (!tbl || !cafParsed) return;
+
+  const cols   = cafParsed.displayCols;
+  const sorted = cafSortRows(rows);
+
+  /* Store sorted rows so cafOpenRequestUpdate(idx) can look them up */
+  cafCurrentRows = sorted;
+
+  if (!cols.length) {
+    tbl.innerHTML =
+      '<tbody><tr><td class="caf-empty" style="padding:36px 20px">' +
+      'No display columns found in ' + CAF_FILE_NAME + '.</td></tr></tbody>';
+    return;
+  }
+
+  const colSpan = cols.length + 1; /* +1 for Actions column */
+
+  /* ── Header row ── */
+  const thRow = cols.map(c => {
+    const isSorted = cafSortCol === c.key;
+    const sortCls  = isSorted ? (' caf-sort-' + cafSortDir) : '';
+    const icon     = isSorted ? (cafSortDir === 'asc' ? '&#x2191;' : '&#x2193;') : '&#x21C5;';
+    return '<th class="caf-th-sort' + sortCls + '" data-col="' + cafEnc(c.key) + '">' +
+           cafEsc(c.label) + '<span class="caf-sort-icon">' + icon + '</span></th>';
+  }).join('') + '<th class="caf-th-action">Actions</th>';
+
+  /* ── Filter row ── */
+  const fiRow = cols.map(c => {
+    const val = cafEsc(cafColFilters[c.key] || '');
+    return '<th class="caf-fh"><input class="caf-fi" value="' + val +
+           '" placeholder="Filter\u2026" data-col="' + cafEnc(c.key) + '"></th>';
+  }).join('') + '<th class="caf-fh caf-fh-action"></th>';
+
+  /* ── Data rows ── */
+  const dataRows = sorted.length
+    ? sorted.map((r, i) =>
+        '<tr>' +
+          cols.map(c => '<td>' + cafCellHtml(c, r) + '</td>').join('') +
+          '<td class="caf-td-action">' +
+            '<button class="caf-req-btn" data-row="' + i + '">Request Update</button>' +
+          '</td>' +
+        '</tr>'
+      ).join('')
+    : '<tr><td colspan="' + colSpan + '" class="caf-empty">' +
+      'No records match the current filters.</td></tr>';
+
+  tbl.innerHTML =
+    '<thead>' +
+      '<tr>' + thRow + '</tr>' +
+      '<tr class="caf-filter-row">' + fiRow + '</tr>' +
+    '</thead>' +
+    '<tbody>' + dataRows + '</tbody>';
+
+  /* ── Sort listeners on column headers ── */
+  tbl.querySelectorAll('th.caf-th-sort').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = cafDec(th.dataset.col);
+      if (cafSortCol === col) {
+        cafSortDir = cafSortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        cafSortCol = col;
+        cafSortDir = 'asc';
+      }
+      /* Re-render only the table (tiles/summary don't change on sort) */
+      cafRenderTable(cafGetRows());
+    });
+  });
+
+  /* ── Column filter listeners on inputs ── */
+  tbl.querySelectorAll('.caf-fi').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const col        = cafDec(inp.dataset.col);
+      const savedStart = inp.selectionStart;
+      const savedEnd   = inp.selectionEnd;
+      if (inp.value) cafColFilters[col] = inp.value;
+      else           delete cafColFilters[col];
+      const filteredRows = cafGetRows();
+      cafRenderTable(filteredRows);
+      cafRenderSummary(filteredRows);
+      cafUpdateBadge(filteredRows);
+      /* After the table is rebuilt the old <input> is gone; re-focus the
+         new input for the same column so the user can keep typing. */
+      requestAnimationFrame(() => {
+        const newInp = document.querySelector(
+          '#caf-tbl .caf-fi[data-col="' + cafEnc(col) + '"]'
+        );
+        if (newInp) {
+          newInp.focus();
+          try { newInp.setSelectionRange(savedStart, savedEnd); } catch(_) {}
+        }
+      });
+    });
+    /* Prevent sort header click when clicking on filter input */
+    inp.addEventListener('click', e => e.stopPropagation());
+  });
+
+  /* ── Request Update button — event delegation on tbody ── */
+  const tbody = tbl.querySelector('tbody');
+  if (tbody) {
+    tbody.addEventListener('click', e => {
+      const btn = e.target.closest('.caf-req-btn');
+      if (!btn) return;
+      const idx = parseInt(btn.dataset.row, 10);
+      cafOpenRequestUpdate(idx);
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   RENDER — MONTH PILL + ROW COUNT BADGE
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafUpdatePill() {
+  const pill = document.getElementById('caf-month-pill');
+  if (!pill) return;
+  if (cafParsed && cafParsed.latestMonth) {
+    pill.textContent = cafParsed.latestMonth;
+    pill.style.display = '';
+  } else {
+    pill.style.display = 'none';
+  }
+}
+
+function cafUpdateBadge(rows) {
+  const badge = document.getElementById('caf-row-badge');
+  if (badge) {
+    badge.textContent = rows.length + ' record' + (rows.length !== 1 ? 's' : '');
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MAIN RENDER (full re-render of the CAF tab)
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafRender() {
+  if (!cafParsed) return;
+  const rows = cafGetRows();
+  cafRenderTiles();
+  cafRenderSummary(rows);
+  cafRenderTable(rows);
+  cafUpdateBadge(rows);
+  cafUpdatePill();
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LOAD ENTRY POINT  (called from loadAndBuild — non-blocking)
+════════════════════════════════════════════════════════════════════════════ */
+
+async function cafLoad(token) {
+  /* Reset file cache so a Refresh Data always re-reads the file */
+  cafItemId = null;
+  cafDriveId = null;
+
+  /* Reset UI state on each load so stale filters don't persist */
+  cafSelected   = 'ALL';
+  cafColFilters = {};
+  cafSearchQ    = '';
+  cafSortCol    = null;
+  cafSortDir    = 'asc';
+  const si = document.getElementById('caf-search');
+  if (si) si.value = '';
+
+  /* Show loading state in tile area */
+  const cssRow = document.getElementById('caf-css-row');
+  if (cssRow) cssRow.innerHTML = '<div class="caf-loading-state">Loading assignment data\u2026</div>';
+  const sumEl = document.getElementById('caf-summary');
+  if (sumEl) sumEl.innerHTML = '';
+  const tbl = document.getElementById('caf-tbl');
+  if (tbl) tbl.innerHTML = '';
+  cafUpdateBadge([]);
+
+  try {
+    const values = await cafFetchSheet(token);
+    cafParsed    = cafParse(values);
+    console.log('[CAF] Parsed — ' + cafParsed.rows.length + ' rows, latest month: ' + cafParsed.latestMonth);
+    /* Only render if the CAF section is currently visible */
+    const sec = document.getElementById('section-caf');
+    if (sec && !sec.classList.contains('hidden')) {
+      cafRender();
+    } else {
+      /* Pre-populate tiles and pill even if tab is not active */
+      cafUpdatePill();
+      cafRenderTiles();
+    }
+  } catch(e) {
+    console.warn('[CAF] Load error:', e.message);
+    cafParsed = null;
+    if (cssRow) {
+      cssRow.innerHTML =
+        '<div class="caf-loading-state" style="color:#BB0000;font-style:normal">' +
+        'Could not load ' + cafEsc(CAF_FILE_NAME) + ': ' + cafEsc(e.message) + '</div>';
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ONE-TIME STATIC LISTENER SETUP  (called from DOMContentLoaded)
+════════════════════════════════════════════════════════════════════════════ */
+
+function cafInitListeners() {
+  /* Global search input */
+  const searchEl = document.getElementById('caf-search');
+  if (searchEl) {
+    searchEl.addEventListener('input', () => {
+      cafSearchQ = searchEl.value;
+      const rows = cafGetRows();
+      cafRenderTable(rows);
+      cafRenderSummary(rows);
+      cafUpdateBadge(rows);
+    });
+  }
+
+  /* Clear all filters button */
+  const clearBtn = document.getElementById('caf-clear-btn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      cafColFilters = {};
+      cafSearchQ    = '';
+      const si = document.getElementById('caf-search');
+      if (si) si.value = '';
+      cafRender();
+    });
+  }
+
+  /* ── Request Update dialog — static close/overlay listeners ── */
+  const reqClose = document.getElementById('caf-req-close');
+  if (reqClose) reqClose.addEventListener('click', cafCancelReq);
+
+  const reqOverlay = document.getElementById('caf-req-overlay');
+  if (reqOverlay) {
+    reqOverlay.addEventListener('click', e => {
+      if (e.target === reqOverlay) cafCancelReq();
+    });
+  }
+
+  /* ── Template dialog — static close/overlay listeners ── */
+  const tmplClose = document.getElementById('caf-tmpl-close');
+  if (tmplClose) tmplClose.addEventListener('click', cafCloseTmplDlg);
+
+  const tmplOverlay = document.getElementById('caf-tmpl-overlay');
+  if (tmplOverlay) {
+    tmplOverlay.addEventListener('click', e => {
+      if (e.target === tmplOverlay) cafCloseTmplDlg();
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 23 — REQUEST DATA UPDATE WORKFLOW
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Rows currently displayed in the table (sorted + filtered).
+   Set by cafRenderTable so cafOpenRequestUpdate(idx) can look them up. */
+let cafCurrentRows        = [];
+let cafReqRow             = null;  /* the specific CAF record being updated        */
+let cafReqSelectedIndices = [];    /* column indices saved for Back navigation     */
+let cafReqHtml            = '';    /* generated HTML email content (ClipboardItem) */
+let cafReqPlain           = '';    /* plain-text fallback for clipboard            */
+
+/* ── Open field-selection dialog for the row at the given display index ──
+   idx >= 0  →  fresh open (sets cafReqRow, resets selection)
+   idx === -1 → Back navigation (cafReqRow + cafReqSelectedIndices preserved) */
+function cafOpenRequestUpdate(idx) {
+  if (idx >= 0) {
+    cafReqRow             = cafCurrentRows[idx];
+    cafReqSelectedIndices = [];  /* fresh start */
+  }
+  if (!cafReqRow || !cafParsed) return;
+
+  const acct = cafParsed.acctCol ? (cafReqRow[cafParsed.acctCol] || '—') : '—';
+
+  /* Build checkbox list from every displayed column */
+  const cols   = cafParsed.displayCols;
+  const checks = cols.map((c, i) =>
+    '<label class="caf-dlg-chk-lbl">' +
+      '<input type="checkbox" class="caf-req-chk" value="' + i + '"> ' +
+      cafEsc(c.label) +
+    '</label>'
+  ).join('');
+
+  document.getElementById('caf-req-body').innerHTML =
+    '<div class="caf-dlg-client">' +
+      '<div class="caf-dlg-client-lbl">Client</div>' +
+      '<div class="caf-dlg-client-val">' + cafEsc(acct) + '</div>' +
+    '</div>' +
+    '<div class="caf-dlg-prompt">Which details need to be updated?</div>' +
+    '<div class="caf-dlg-prompt-sub">Select all applicable fields.</div>' +
+    '<div class="caf-dlg-selall">' +
+      '<input type="checkbox" id="caf-req-selall">' +
+      '<label for="caf-req-selall">Select All</label>' +
+      '<button class="caf-dlg-clear-lnk" id="caf-req-clear-btn" type="button">Clear Selection</button>' +
+    '</div>' +
+    '<div class="caf-dlg-checks">' + checks + '</div>' +
+    '<div class="caf-dlg-validation" id="caf-req-validation">' +
+      'Please select at least one field to update.' +
+    '</div>' +
+    '<div class="caf-dlg-foot">' +
+      '<button class="caf-dlg-cancel" id="caf-req-cancel-btn">Cancel</button>' +
+      '<button class="caf-dlg-primary" id="caf-req-gen-btn">Generate Email Template</button>' +
+    '</div>';
+
+  const selAll  = document.getElementById('caf-req-selall');
+  const allChks = () => [...document.querySelectorAll('#caf-req-body .caf-req-chk')];
+
+  /* Restore selections if Back navigation */
+  if (cafReqSelectedIndices.length) {
+    allChks().forEach(cb => {
+      cb.checked = cafReqSelectedIndices.includes(parseInt(cb.value, 10));
+    });
+    const list    = allChks();
+    const checked = list.filter(c => c.checked).length;
+    selAll.checked       = checked === list.length && list.length > 0;
+    selAll.indeterminate = checked > 0 && checked < list.length;
+  }
+
+  /* Select All toggle */
+  selAll.addEventListener('change', () => {
+    allChks().forEach(cb => { cb.checked = selAll.checked; });
+  });
+
+  /* Clear Selection */
+  document.getElementById('caf-req-clear-btn')
+    .addEventListener('click', () => {
+      allChks().forEach(cb => { cb.checked = false; });
+      selAll.checked       = false;
+      selAll.indeterminate = false;
+    });
+
+  allChks().forEach(cb => {
+    cb.addEventListener('change', () => {
+      const list    = allChks();
+      const checked = list.filter(c => c.checked).length;
+      selAll.indeterminate = checked > 0 && checked < list.length;
+      selAll.checked       = checked === list.length;
+    });
+  });
+
+  /* Cancel — full state reset */
+  document.getElementById('caf-req-cancel-btn')
+    .addEventListener('click', cafCancelReq);
+
+  /* Generate */
+  document.getElementById('caf-req-gen-btn')
+    .addEventListener('click', cafGenerateTemplate);
+
+  document.getElementById('caf-req-overlay').classList.remove('hidden');
+}
+
+/* ── Full-cancel: close dialog and reset all request state ─────────────── */
+function cafCancelReq() {
+  cafCloseReqDlg();
+  cafReqRow             = null;
+  cafReqSelectedIndices = [];
+  cafReqHtml            = '';
+  cafReqPlain           = '';
+}
+
+/* ── Close field-selection dialog ───────────────────────────────────────── */
+function cafCloseReqDlg() {
+  document.getElementById('caf-req-overlay').classList.add('hidden');
+  document.getElementById('caf-req-body').innerHTML = '';
+}
+
+/* ── Generate email template from selected fields ───────────────────────── */
+function cafGenerateTemplate() {
+  if (!cafReqRow || !cafParsed) return;
+
+  const selected = [...document.querySelectorAll('#caf-req-body .caf-req-chk:checked')]
+    .map(cb => cafParsed.displayCols[parseInt(cb.value, 10)])
+    .filter(Boolean);
+
+  const validation = document.getElementById('caf-req-validation');
+  if (!selected.length) {
+    if (validation) validation.classList.add('visible');
+    return;
+  }
+  if (validation) validation.classList.remove('visible');
+
+  /* Save selected indices for Back navigation */
+  cafReqSelectedIndices = [...document.querySelectorAll('#caf-req-body .caf-req-chk:checked')]
+    .map(cb => parseInt(cb.value, 10));
+
+  const acct = cafParsed.acctCol ? (cafReqRow[cafParsed.acctCol] || '(unknown)') : '(unknown)';
+
+  /* Find entity code column (key or label contains "entity") */
+  const entityCol  = cafParsed.displayCols.find(c =>
+    /entity.?code/i.test(c.key) || /entity.?code/i.test(c.label) ||
+    (/entity/i.test(c.key) && /code/i.test(c.key))
+  );
+  const entityCode  = entityCol ? (cafReqRow[entityCol.key] || '') : '';
+  const clientPlain = entityCode ? acct + ' [' + entityCode + ']' : acct;
+  const clientEntity = entityCode
+    ? '<strong>' + cafEsc(acct) + '</strong>' +
+      ' <span class="caf-tmpl-entity">[' + cafEsc(entityCode) + ']</span>'
+    : '<strong>' + cafEsc(acct) + '</strong>';
+
+  /* ── HTML email (ClipboardItem text/html) ── */
+  const trHtml = selected.map(c =>
+    '<tr>' +
+    '<td style="border:1px solid #D0D8E6;padding:7px 12px;font-family:Arial,sans-serif;font-size:13px;color:#1D2329">' +
+      cafEsc(c.label) + '</td>' +
+    '<td style="border:1px solid #D0D8E6;padding:7px 12px;font-family:Arial,sans-serif;font-size:13px;color:#1D2329">' +
+      cafEsc(cafReqRow[c.key] || '') + '</td>' +
+    '<td style="border:1px solid #D0D8E6;padding:7px 12px;font-family:Arial,sans-serif;font-size:13px;color:#1D2329"></td>' +
+    '</tr>'
+  ).join('');
+
+  cafReqHtml =
+    '<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px">Hello,</p>' +
+    '<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px">Good day.</p>' +
+    '<p style="margin:0 0 10px;font-family:Arial,sans-serif;font-size:13px">' +
+      'The following details need to be updated for <strong>' +
+      cafEsc(clientPlain) + '</strong>:</p>' +
+    '<table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif">' +
+      '<thead>' +
+        '<tr style="background:#E8F0FB">' +
+          '<th style="border:1px solid #D0D8E6;padding:7px 12px;text-align:left;' +
+               'font-size:12px;color:#00144A">Detail</th>' +
+          '<th style="border:1px solid #D0D8E6;padding:7px 12px;text-align:left;' +
+               'font-size:12px;color:#00144A">Current Information</th>' +
+          '<th style="border:1px solid #D0D8E6;padding:7px 12px;text-align:left;' +
+               'font-size:12px;color:#00144A">Updated Information</th>' +
+        '</tr>' +
+      '</thead>' +
+      '<tbody>' + trHtml + '</tbody>' +
+    '</table>' +
+    '<p style="margin:10px 0 0;font-family:Arial,sans-serif;font-size:13px">Thank you.</p>';
+
+  /* ── Plain-text fallback ── */
+  cafReqPlain =
+    'Hello,\n\nGood day.\n\n' +
+    'The following details need to be updated for ' + clientPlain + ':\n\n' +
+    selected.map(c =>
+      '  ' + c.label + ':\n' +
+      '    Current : ' + (cafReqRow[c.key] || '(empty)') + '\n' +
+      '    Updated : '
+    ).join('\n') + '\n\nThank you.';
+
+  /* ── Build preview ── */
+  const previewRows = selected.map(c =>
+    '<tr>' +
+      '<td class="caf-tmpl-tbl-cell">' + cafEsc(c.label) + '</td>' +
+      '<td class="caf-tmpl-tbl-cell">' + cafEsc(cafReqRow[c.key] || '') + '</td>' +
+      '<td class="caf-tmpl-tbl-cell caf-tmpl-tbl-empty">\u2015 fill in \u2015</td>' +
+    '</tr>'
+  ).join('');
+
+  document.getElementById('caf-tmpl-body').innerHTML =
+    '<div class="caf-tmpl-guide">' +
+      'Click <strong>Copy Email Template</strong> below, paste into a new email, ' +
+      'fill in the <em>Updated Information</em> column, then send to ' +
+      '<a href="mailto:Josh.Nacional@sap.com">Josh.Nacional@sap.com</a>.' +
+    '</div>' +
+    '<div class="caf-tmpl-preview">' +
+      '<div class="caf-tmpl-para">Hello,</div>' +
+      '<div class="caf-tmpl-para">Good day.</div>' +
+      '<div class="caf-tmpl-para caf-tmpl-for">' +
+        'The following details need to be updated for ' + clientEntity + ':' +
+      '</div>' +
+      '<table class="caf-tmpl-tbl">' +
+        '<thead><tr>' +
+          '<th class="caf-tmpl-tbl-hd">Detail</th>' +
+          '<th class="caf-tmpl-tbl-hd">Current Information</th>' +
+          '<th class="caf-tmpl-tbl-hd caf-tmpl-tbl-hd-upd">Updated Information</th>' +
+        '</tr></thead>' +
+        '<tbody>' + previewRows + '</tbody>' +
+      '</table>' +
+      '<div class="caf-tmpl-para caf-tmpl-closing">Thank you.</div>' +
+    '</div>' +
+    '<div class="caf-tmpl-actions">' +
+      '<button class="caf-dlg-cancel" id="caf-back-btn">\u2190 Back</button>' +
+      '<div class="caf-tmpl-actions-right">' +
+        '<button class="caf-copy-btn" id="caf-copy-btn">Copy Email Template</button>' +
+        '<button class="caf-dlg-primary" id="caf-done-btn">Done</button>' +
+      '</div>' +
+    '</div>';
+
+  /* Attach handlers */
+  document.getElementById('caf-back-btn').addEventListener('click', cafGoBack);
+  document.getElementById('caf-copy-btn').addEventListener('click', cafCopyTemplate);
+  document.getElementById('caf-done-btn').addEventListener('click', cafDoneReq);
+
+  /* Show template; hide field-selection (no state clear) */
+  cafCloseReqDlg();
+  document.getElementById('caf-tmpl-overlay').classList.remove('hidden');
+}
+
+/* ── Back to field-selection (preserves selections) ─────────────────────── */
+function cafGoBack() {
+  document.getElementById('caf-tmpl-overlay').classList.add('hidden');
+  document.getElementById('caf-tmpl-body').innerHTML = '';
+  cafOpenRequestUpdate(-1); /* restores cafReqRow + cafReqSelectedIndices */
+}
+
+/* ── Done button: close everything ──────────────────────────────────────── */
+function cafDoneReq() {
+  document.getElementById('caf-tmpl-overlay').classList.add('hidden');
+  document.getElementById('caf-tmpl-body').innerHTML = '';
+  cafReqRow             = null;
+  cafReqSelectedIndices = [];
+  cafReqHtml            = '';
+  cafReqPlain           = '';
+}
+
+/* ── Close template dialog (X button / overlay click) ───────────────────── */
+function cafCloseTmplDlg() {
+  document.getElementById('caf-tmpl-overlay').classList.add('hidden');
+  document.getElementById('caf-tmpl-body').innerHTML = '';
+  cafReqRow             = null;
+  cafReqSelectedIndices = [];
+  cafReqHtml            = '';
+  cafReqPlain           = '';
+}
+
+/* ── Copy template to clipboard (HTML preferred, plain-text fallback) ───── */
+function cafCopyTemplate() {
+  const btn = document.getElementById('caf-copy-btn');
+
+  const markCopied = () => {
+    if (btn) {
+      btn.textContent = 'Copied \u2714';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy Email Template';
+        btn.classList.remove('copied');
+      }, 2800);
+    }
+  };
+
+  /* Modern: write both HTML + plain-text so Outlook gets a formatted table */
+  if (navigator.clipboard && window.ClipboardItem) {
+    try {
+      const htmlBlob  = new Blob([cafReqHtml],  { type: 'text/html'  });
+      const plainBlob = new Blob([cafReqPlain], { type: 'text/plain' });
+      navigator.clipboard.write([new ClipboardItem({
+        'text/html' : htmlBlob,
+        'text/plain': plainBlob,
+      })]).then(markCopied).catch(() => cafCopyPlainText(markCopied));
+      return;
+    } catch(e) { /* ClipboardItem not supported — fall through */ }
+  }
+  cafCopyPlainText(markCopied);
+}
+
+function cafCopyPlainText(cb) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(cafReqPlain).then(cb)
+      .catch(() => cafCopyFallback(cafReqPlain, cb));
+  } else {
+    cafCopyFallback(cafReqPlain, cb);
+  }
+}
+
+function cafCopyFallback(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 24 — eLEARNING COMPLIANCE
+   Reads sheet "eLearning Compliance" from the main workbook.
+   Column A = eLearning Course, B = CS Internal Deadline, C = SAP Deadline,
+   D+ = CS member names (Dhean, Hannah, Hart, Oliver, Rob, Roanne, Thor).
+   Status values: "Completed" / "Pending". View-only — no editing.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── State ───────────────────────────────────────────────────────────────── */
+let elData     = null;   /* parsed eLearning data                          */
+let elSelected = 'ALL';  /* selected CS filter ('ALL' or CS member name)   */
+
+/* ── Compliance color threshold ─────────────────────────────────────────── */
+function elColor(pct) {
+  if (pct >= 97) return '#0070F2';
+  if (pct >= 90) return '#E76500';
+  return '#D20A0A';
+}
+
+/* ── Load sheet data ─────────────────────────────────────────────────────── */
+async function elLoad(token) {
+  try {
+    if (!excelItemId) await resolveExcelFile(token);
+    const enc  = encodeURIComponent('eLearning Compliance');
+    const resp = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + excelItemId +
+      '/workbook/worksheets/' + enc + '/usedRange?$select=text,values',
+      token
+    );
+    const textGrid  = Array.isArray(resp.text)   ? resp.text   : [];
+    const valueGrid = Array.isArray(resp.values) ? resp.values : [];
+    const rows = textGrid.length ? textGrid : valueGrid;
+    elData = elParse(rows);
+    console.log('[EL] Parsed — ' + (elData ? elData.courses.length + ' courses, ' +
+      elData.csMembers.length + ' CS members' : 'null'));
+    const sec = document.getElementById('section-el');
+    if (sec && !sec.classList.contains('hidden')) elRender();
+  } catch(e) {
+    console.warn('[EL] Load error:', e.message);
+    elData = null;
+    const row = document.getElementById('el-cs-row');
+    if (row) row.innerHTML =
+      '<div class="el-loading-state" style="color:#BB0000;font-style:normal">' +
+      'Could not load eLearning data: ' + cafEsc(e.message) + '</div>';
+  }
+}
+
+/* ── Parse raw sheet values ─────────────────────────────────────────────── */
+function elParse(values) {
+  if (!values || values.length < 2) return null;
+
+  /* Skip leading blank rows */
+  let hi = 0;
+  while (hi < values.length - 1 && values[hi].every(c => c === null || String(c).trim() === '')) hi++;
+
+  const headers = values[hi].map(h => h != null ? String(h).trim() : '');
+
+  /* Locate key columns */
+  const courseIdx  = headers.findIndex(h => /course|elearning|e-learning/i.test(h));
+  const intDeadIdx = headers.findIndex(h => /internal/i.test(h));
+  const sapDeadIdx = headers.findIndex(h => /sap\s*(dead|date)/i.test(h) || h.toLowerCase() === 'sap deadline');
+
+  if (courseIdx < 0) {
+    console.warn('[EL] Could not locate "course" column in headers:', headers);
+    return null;
+  }
+
+  /* CS columns start right after the last known header column */
+  const lastFixed  = Math.max(courseIdx, intDeadIdx, sapDeadIdx);
+  const startCsIdx = lastFixed + 1;
+  const csMembers  = headers.slice(startCsIdx).filter(h => h.length > 0);
+
+  /* Parse data rows */
+  const courses = [];
+  for (let i = hi + 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row) continue;
+    const name = row[courseIdx] != null ? String(row[courseIdx]).trim() : '';
+    if (!name) continue;
+    const course = {
+      name       : name,
+      intDeadline: intDeadIdx >= 0 && row[intDeadIdx] != null ? String(row[intDeadIdx]).trim() : '',
+      sapDeadline: sapDeadIdx >= 0 && row[sapDeadIdx] != null ? String(row[sapDeadIdx]).trim() : '',
+      status     : {}
+    };
+    csMembers.forEach((cs, j) => {
+      const idx = startCsIdx + j;
+      course.status[cs] = row[idx] != null ? String(row[idx]).trim() : '';
+    });
+    courses.push(course);
+  }
+
+  return { courses, csMembers };
+}
+
+/* ── Count completed / pending for a CS (or ALL) ────────────────────────── */
+function elCountsForCs(cs) {
+  if (!elData) return { total: 0, completed: 0, pending: 0 };
+  let completed = 0, pending = 0;
+  const members = cs === 'ALL' ? elData.csMembers : [cs];
+  elData.courses.forEach(c => {
+    members.forEach(m => {
+      const s = (c.status[m] || '').toLowerCase();
+      if (s === 'completed') completed++;
+      else if (s === 'pending') pending++;
+    });
+  });
+  const total = completed + pending;
+  return { total, completed, pending };
+}
+
+function elPctForCs(cs) {
+  const c = elCountsForCs(cs);
+  return c.total > 0 ? Math.round(c.completed / c.total * 100) : 0;
+}
+
+/* ── Render: Team Summary cards ─────────────────────────────────────────── */
+function elRenderSummary() {
+  const el = document.getElementById('el-summary');
+  if (!el || !elData) return;
+
+  const counts  = elCountsForCs(elSelected);
+  const pct     = elPctForCs(elSelected);
+  const col     = elColor(pct);
+  const isAll   = elSelected === 'ALL';
+
+  const cards = [
+    { lbl: 'Team Completion',
+      val: pct + '%',
+      sub: isAll ? 'Overall team completion' : elSelected + ' completion',
+      acc: col },
+    { lbl: 'Total Courses',
+      val: elData.courses.length,
+      sub: 'eLearning courses',
+      acc: '#0070F2' },
+    { lbl: 'Completed',
+      val: counts.completed,
+      sub: 'Completed assignments',
+      acc: '#2CE0BF' },
+    { lbl: 'Pending',
+      val: counts.pending,
+      sub: 'Pending assignments',
+      acc: '#E76500' },
+  ];
+
+  el.innerHTML = cards.map(c =>
+    '<div class="el-sum-card" style="border-top-color:' + c.acc + '">' +
+      '<div class="el-sum-lbl">' + c.lbl + '</div>' +
+      '<div class="el-sum-val" style="color:' + c.acc + '">' + c.val + '</div>' +
+      '<div class="el-sum-sub">' + c.sub + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+/* ── Render: CS completion tiles ─────────────────────────────────────────── */
+function elRenderTiles() {
+  const container = document.getElementById('el-cs-row');
+  if (!container) return;
+
+  if (!elData) {
+    container.innerHTML = '<div class="el-loading-state">Loading eLearning data\u2026</div>';
+    return;
+  }
+
+  const allSel  = elSelected === 'ALL';
+  const members = ['ALL', ...elData.csMembers];
+
+  container.innerHTML = members.map(m => {
+    const isAll    = m === 'ALL';
+    const isActive = elSelected === m;
+    const isMuted  = !allSel && !isActive;
+
+    let cls = 'el-tile';
+    if (isActive) cls += ' el-tile-active';
+    if (isMuted)  cls += ' el-tile-muted';
+
+    const p     = isAll ? elPctForCs('ALL') : elPctForCs(m);
+    const col   = elColor(p);
+    const pcTxt = isAll ? (p + '% Complete') : (p + '%');
+    const pStyle = isActive ? 'color:rgba(255,255,255,.85)' : ('color:' + col);
+
+    return '<div class="' + cls + '" data-cs="' + cafEsc(m) + '">' +
+             '<div class="el-tile-name">' + cafEsc(m) + '</div>' +
+             '<div class="el-tile-pct" style="' + pStyle + '">' + pcTxt + '</div>' +
+           '</div>';
+  }).join('');
+
+  container.querySelectorAll('.el-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      elSelected = tile.dataset.cs;
+      elRender();
+    });
+  });
+}
+
+/* ── Render: Course compliance table ─────────────────────────────────────── */
+function elRenderTable() {
+  const tbl = document.getElementById('el-tbl');
+  if (!tbl || !elData) { if (tbl) tbl.innerHTML = ''; return; }
+
+  const showAll = elSelected === 'ALL';
+  const showCs  = showAll ? elData.csMembers : [elSelected];
+
+  const statusPill = (s) => {
+    const lv = (s || '').toLowerCase();
+    if (lv === 'completed') return '<span class="el-status el-status-completed">Completed</span>';
+    if (lv === 'pending')   return '<span class="el-status el-status-pending">Pending</span>';
+    return s ? '<span class="el-status el-status-other">' + cafEsc(s) + '</span>' : '\u2014';
+  };
+
+  const headers =
+    '<th class="el-th-course">eLearning Course</th>' +
+    '<th class="el-th-intdead">CS Internal Deadline</th>' +
+    '<th class="el-th-sapdead">SAP Deadline</th>' +
+    showCs.map(cs => '<th>' + cafEsc(cs) + '</th>').join('');
+
+  const dataRows = elData.courses.map(c =>
+    '<tr>' +
+      '<td class="el-td-course">' + cafEsc(c.name) + '</td>' +
+      '<td class="el-td-intdead el-deadline-int">' + cafEsc(c.intDeadline) + '</td>' +
+      '<td class="el-td-sapdead el-deadline-sap">' + cafEsc(c.sapDeadline) + '</td>' +
+      showCs.map(cs => '<td class="el-td-status">' + statusPill(c.status[cs]) + '</td>').join('') +
+    '</tr>'
+  ).join('');
+
+  const colSpan = 3 + showCs.length;
+  tbl.innerHTML =
+    '<thead><tr>' + headers + '</tr></thead>' +
+    '<tbody>' +
+    (dataRows || '<tr><td colspan="' + colSpan + '" class="caf-empty">No courses found.</td></tr>') +
+    '</tbody>';
+}
+
+/* ── Render: Pending eLearning ───────────────────────────────────────────── */
+function elRenderPending() {
+  const el = document.getElementById('el-pending-body');
+  if (!el || !elData) { if (el) el.innerHTML = ''; return; }
+
+  const showAll = elSelected === 'ALL';
+  const showCs  = showAll ? elData.csMembers : [elSelected];
+
+  const pending = [];
+  elData.courses.forEach(course => {
+    showCs.forEach(cs => {
+      if ((course.status[cs] || '').toLowerCase() === 'pending') {
+        pending.push({ cs, course: course.name,
+          intDead: course.intDeadline, sapDead: course.sapDeadline });
+      }
+    });
+  });
+
+  if (!pending.length) {
+    el.innerHTML = '<div class="el-empty-state">No pending courses \u2014 all assignments are complete.</div>';
+    return;
+  }
+
+  const headers = showAll
+    ? '<tr><th>CS</th><th>Course</th><th>CS Internal Deadline</th><th>SAP Deadline</th></tr>'
+    : '<tr><th>Course</th><th>CS Internal Deadline</th><th>SAP Deadline</th></tr>';
+
+  const rows = pending.map(p =>
+    '<tr>' +
+    (showAll ? '<td><span class="el-cs-name-badge">' + cafEsc(p.cs) + '</span></td>' : '') +
+    '<td>' + cafEsc(p.course) + '</td>' +
+    '<td class="el-deadline-int">' + cafEsc(p.intDead) + '</td>' +
+    '<td class="el-deadline-sap">' + cafEsc(p.sapDead) + '</td>' +
+    '</tr>'
+  ).join('');
+
+  el.innerHTML =
+    '<table class="el-pending-tbl">' +
+    '<thead>' + headers + '</thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>';
+}
+
+/* ── Render: Upcoming Deadlines ──────────────────────────────────────────── */
+function elRenderUpcoming() {
+  const el = document.getElementById('el-upcoming-body');
+  if (!el || !elData) { if (el) el.innerHTML = ''; return; }
+
+  const showAll = elSelected === 'ALL';
+  const showCs  = showAll ? elData.csMembers : [elSelected];
+
+  const upcoming = elData.courses
+    .map(c => {
+      const pendingCount = showCs.filter(cs =>
+        (c.status[cs] || '').toLowerCase() === 'pending'
+      ).length;
+      return { name: c.name, intDead: c.intDeadline,
+               sapDead: c.sapDeadline, pendingCount };
+    })
+    .filter(c => c.pendingCount > 0);
+
+  if (!upcoming.length) {
+    el.innerHTML = '<div class="el-empty-state">No upcoming deadlines with pending items.</div>';
+    return;
+  }
+
+  el.innerHTML = upcoming.map(c =>
+    '<div class="el-upcoming-row">' +
+      '<div class="el-upcoming-name">' + cafEsc(c.name) + '</div>' +
+      '<div class="el-upcoming-metas">' +
+        '<span class="el-upcoming-meta-int">' + cafEsc(c.intDead) + '</span>' +
+        '<span class="el-upcoming-meta-sep">\u00b7</span>' +
+        '<span class="el-upcoming-meta-sap">' + cafEsc(c.sapDead) + '</span>' +
+      '</div>' +
+      '<div class="el-upcoming-badge el-pending-badge">' + c.pendingCount +
+        (c.pendingCount === 1 ? ' Pending' : ' Pending') + '</div>' +
+    '</div>'
+  ).join('');
+}
+
+/* ── Master render ───────────────────────────────────────────────────────── */
+function elRender() {
+  if (!elData) return;
+  elRenderSummary();
+  elRenderTiles();
+  elRenderTable();
+  elRenderPending();
+  elRenderUpcoming();
+}
+
 
 </script>
 </body>
