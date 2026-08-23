@@ -4525,6 +4525,11 @@ function lpRenderCalendar() {
 }
 
 function lpLeavesForDate(dateStr) {
+  /* Weekday-only rendering: never show leave entries on Saturday or Sunday.
+     The underlying leave record is not modified — this is a display filter only.
+     Use T00:00:00 to force local-time parsing and avoid UTC date-shift.        */
+  const dow = new Date(dateStr + 'T00:00:00').getDay(); /* 0=Sun, 6=Sat */
+  if (dow === 0 || dow === 6) return [];
   return lpLeaves.filter(lv =>
     lv.startDate && lv.endDate &&
     lv.startDate <= dateStr && lv.endDate >= dateStr
