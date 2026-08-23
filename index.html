@@ -206,6 +206,9 @@ body{
 /* Screenshot button */
 .btn-screenshot{margin-left:4px}
 
+/* Full Screen button */
+.btn-fullscreen{margin-left:4px}
+
 /* Sign-in button (header — shown only when not authenticated) */
 .btn-signin{
   background:rgba(255,255,255,.90);
@@ -230,15 +233,87 @@ body{
   transition:background .25s;
 }
 .signin-overlay.hidden{display:none}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   WELCOME OVERLAY — floating iOS-style card above the fully-rendered dashboard.
+   Sign-in overlay is hidden first; the dashboard loads underneath while this
+   card is visible. Dismissed after 2-second minimum + data-ready condition.
+════════════════════════════════════════════════════════════════════════════ */
+.welcome-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.32);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:65;padding:24px;
+}
+.welcome-overlay.hidden{display:none}
+
+/* ─ Keyframes ─ */
+@keyframes welcomeOverlayIn {from{opacity:0}to{opacity:1}}
+@keyframes welcomeCardIn    {from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes welcomeOverlayOut{from{opacity:1}to{opacity:0}}
+@keyframes welcomeCardOut   {from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.94)}}
+
+/* ─ Opening — backdrop fades, card scales in ─ */
+.welcome-overlay:not(.hidden):not(.welcome-close)            {animation:welcomeOverlayIn .25s ease}
+.welcome-overlay:not(.hidden):not(.welcome-close) .welcome-card{animation:welcomeCardIn .36s cubic-bezier(0.16,1,0.3,1)}
+
+/* ─ Closing — both fade together, card also scales out ─ */
+.welcome-overlay.welcome-close                  {animation:welcomeOverlayOut .30s ease-in forwards;pointer-events:none}
+.welcome-overlay.welcome-close .welcome-card    {animation:welcomeCardOut   .26s ease-in forwards}
+
+/* ─ Card ─ */
+.welcome-card{
+  background:var(--cb);border-radius:20px;
+  box-shadow:0 24px 64px rgba(0,0,0,.20),0 4px 16px rgba(0,0,0,.10);
+  padding:40px 36px 32px;max-width:360px;width:100%;
+  text-align:center;transition:background .25s;
+}
+.welcome-logo{
+  height:68px;max-width:240px;width:auto;
+  margin-bottom:20px;object-fit:contain;
+}
+.welcome-title{
+  font-size:17px;font-weight:700;color:var(--ct);
+  margin-bottom:6px;letter-spacing:.1px;transition:color .25s;
+}
+.welcome-sub{
+  font-size:12px;color:var(--cm);margin-bottom:24px;
+  line-height:1.7;transition:color .25s;
+}
+.welcome-progress-track{
+  height:3px;background:var(--cd);border-radius:2px;
+  overflow:hidden;max-width:180px;margin:0 auto 12px;
+  transition:background .25s;
+}
+.welcome-progress-bar{
+  height:100%;width:0%;border-radius:2px;
+  background:linear-gradient(90deg,#0070F2,#4CB1FF);
+}
+.welcome-countdown{
+  font-size:11px;color:var(--cm);font-weight:500;
+  letter-spacing:.2px;transition:color .25s;
+}
+
+/* ─ Reduced motion ─ */
+@media(prefers-reduced-motion:reduce){
+  .welcome-overlay:not(.hidden):not(.welcome-close),
+  .welcome-overlay:not(.hidden):not(.welcome-close) .welcome-card{animation:none!important}
+  .welcome-overlay.welcome-close,
+  .welcome-overlay.welcome-close .welcome-card{animation:none!important;opacity:0}
+}
 .signin-card{
   text-align:center;
   padding:44px 36px;
   max-width:400px;
 }
 .signin-logo-img{
-  height:58px;
+  height:72px;
+  max-width:260px;
+  width:auto;
   margin-bottom:20px;
-  border-radius:10px;
+  object-fit:contain;
 }
 .signin-title{
   font-size:17px;
@@ -473,9 +548,9 @@ body{
 /* SAP pictogram inside nav tile */
 .tab-icon{
   width:28px;height:28px;object-fit:contain;flex-shrink:0;
-  display:none;transition:filter .2s ease;
+  display:block;visibility:hidden;transition:filter .2s ease;
 }
-.tab-icon.loaded{display:block}
+.tab-icon.loaded{visibility:visible}
 /* Active tile: invert icon to white (works for any dark SAP pictogram) */
 .tab-btn.active .tab-icon.loaded{filter:brightness(0) invert(1)}
 /* Dark mode inactive tile: icon must be light enough to read on dark surface */
@@ -498,6 +573,22 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
 }
 .tab-section{display:block}
 .tab-section.hidden{display:none}
+
+/* ── Tab-section enter / exit animation ──────────────────────────────────
+   Only the content area below the nav animates. Header + nav stay fixed.
+   .tab-exit is managed by switchTab() with rapid-click protection.       */
+@keyframes tabIn {from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes tabOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(5px)}}
+.tab-section:not(.hidden){animation:tabIn .22s ease-out}
+.tab-section.tab-exit{animation:tabOut .14s ease-in forwards}
+
+/* ── LP calendar grid month transition — same visual language as tab switch ─
+   Only the grid animates; the day-of-week header and surrounding chrome stay
+   fixed. Exit/enter managed by lpAnimateMonthChange() with rapid-click guard. */
+@keyframes calIn {from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes calOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(5px)}}
+.lp-cal-exit  {animation:calOut .12s ease-in  forwards}
+.lp-cal-enter {animation:calIn  .20s ease-out}
 
 /* ════════════════════════════════════════════════════════════════════════════
    LEAVE PLANNER — CONTAINER
@@ -525,6 +616,44 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   transition:background .15s;white-space:nowrap;
 }
 .lp-add-btn:hover{background:#0057C2}
+
+/* ── Instructional guide banner (replaces the + Add Leave button) ─────────
+   Communicates the OFFICIAL / PLANNER distinction.
+   Uses a subtle left accent stripe + SAP blue emphasis.                   */
+.lp-guide-banner{
+  background:var(--ch);
+  border:1px solid var(--cd);
+  border-left:3px solid #0070F2;
+  border-radius:8px;
+  padding:7px 13px 7px 10px;
+  max-width:320px;
+  transition:background .25s,border-color .25s;
+}
+.lp-guide-top{
+  display:flex;align-items:center;gap:5px;margin-bottom:3px;
+}
+.lp-guide-ttl{
+  font-size:9px;font-weight:800;letter-spacing:.55px;
+  text-transform:uppercase;color:var(--ct);transition:color .25s;
+}
+.lp-guide-sep{
+  font-size:9px;font-weight:400;color:var(--cm);transition:color .25s;
+}
+.lp-guide-vis{
+  font-size:9px;font-weight:800;letter-spacing:.55px;
+  text-transform:uppercase;color:#0070F2;
+}
+.lp-guide-body{
+  font-size:10px;color:var(--cm);line-height:1.45;
+  margin:0;transition:color .25s;
+}
+.lp-guide-fiori{
+  color:#0070F2;font-weight:700;
+}
+.lp-guide-action{
+  font-size:10px;font-weight:700;color:#0070F2;
+  margin:3px 0 0;line-height:1.45;
+}
 .lp-today-btn{
   background:var(--cb);border:1px solid var(--cd);color:var(--ct);
   padding:5px 12px;border-radius:8px;font-size:11px;font-family:inherit;
@@ -585,6 +714,137 @@ html[data-theme="dark"] .lp-day.today .lp-day-num{color:#4CB1FF}
 }
 .lp-entry:hover{opacity:.82}
 
+/* ── Leave entry — photo-enhanced variant ─────────────────────────────────
+   Used when soloPics[member] is available; falls back to text-only pill.   */
+.lp-entry.lp-entry-has-photo{
+  display:flex;align-items:center;gap:3px;padding:2px 4px;
+  white-space:nowrap;overflow:hidden;
+}
+/* Avatar circle — default 26 px; overridden by data-count on parent */
+.lp-av{
+  flex-shrink:0;width:26px;height:26px;
+  border-radius:50%;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.22);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.lp-av img{
+  width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;
+}
+.lp-entry.lp-entry-has-photo:hover .lp-av{
+  transform:scale(1.10);box-shadow:0 2px 8px rgba(0,0,0,.30);
+}
+.lp-entry-lbl{
+  flex:1;min-width:0;font-size:9.5px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;
+}
+/* Responsive avatar size based on how many entries share the day */
+.lp-day-entries[data-count="1"] .lp-av{width:28px;height:28px}
+.lp-day-entries[data-count="2"] .lp-av{width:24px;height:24px}
+.lp-day-entries[data-count="3"] .lp-av,
+.lp-day-entries[data-count="4"] .lp-av{width:20px;height:20px}
+/* Side-by-side 2-column grid for 2–4 entries */
+.lp-day-entries[data-count="2"],
+.lp-day-entries[data-count="3"],
+.lp-day-entries[data-count="4"]{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;
+}
+/* "+X more" overflow badge — spans both columns */
+.lp-entry-overflow{
+  font-size:9px;font-weight:600;padding:2px 5px;border-radius:3px;
+  background:rgba(0,0,0,.07);color:var(--cm);
+  cursor:pointer;text-align:center;grid-column:1/-1;
+  transition:background .12s;
+}
+.lp-entry-overflow:hover{background:rgba(0,0,0,.15)}
+html[data-theme="dark"] .lp-entry-overflow{background:rgba(255,255,255,.09)}
+html[data-theme="dark"] .lp-entry-overflow:hover{background:rgba(255,255,255,.16)}
+
+/* ── Day-detail popover ("#X more" → iOS-style card) ─────────────────────── */
+.lp-pop{
+  position:fixed;z-index:900;
+  background:var(--cb);border:1px solid var(--cd);border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.08);
+  min-width:220px;max-width:300px;padding:0;overflow:hidden;
+  animation:lpPopIn .18s ease;
+  transition:background .25s,border-color .25s;
+}
+.lp-pop.hidden{display:none}
+@keyframes lpPopIn{
+  from{opacity:0;transform:scale(.94) translateY(-6px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+.lp-pop-head{
+  display:flex;align-items:center;padding:10px 12px 8px;
+  border-bottom:1px solid var(--cd);transition:border-color .25s;
+}
+.lp-pop-title{
+  flex:1;font-size:9px;font-weight:800;letter-spacing:.55px;
+  text-transform:uppercase;color:var(--cm);transition:color .25s;
+}
+.lp-pop-close{
+  background:none;border:none;cursor:pointer;
+  color:var(--cm);font-size:16px;line-height:1;
+  padding:0 0 0 8px;transition:color .15s;
+}
+.lp-pop-close:hover{color:var(--ct)}
+.lp-pop-list{
+  padding:6px 0;max-height:260px;overflow-y:auto;
+}
+.lp-pop-row{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 12px;cursor:pointer;
+  transition:background .1s;
+}
+.lp-pop-row:hover{background:var(--ch)}
+.lp-pop-av{
+  flex-shrink:0;width:30px;height:30px;border-radius:50%;overflow:hidden;
+  box-shadow:0 1px 4px rgba(0,0,0,.18);background:var(--cd);
+  display:flex;align-items:center;justify-content:center;
+}
+.lp-pop-av img{width:100%;height:100%;object-fit:cover;display:block;}
+.lp-pop-av-init{font-size:11px;font-weight:700;color:var(--cm);}
+.lp-pop-name{flex:1;font-size:12px;font-weight:600;color:var(--ct);transition:color .25s;}
+.lp-pop-badge{
+  font-size:9.5px;font-weight:700;padding:2px 7px;
+  border-radius:20px;white-space:nowrap;
+}
+
+/* ── Duplicate-leave warning dialog ────────────────────────────────────────
+   Shown when the user tries to add a second leave entry for an employee who
+   already has one on an overlapping date. Premium iOS-style card.          */
+.lp-dup-icon{
+  width:38px;height:38px;border-radius:50%;
+  background:#FFF5E0;border:1.5px solid #E89700;
+  color:#E89700;font-size:19px;font-weight:800;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  margin:4px auto 14px;
+}
+html[data-theme="dark"] .lp-dup-icon{
+  background:rgba(232,151,0,.14);border-color:#E89700;
+}
+.lp-dup-msg{
+  font-size:13px;font-weight:400;color:var(--ct);
+  text-align:center;margin:0 0 12px;line-height:1.55;
+  transition:color .25s;
+}
+.lp-dup-card{
+  background:var(--db);border:1px solid var(--cd);border-radius:8px;
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  margin-bottom:12px;transition:background .25s,border-color .25s;
+}
+.lp-dup-entry-badge{
+  font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:20px;white-space:nowrap;
+}
+.lp-dup-entry-dates{
+  font-size:11.5px;font-weight:500;color:var(--cx);
+  transition:color .25s;
+}
+.lp-dup-hint{
+  font-size:11px;color:var(--cm);text-align:center;
+  margin:0;line-height:1.5;transition:color .25s;
+}
+
 /* ── Status bar ───────────────────────────────────────────────────────────── */
 .lp-status{margin-top:8px;font-size:10px;color:var(--cm);min-height:16px;transition:color .25s}
 
@@ -631,6 +891,42 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   display:flex;align-items:center;justify-content:center;z-index:800;
 }
 .lp-dialog-overlay.hidden{display:none}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DIALOG TRANSITION SYSTEM — iOS-style smooth open / close
+   Open  : .hidden removed → element becomes visible → CSS animations fire
+   Close : JS adds .is-closing → exit animations play → .hidden added ~190ms
+   Applies to ALL overlays: lp-dialog-overlay, caf-dlg-overlay, lp-pop.
+   The backdrop and dialog card animate as ONE coordinated unit.
+════════════════════════════════════════════════════════════════════════════ */
+@keyframes overlayIn  {from{opacity:0}to{opacity:1}}
+@keyframes overlayOut {from{opacity:1}to{opacity:0}}
+@keyframes dlgIn  {from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes dlgOut {from{opacity:1;transform:none}to{opacity:0;transform:scale(.96) translateY(8px)}}
+@keyframes lpPopOut{from{opacity:1;transform:none}to{opacity:0;transform:scale(.94) translateY(-4px)}}
+
+/* ─ Opening: fires when .hidden is removed (display:none → flex restarts CSS animations) ─ */
+.lp-dialog-overlay:not(.hidden):not(.is-closing),
+.caf-dlg-overlay:not(.hidden):not(.is-closing)    {animation:overlayIn .20s ease}
+
+.lp-dialog-overlay:not(.hidden):not(.is-closing) .lp-dialog,
+.caf-dlg-overlay:not(.hidden):not(.is-closing)    .caf-dlg  {animation:dlgIn .28s cubic-bezier(0.16,1,0.3,1)}
+
+/* ─ Closing: .is-closing is applied by uiCloseOverlay() just before .hidden ─ */
+.lp-dialog-overlay.is-closing,
+.caf-dlg-overlay.is-closing   {animation:overlayOut .19s ease-in forwards}
+
+.lp-dialog-overlay.is-closing .lp-dialog,
+.caf-dlg-overlay.is-closing   .caf-dlg {animation:dlgOut .17s ease-in forwards}
+
+/* ─ Popover close ─ */
+.lp-pop.is-closing{animation:lpPopOut .16s ease-in forwards}
+
+/* ─ Respect prefers-reduced-motion ─ */
+@media(prefers-reduced-motion:reduce){
+  .lp-dialog-overlay,.caf-dlg-overlay,.lp-dialog,.caf-dlg,.lp-pop{animation:none!important}
+  .tab-section,.tab-section.tab-exit,.lp-cal-exit,.lp-cal-enter{animation:none!important}
+}
 .lp-dialog{
   background:var(--cb);border-radius:14px;
   box-shadow:0 12px 40px rgba(0,0,0,.28);
@@ -740,6 +1036,7 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   flex:0 0 auto;min-width:88px;
   background:var(--cb);border:1.5px solid var(--cd);border-radius:10px;
   padding:10px 14px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   box-shadow:0 2px 6px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03),
              inset 0 1px 0 rgba(255,255,255,.55);
   transition:transform .15s ease,box-shadow .15s ease,
@@ -1031,6 +1328,7 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
 .el-tile{flex:0 0 auto;min-width:88px;
   background:var(--cb);border:1.5px solid var(--cd);border-radius:10px;
   padding:10px 14px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   box-shadow:0 2px 6px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03),
              inset 0 1px 0 rgba(255,255,255,.55);
   transition:transform .15s ease,box-shadow .15s ease,
@@ -1053,6 +1351,25 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
 .el-tile-muted .el-tile-name{color:var(--cm)}
 .el-tile-pct{font-size:10px;font-weight:700;transition:color .2s}
 .el-tile-active .el-tile-pct{color:rgba(255,255,255,.85) !important}
+/* ── Member profile photos — shared by .caf-tile and .el-tile ──────────────
+   54 × 54 px circular crop; photo zooms inside on tile hover.
+   Fully responsive — works for any number of members.                      */
+.member-photo-wrap{
+  width:54px;height:54px;border-radius:50%;overflow:hidden;
+  margin-bottom:8px;flex-shrink:0;
+  box-shadow:0 1px 8px rgba(0,0,0,.18);
+  transition:transform .22s ease,box-shadow .22s ease}
+.member-photo{
+  width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+/* Tile hover: photo zooms in while tile lifts (scale already on parent) */
+.caf-tile:hover:not(.caf-tile-active) .member-photo-wrap,
+.el-tile:hover:not(.el-tile-active) .member-photo-wrap{
+  transform:scale(1.13);
+  box-shadow:0 5px 16px rgba(0,0,0,.28)}
+/* Active (selected) tile: subtle inward glow on the photo circle */
+.caf-tile-active .member-photo-wrap,
+.el-tile-active .member-photo-wrap{
+  box-shadow:0 0 0 2.5px rgba(255,255,255,.55),0 2px 10px rgba(0,0,0,.20)}
 /* Summary cards */
 .el-summary{display:grid;grid-template-columns:repeat(4,1fr);
   gap:10px;margin-bottom:12px}
@@ -1144,6 +1461,79 @@ html[data-theme="dark"] .el-status-pending{background:#3D2000;color:#FFB366}
   border-radius:8px;white-space:nowrap}
 .el-pending-badge{background:#FFF0E0;color:#8A4500}
 html[data-theme="dark"] .el-pending-badge{background:#3D2000;color:#FFB366}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   eLEARNING ENHANCEMENTS v19
+───────────────────────────────────────────────────────────────────────── */
+
+/* CS column header → centered to match status pills below */
+.el-th-cs{text-align:center !important;min-width:80px}
+
+/* ── Deadline warning row tints (subtle, premium) ────────────────────── */
+.el-row-overdue > td{background:rgba(210,10,10,.03) !important}
+.el-row-overdue > td:first-child{border-left:3px solid rgba(210,10,10,.45)}
+.el-row-due-soon > td{background:rgba(231,101,0,.03) !important}
+.el-row-due-soon > td:first-child{border-left:3px solid rgba(231,101,0,.45)}
+/* hover on warning rows — deepen rather than reset */
+.el-row-overdue:hover > td{background:rgba(210,10,10,.07) !important}
+.el-row-due-soon:hover > td{background:rgba(231,101,0,.07) !important}
+html[data-theme="dark"] .el-row-overdue > td{background:rgba(210,10,10,.07) !important}
+html[data-theme="dark"] .el-row-due-soon > td{background:rgba(231,101,0,.06) !important}
+html[data-theme="dark"] .el-row-overdue:hover > td{background:rgba(210,10,10,.13) !important}
+html[data-theme="dark"] .el-row-due-soon:hover > td{background:rgba(231,101,0,.12) !important}
+
+/* ── Inline deadline badges ──────────────────────────────────────────── */
+.el-deadline-badge{
+  display:inline-block;font-size:7px;font-weight:700;
+  padding:1px 6px;border-radius:5px;white-space:nowrap;
+  vertical-align:middle;margin-left:6px;line-height:1.6;letter-spacing:.2px}
+.el-badge-overdue{background:rgba(210,10,10,.10);color:#C80000}
+.el-badge-due-soon{background:rgba(231,101,0,.11);color:#A04000}
+html[data-theme="dark"] .el-badge-overdue{background:rgba(210,10,10,.26);color:#FF7070}
+html[data-theme="dark"] .el-badge-due-soon{background:rgba(231,101,0,.26);color:#FFB366}
+
+/* ── Upcoming Deadlines — new table layout ───────────────────────────── */
+.el-upcoming-tbl{width:100%;border-collapse:collapse;font-size:10px}
+.el-upcoming-tbl th{
+  background:var(--ch);color:var(--ct);font-weight:700;
+  font-size:8px;letter-spacing:.35px;text-transform:uppercase;
+  padding:6px 10px;text-align:left;border-bottom:1.5px solid var(--cd);
+  white-space:nowrap;
+  transition:background .25s,color .25s,border-color .25s}
+.el-upc-th-intdead{color:#E76500 !important}
+.el-upc-th-sapdead{color:#0070F2 !important}
+.el-upc-th-status{text-align:center !important}
+.el-upcoming-tbl td{
+  padding:6px 10px;border-bottom:1px solid var(--rb);
+  color:var(--cx);vertical-align:middle;
+  transition:border-color .25s,color .25s}
+.el-upcoming-tbl tr:last-child td{border-bottom:none}
+.el-upcoming-tbl tbody tr:hover td{background:var(--rh)}
+.el-upc-course{font-weight:600;min-width:160px}
+.el-upc-date{white-space:nowrap;min-width:110px}
+.el-upc-status-cell{text-align:center}
+/* Team status badge in upcoming */
+.el-upc-status-badge{
+  display:inline-block;font-size:8.5px;font-weight:700;
+  padding:2px 9px;border-radius:8px;white-space:nowrap;line-height:1.5}
+.el-upc-normal{background:#FFF0E0;color:#8A4500}
+.el-upc-overdue{background:rgba(210,10,10,.10);color:#C80000}
+.el-upc-due-soon{background:rgba(231,101,0,.11);color:#A04000}
+html[data-theme="dark"] .el-upc-normal{background:#3D2000;color:#FFB366}
+html[data-theme="dark"] .el-upc-overdue{background:rgba(210,10,10,.26);color:#FF7070}
+html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#FFB366}
+
+/* ── Email subject block in Update Request template ─────────────────────── */
+.caf-tmpl-subject-wrap{
+  background:var(--ch);border-radius:8px;padding:10px 14px;
+  margin-bottom:10px;border-left:3px solid #0070F2;
+  transition:background .25s}
+.caf-tmpl-subject-lbl{
+  font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--cm);margin-bottom:3px;transition:color .25s}
+.caf-tmpl-subject-val{
+  font-size:11.5px;font-weight:700;color:var(--ct);
+  line-height:1.4;word-break:break-word;transition:color .25s}
 </style>
 </head>
 <body>
@@ -1190,6 +1580,11 @@ html[data-theme="dark"] .el-pending-badge{background:#3D2000;color:#FFB366}
     <button class="hdr-btn btn-screenshot" id="btnScreenshot"
             onclick="takeScreenshot()" title="Download full dashboard as PNG">
       <span class="btn-icon">&#x1F4F7;</span> Screenshot
+    </button>
+    <!-- Full Screen: enters / exits browser fullscreen presentation mode -->
+    <button class="hdr-btn btn-fullscreen" id="btnFullscreen"
+            onclick="toggleFullscreen()" title="Enter fullscreen presentation mode">
+      <span class="btn-icon">&#x26F6;</span> Full Screen
     </button>
   </header>
 
@@ -1425,7 +1820,15 @@ html[data-theme="dark"] .el-pending-badge{background:#3D2000;color:#FFB366}
         <button class="lp-nav-btn" onclick="lpNextMonth()" title="Next month">&#8250;</button>
         <button class="lp-today-btn" onclick="lpGoToday()">Today</button>
         <div class="lp-header-right">
-          <button class="lp-add-btn" onclick="lpOpenAddDialog(null)">+ Add Leave</button>
+          <div class="lp-guide-banner">
+            <div class="lp-guide-top">
+              <span class="lp-guide-ttl">Leave Planner</span>
+              <span class="lp-guide-sep">&mdash;</span>
+              <span class="lp-guide-vis">Team Visibility</span>
+            </div>
+            <p class="lp-guide-body">Official leaves must still be filed via the <strong class="lp-guide-fiori">SAP Fiori Leave Tool</strong>.</p>
+            <p class="lp-guide-action">Click any calendar date to add an entry to this planner.</p>
+          </div>
         </div>
       </div>
 
@@ -1668,11 +2071,47 @@ html[data-theme="dark"] .el-pending-badge{background:#3D2000;color:#FFB366}
     </div>
   </div>
 
+  <!-- ══ Duplicate leave warning ══════════════════════════════════════════ -->
+  <div id="lp-dup-overlay" class="lp-dialog-overlay hidden"
+       onclick="lpOverlayClick(event,'dup')">
+    <div class="lp-dialog" style="max-width:340px">
+      <div class="lp-dialog-head">
+        <span>Leave Already Recorded</span>
+        <button class="lp-dialog-close" onclick="lpCloseDupWarning()">&#x2715;</button>
+      </div>
+      <div class="lp-dialog-body" style="text-align:center">
+        <div class="lp-dup-icon">!</div>
+        <p class="lp-dup-msg">
+          <strong id="lp-dup-name"></strong> already has a leave entry on this date.
+        </p>
+        <div class="lp-dup-card">
+          <span class="lp-dup-entry-badge" id="lp-dup-entry-badge"></span>
+          <span class="lp-dup-entry-dates" id="lp-dup-entry-dates"></span>
+        </div>
+        <p class="lp-dup-hint">Please edit the existing entry instead of creating another one.</p>
+      </div>
+      <div class="lp-dialog-footer">
+        <button id="lp-dup-edit-btn" class="lp-btn-primary">Edit Existing Leave</button>
+        <button class="lp-btn-secondary" onclick="lpCloseDupWarning()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Leave day-detail popover ══ -->
+  <div id="lp-pop" class="lp-pop hidden" role="dialog" aria-label="Leave details">
+    <div class="lp-pop-head">
+      <span class="lp-pop-title" id="lp-pop-title"></span>
+      <button class="lp-pop-close" onclick="lpClosePopover()" title="Close">&#x2715;</button>
+    </div>
+    <div class="lp-pop-list" id="lp-pop-list"></div>
+  </div>
+
   <!-- ══ Sign-in overlay (shown when not authenticated — new in v5) ══ -->
   <div id="signin-overlay" class="signin-overlay">
     <div class="signin-card">
       <img id="signin-logo-img" class="signin-logo-img"
-        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjgiIGZpbGw9IiMwMDcwRjIiLz48dGV4dCB4PSI1MCIgeT0iNjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI1NCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5UPC90ZXh0Pjwvc3ZnPg=="
+        src="Logos/Team%20Josh%20Aqua%20Logo.png"
+        onerror="(function(i){i.onerror=null;var c=localStorage.getItem('tj_cached_logo');if(c&&c!==i.src){i.src=c;}else{i.style.display='none';}})(this)"
         alt="Team Josh">
       <div class="signin-title">Team Josh Executive Dashboard</div>
       <div class="signin-sub" id="signin-sub">
@@ -1687,11 +2126,42 @@ html[data-theme="dark"] .el-pending-badge{background:#3D2000;color:#FFB366}
 
 </div><!-- /dashboard -->
 
+<!-- ══ Post-login welcome overlay ══════════════════════════════════════════ -->
+<div id="welcome-overlay" class="welcome-overlay hidden" aria-live="polite" role="status">
+  <div class="welcome-card">
+    <img id="welcome-logo" class="welcome-logo"
+      src="Logos/Team%20Josh%20Aqua%20Logo.png"
+      onerror="(function(i){i.onerror=null;var c=localStorage.getItem('tj_cached_logo');if(c&&c!==i.src){i.src=c;}else{i.style.display='none';}})(this)"
+      alt="Team Josh">
+    <div class="welcome-title">Welcome to Team Josh Executive Dashboard</div>
+    <div class="welcome-sub" id="welcome-sub">Your dashboard is getting everything ready&hellip;</div>
+    <div class="welcome-progress-track">
+      <div class="welcome-progress-bar" id="welcome-bar"></div>
+    </div>
+    <div class="welcome-countdown" id="welcome-countdown">Continuing in 2 seconds&hellip;</div>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════════════════════════════════════════
      SCRIPT
 ════════════════════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
+
+/* ── Sign-in logo: restore from localStorage on every page load ─────────
+   After first successful auth, loadLogo caches the real Team Josh logo as
+   a base64 data URL.  Restoring it here (synchronously, before any auth
+   or API call) ensures the sign-in overlay shows the actual logo on every
+   return visit with zero network requests. */
+(function () {
+  try {
+    const cached = localStorage.getItem('tj_cached_logo');
+    if (cached) {
+      const el = document.getElementById('signin-logo-img');
+      if (el) el.src = cached;
+    }
+  } catch (e) {}
+}());
 
 /* NOTE: Chart.register(ChartDataLabels) is intentionally deferred to
    buildCharts() so that a blocked/slow CDN cannot prevent sign-in from
@@ -1879,13 +2349,86 @@ async function signIn() {
     await _popupAuth();
     updateAuthUI(true, TK.name());
     hideSignInOverlay();
-    await loadAndBuild();
+    await _welcomeAndLoad(); /* welcome overlay + parallel data load */
   } catch(e) {
     console.error('[Auth] Sign-in failed:', e);
+    await _hideWelcomeOverlay(true); /* ensure overlay is dismissed on error */
     showToast('Sign-in failed — ' + e.message);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Sign in with Microsoft 365'; }
   }
+}
+
+/* ── Post-login welcome overlay ─────────────────────────────────────────────
+   _welcomeAndLoad() runs ONLY from signIn() — not from initAuth() or refresh.
+   Dashboard renders underneath the floating card; overlay stays for at least
+   2 seconds and until the data-ready condition is also satisfied.          */
+async function _welcomeAndLoad() {
+  _showWelcomeOverlay();
+  try {
+    await Promise.all([
+      loadAndBuild(),
+      _welcomeMinWait(2)
+    ]);
+  } catch(e) {
+    console.error('[Welcome] Load error during welcome:', e);
+    showToast('Dashboard load failed: ' + (e.message || 'unknown error'));
+  } finally {
+    await _hideWelcomeOverlay();
+  }
+}
+
+function _showWelcomeOverlay() {
+  const overlay = document.getElementById('welcome-overlay');
+  if (!overlay) return;
+
+  /* Use cached logo if available (same pattern as sign-in overlay) */
+  const img = document.getElementById('welcome-logo');
+  if (img) {
+    try {
+      const cached = localStorage.getItem('tj_cached_logo');
+      if (cached) img.src = cached;
+    } catch(e) {}
+  }
+
+  /* Reset progress bar and start 2-second fill */
+  const bar = document.getElementById('welcome-bar');
+  if (bar) {
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    void bar.offsetWidth; /* reflow to reset */
+    bar.style.transition = 'width 2s linear';
+    bar.style.width = '100%';
+  }
+
+  /* Start countdown display */
+  let secs = 2;
+  const cdEl = document.getElementById('welcome-countdown');
+  const updateCd = () => {
+    if (!cdEl) return;
+    cdEl.textContent = 'Continuing in ' + secs + ' second' + (secs !== 1 ? 's' : '') + '\u2026';
+    if (secs > 0) { secs--; setTimeout(updateCd, 1000); }
+  };
+  updateCd();
+
+  overlay.classList.remove('hidden', 'welcome-close');
+}
+
+function _welcomeMinWait(seconds) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+async function _hideWelcomeOverlay(immediate) {
+  const overlay = document.getElementById('welcome-overlay');
+  if (!overlay || overlay.classList.contains('hidden')) return;
+  if (immediate) {
+    overlay.classList.add('hidden');
+    return;
+  }
+  overlay.classList.add('welcome-close');
+  await new Promise(resolve => setTimeout(resolve, 320));
+  overlay.classList.add('hidden');
+  overlay.classList.remove('welcome-close');
 }
 
 async function initAuth() {
@@ -2376,6 +2919,10 @@ async function fetchAssetDataUrl(items, filename, token) {
 
 async function loadLogo(token) {
   try {
+    /* Ensure drive/item IDs are available — needed when loadLogo is kicked off
+       before fetchDashboardData has had a chance to call resolveExcelFile. */
+    if (!excelDriveId || !excelItemId) await resolveExcelFile(token);
+
     /* Step 1: Excel item → parent folder (Team Josh Dashboard Data) */
     const excelMeta = await graphGet(
       '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference',
@@ -2412,6 +2959,9 @@ async function loadLogo(token) {
     /* Step 4: Load Team Josh logo */
     const logoUrl = await fetchAssetDataUrl(assetItems, LOGO_FILE_NAME, token);
     if (logoUrl) {
+      /* Persist as base64 data URL — enables the sign-in page to show the
+         real logo on all future visits without any API calls or auth. */
+      try { localStorage.setItem('tj_cached_logo', logoUrl); } catch (e) {}
       ['hdr-logo-img', 'signin-logo-img'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.src = logoUrl;
@@ -2450,14 +3000,47 @@ async function loadLogo(token) {
         console.warn('[NavIcon] Not found: 301613_Archive_R.png');
       }
 
-      const elrnUrl = await fetchAssetDataUrl(assetItems, '301616_Learning_R.png', token);
+      const elrnUrl = await fetchAssetDataUrl(assetItems, '301702_Story-Book_R.png', token);
       if (elrnUrl) {
         const elIcon = document.getElementById('tab-icon-el');
         if (elIcon) { elIcon.src = elrnUrl; elIcon.classList.add('loaded'); }
-        console.log('[NavIcon] Loaded: 301616_Learning_R.png');
+        console.log('[NavIcon] Loaded: 301702_Story-Book_R.png');
       } else {
-        console.warn('[NavIcon] Not found: 301616_Learning_R.png (optional)');
+        console.warn('[NavIcon] Not found: 301702_Story-Book_R.png (optional)');
       }
+    }
+
+    /* Step 6: Load Solo Pics — member profile photos for CS selection tiles.
+       Supports .png, .jpg, and .jpeg; keyed by filename stem (e.g. "Oliver").
+       Using rootItems avoids an extra API call (folder already enumerated).
+       Photos are an optional enhancement — the dashboard works without them. */
+    const soloPicsFolder = rootItems.find(f => f.name === 'Solo Pics');
+    if (soloPicsFolder) {
+      try {
+        const spResp  = await graphGet(
+          '/drives/' + excelDriveId + '/items/' + soloPicsFolder.id +
+          '/children?$select=id,name', token
+        );
+        const spItems = (spResp.value || []).filter(f => /\.(png|jpg|jpeg)$/i.test(f.name));
+        await Promise.all(spItems.map(async f => {
+          const name = f.name.replace(/\.(png|jpg|jpeg)$/i, '');
+          const url  = await fetchAssetDataUrl(spItems, f.name, token);
+          if (url) {
+            soloPics[name] = url;
+            console.log('[SoloPics] Loaded:', f.name);
+          } else {
+            console.warn('[SoloPics] Failed to fetch:', f.name);
+          }
+        }));
+        /* Re-render tiles in case data arrived before photos */
+        if (typeof cafParsed !== 'undefined' && cafParsed) cafRenderTiles();
+        if (typeof elData    !== 'undefined' && elData)    elRenderTiles();
+        console.log('[SoloPics]', Object.keys(soloPics).length, 'photo(s) loaded');
+      } catch (eP) {
+        console.warn('[SoloPics] Could not load solo pics:', eP.message);
+      }
+    } else {
+      console.log('[SoloPics] "Solo Pics" folder not found — name-only tiles used');
     }
   } catch(e) {
     console.warn('[Assets] Could not load assets (non-critical):', e.message);
@@ -2723,6 +3306,39 @@ async function takeScreenshot() {
     btn.disabled  = false;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FULLSCREEN
+   Enter / exit browser fullscreen presentation mode.
+   The dashboard header and navigation remain visible.
+   Pressing ESC naturally exits via the browser's built-in fullscreen handling.
+════════════════════════════════════════════════════════════════════════════ */
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(e => {
+      console.warn('[Fullscreen] Could not enter fullscreen:', e.message);
+      showToast('Full screen not available in this browser.');
+    });
+  } else {
+    document.exitFullscreen().catch(e => {
+      console.warn('[Fullscreen] Could not exit fullscreen:', e.message);
+    });
+  }
+}
+
+/* Update button label to reflect current fullscreen state */
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('btnFullscreen');
+  if (!btn) return;
+  if (document.fullscreenElement) {
+    btn.innerHTML = '<span class="btn-icon">&#x26F6;</span> Exit Full Screen';
+    btn.title     = 'Exit fullscreen mode (or press Esc)';
+  } else {
+    btn.innerHTML = '<span class="btn-icon">&#x26F6;</span> Full Screen';
+    btn.title     = 'Enter fullscreen presentation mode';
+  }
+});
 
 /* ════════════════════════════════════════════════════════════════════════════
    SECTION 12 — CHART INSTANCES  (v4 — unchanged)
@@ -3396,12 +4012,15 @@ function setLastRefresh() {
 async function loadAndBuild(token) {
   const t = token || await getToken();
   destroyAll();
+  /* Start logo load immediately — non-blocking, races the data fetch.
+     The sign-in overlay stays visible while Excel sheets load (2-5 s),
+     so starting here means the real Team Josh logo will appear on the
+     sign-in screen for that window before hideSignInOverlay() fires. */
+  loadLogo(t).catch(() => {});
   const D = await fetchDashboardData(t);
   buildDashboard(D);
   hideSignInOverlay();
   setLastRefresh();
-  /* Load the real logo in the background — non-blocking */
-  loadLogo(t).catch(() => {});
   /* Load CAF data in the background — non-blocking */
   cafLoad(t).catch(e => console.warn('[CAF] Background load failed:', e.message));
   /* Load eLearning data in the background — non-blocking */
@@ -3443,6 +4062,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTheme();           /* restore saved theme BEFORE building charts */
   cafInitListeners();    /* attach static CAF event listeners           */
   await initAuth();      /* check Microsoft 365 session and auto-load   */
+
+  /* Close leave-day popover when clicking outside it */
+  document.addEventListener('click', e => {
+    const pop = document.getElementById('lp-pop');
+    if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target)) {
+      lpClosePopover();
+    }
+  });
 });
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -3497,54 +4124,88 @@ let lpViewId   = null;
 /* ════════════════════════════════════════════════════════════════════════════
    TAB SWITCHING
 ════════════════════════════════════════════════════════════════════════════ */
+/* Tab-transition timer — prevents stacked timeouts on rapid clicks */
+let _tabTimer = null;
+
 function switchTab(tab) {
-  const perf  = document.getElementById('section-performance');
-  const leave = document.getElementById('section-leave');
-  const caf   = document.getElementById('section-caf');
-  const el    = document.getElementById('section-el');
-  const pBtn  = document.getElementById('tab-btn-perf');
-  const lBtn  = document.getElementById('tab-btn-leave');
-  const cBtn  = document.getElementById('tab-btn-caf');
-  const eBtn  = document.getElementById('tab-btn-el');
+  /* Cancel any pending transition and snap exit state clean */
+  if (_tabTimer) { clearTimeout(_tabTimer); _tabTimer = null; }
+  document.querySelectorAll('.tab-section.tab-exit').forEach(s => {
+    s.classList.remove('tab-exit');
+    if (!s.classList.contains('hidden')) s.classList.add('hidden');
+  });
 
-  /* Hide all sections; deactivate all buttons */
-  [perf, leave, caf, el].forEach(s => s && s.classList.add('hidden'));
-  [pBtn, lBtn, cBtn, eBtn].forEach(b => b && b.classList.remove('active'));
+  /* Map tab name → section element; guard against same-tab re-click */
+  const sectionIds = {
+    performance:'section-performance', leave:'section-leave',
+    caf:'section-caf', el:'section-el'
+  };
+  const targetEl = document.getElementById(sectionIds[tab]);
+  const cur      = document.querySelector('.tab-section:not(.hidden)');
+  if (cur && cur === targetEl) return; /* already on this tab */
 
-  if (tab === 'performance') {
-    perf && perf.classList.remove('hidden');
-    pBtn && pBtn.classList.add('active');
+  /* Wrap the existing show / lazy-load logic so it can be deferred */
+  const doSwitch = () => {
+    const perf  = document.getElementById('section-performance');
+    const leave = document.getElementById('section-leave');
+    const caf   = document.getElementById('section-caf');
+    const el    = document.getElementById('section-el');
+    const pBtn  = document.getElementById('tab-btn-perf');
+    const lBtn  = document.getElementById('tab-btn-leave');
+    const cBtn  = document.getElementById('tab-btn-caf');
+    const eBtn  = document.getElementById('tab-btn-el');
 
-  } else if (tab === 'leave') {
-    leave && leave.classList.remove('hidden');
-    lBtn  && lBtn.classList.add('active');
-    /* Lazy-load leave data on first visit to the tab */
-    if (!lpLoaded) {
-      if (TK.hasAny()) {
-        lpInitAndLoad();
-      } else {
-        lpSetStatus('Please sign in using the Performance Dashboard tab first.');
-        lpShowMessage('Sign in to view the Leave Planner.');
+    /* Hide all sections; deactivate all buttons */
+    [perf, leave, caf, el].forEach(s => s && s.classList.add('hidden'));
+    [pBtn, lBtn, cBtn, eBtn].forEach(b => b && b.classList.remove('active'));
+
+    if (tab === 'performance') {
+      perf && perf.classList.remove('hidden');
+      pBtn && pBtn.classList.add('active');
+
+    } else if (tab === 'leave') {
+      leave && leave.classList.remove('hidden');
+      lBtn  && lBtn.classList.add('active');
+      /* Lazy-load leave data on first visit to the tab */
+      if (!lpLoaded) {
+        if (TK.hasAny()) {
+          lpInitAndLoad();
+        } else {
+          lpSetStatus('Please sign in using the Performance Dashboard tab first.');
+          lpShowMessage('Sign in to view the Leave Planner.');
+        }
+      }
+
+    } else if (tab === 'caf') {
+      caf  && caf.classList.remove('hidden');
+      cBtn && cBtn.classList.add('active');
+      /* If data is already parsed, render now; otherwise loading state is shown */
+      if (cafParsed) cafRender();
+
+    } else if (tab === 'el') {
+      el   && el.classList.remove('hidden');
+      eBtn && eBtn.classList.add('active');
+      /* If data is already parsed, render; otherwise load triggers render on completion */
+      if (elData) {
+        elRender();
+      } else if (TK.hasAny()) {
+        getToken()
+          .then(t => elLoad(t))
+          .catch(e => console.warn('[EL] Tab load failed:', e.message));
       }
     }
+  };
 
-  } else if (tab === 'caf') {
-    caf  && caf.classList.remove('hidden');
-    cBtn && cBtn.classList.add('active');
-    /* If data is already parsed, render now; otherwise loading state is shown */
-    if (cafParsed) cafRender();
-
-  } else if (tab === 'el') {
-    el   && el.classList.remove('hidden');
-    eBtn && eBtn.classList.add('active');
-    /* If data is already parsed, render; otherwise load triggers render on completion */
-    if (elData) {
-      elRender();
-    } else if (TK.hasAny()) {
-      getToken()
-        .then(t => elLoad(t))
-        .catch(e => console.warn('[EL] Tab load failed:', e.message));
-    }
+  /* Animate the current section out, then switch in the new one */
+  if (cur) {
+    cur.classList.add('tab-exit');
+    _tabTimer = setTimeout(() => {
+      _tabTimer = null;
+      cur.classList.remove('tab-exit');
+      doSwitch();
+    }, 140);
+  } else {
+    doSwitch(); /* first load — no outgoing section */
   }
 }
 
@@ -3787,27 +4448,70 @@ function lpRenderCalendar() {
       cell.appendChild(badge);
     });
 
-    /* Leave entry pills */
+    /* Leave entry pills — photo-enhanced when Solo Pics image is available,
+       clean text-only pill as automatic fallback.
+       Max 4 visible entries; surplus shown as "+X more" badge.            */
+    const dayLeaves  = lpLeavesForDate(dateStr);
+    const LP_MAX_VIS = 4;
+    const visLeaves  = dayLeaves.slice(0, LP_MAX_VIS);
+    const overflowN  = dayLeaves.length - LP_MAX_VIS;
+
     const entriesDiv = document.createElement('div');
     entriesDiv.className = 'lp-day-entries';
+    if (visLeaves.length > 0) entriesDiv.setAttribute('data-count', visLeaves.length);
 
-    lpLeavesForDate(dateStr).forEach(lv => {
-      const meta = lpGetMeta(lv.leaveType, lv.customType);
-      const pill = document.createElement('div');
-      pill.className            = 'lp-entry';
-      pill.style.background     = meta.bg;
-      pill.style.color          = meta.fg;
-      pill.textContent          = lv.name + ' \u2013 ' + meta.abbr;
-      const tipType = lv.leaveType === 'Other'
-        ? (lv.customType || 'Other')
-        : lv.leaveType;
-      pill.title = lv.name + ' \u2014 ' + tipType +
+    visLeaves.forEach(lv => {
+      const meta    = lpGetMeta(lv.leaveType, lv.customType);
+      const tipType = lv.leaveType === 'Other' ? (lv.customType || 'Other') : lv.leaveType;
+      const tipText = lv.name + ' \u2014 ' + tipType +
         (lv.startDate !== lv.endDate
           ? ' (' + lpFmtDate(lv.startDate) + ' \u2013 ' + lpFmtDate(lv.endDate) + ')'
           : '');
+      const pill = document.createElement('div');
+      const pic  = soloPics[lv.name];   /* undefined → falsy → text-only pill */
+
+      if (pic) {
+        /* ── Photo-enhanced entry ───────────────────────────────────────── */
+        pill.className        = 'lp-entry lp-entry-has-photo';
+        pill.style.background = meta.bg;
+        pill.style.color      = meta.fg;
+        pill.title            = tipText;
+
+        const av  = document.createElement('div');
+        av.className          = 'lp-av';
+        const img = document.createElement('img');
+        img.src               = pic;
+        img.alt               = '';
+        img.draggable         = false;
+        av.appendChild(img);
+
+        const lbl = document.createElement('span');
+        lbl.className   = 'lp-entry-lbl';
+        lbl.textContent = lv.name + ' \u00B7 ' + meta.abbr;
+
+        pill.appendChild(av);
+        pill.appendChild(lbl);
+      } else {
+        /* ── Existing text-only pill (unchanged behaviour) ──────────────── */
+        pill.className        = 'lp-entry';
+        pill.style.background = meta.bg;
+        pill.style.color      = meta.fg;
+        pill.textContent      = lv.name + ' \u2013 ' + meta.abbr;
+        pill.title            = tipText;
+      }
+
       pill.addEventListener('click', e => { e.stopPropagation(); lpOpenView(lv.id); });
       entriesDiv.appendChild(pill);
     });
+
+    /* "+X more" badge — opens day-detail popover on click */
+    if (overflowN > 0) {
+      const more = document.createElement('div');
+      more.className   = 'lp-entry-overflow';
+      more.textContent = '+' + overflowN + ' more';
+      more.addEventListener('click', e => { e.stopPropagation(); lpOpenPopover(cell, dateStr, dayLeaves); });
+      entriesDiv.appendChild(more);
+    }
 
     cell.appendChild(entriesDiv);
 
@@ -3846,19 +4550,49 @@ function lpBuildLegend() {
 /* ════════════════════════════════════════════════════════════════════════════
    MONTH NAVIGATION
 ════════════════════════════════════════════════════════════════════════════ */
+/* ── LP calendar month-change animation ──────────────────────────────────
+   Same visual language as the tab transition. Exit the current grid content
+   (opacity/translateY), then run the re-render, then enter the new content.
+   _lpCalTimer guards against animation stacking on rapid clicks.          */
+let _lpCalTimer = null;
+
+function lpAnimateMonthChange(doChange) {
+  if (_lpCalTimer) { clearTimeout(_lpCalTimer); _lpCalTimer = null; }
+  const grid = document.getElementById('lp-grid');
+  if (!grid) { doChange(); return; }
+
+  /* Snap-clean any leftover animation classes from a cancelled transition */
+  grid.classList.remove('lp-cal-exit', 'lp-cal-enter');
+
+  grid.classList.add('lp-cal-exit');
+  _lpCalTimer = setTimeout(() => {
+    _lpCalTimer = null;
+    doChange();                      /* updates lpMonth/lpYear + rebuilds grid */
+    grid.classList.remove('lp-cal-exit');
+    void grid.offsetWidth;           /* reflow — ensures animation restarts clean */
+    grid.classList.add('lp-cal-enter');
+  }, 120);
+}
+
 function lpPrevMonth() {
-  lpMonth--; if (lpMonth < 0)  { lpMonth = 11; lpYear--; }
-  lpRenderCalendar();
+  lpAnimateMonthChange(() => {
+    lpMonth--; if (lpMonth < 0)  { lpMonth = 11; lpYear--; }
+    lpRenderCalendar();
+  });
 }
 function lpNextMonth() {
-  lpMonth++; if (lpMonth > 11) { lpMonth = 0;  lpYear++; }
-  lpRenderCalendar();
+  lpAnimateMonthChange(() => {
+    lpMonth++; if (lpMonth > 11) { lpMonth = 0;  lpYear++; }
+    lpRenderCalendar();
+  });
 }
 function lpGoToday() {
-  const n = new Date();
-  lpYear  = n.getFullYear();
-  lpMonth = n.getMonth();
-  lpRenderCalendar();
+  lpAnimateMonthChange(() => {
+    const n = new Date();
+    lpYear  = n.getFullYear();
+    lpMonth = n.getMonth();
+    lpRenderCalendar();
+  });
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -3937,8 +4671,24 @@ function lpOpenEditDialog(id) {
   document.getElementById('lp-form-overlay').classList.remove('hidden');
 }
 
+/* ── Shared overlay close helper (iOS-style exit animation) ──────────────
+   Adds .is-closing to trigger CSS exit animation, then adds .hidden after
+   the animation duration. Optional onHidden() fires after fully hidden
+   (use for clearing innerHTML / resetting state that should not vanish
+   before the animation completes).                                        */
+function uiCloseOverlay(id, onHidden) {
+  const el = document.getElementById(id);
+  if (!el || el.classList.contains('hidden') || el.classList.contains('is-closing')) return;
+  el.classList.add('is-closing');
+  setTimeout(() => {
+    el.classList.remove('is-closing');
+    el.classList.add('hidden');
+    if (typeof onHidden === 'function') onHidden();
+  }, 190);
+}
+
 function lpCloseForm() {
-  document.getElementById('lp-form-overlay').classList.add('hidden');
+  uiCloseOverlay('lp-form-overlay');
 }
 
 function lpTypeChange() {
@@ -3980,6 +4730,20 @@ async function lpSaveLeave() {
   /* Default end = start (single day) */
   const endDate = eDate || sDate;
   if (endDate < sDate)     { showToast('End date cannot be before start date.'); return; }
+
+  /* Duplicate check (ADD only): same employee, overlapping date range */
+  if (!lpEditId) {
+    const dup = lpLeaves.find(lv =>
+      lv.name === name &&
+      lv.startDate <= endDate &&
+      lv.endDate   >= sDate
+    );
+    if (dup) {
+      lpCloseForm();
+      lpOpenDupWarning(dup);
+      return;
+    }
+  }
 
   const fields = {
     name,
@@ -4077,7 +4841,7 @@ function lpFmtDate(s) {
 }
 
 function lpCloseView() {
-  document.getElementById('lp-view-overlay').classList.add('hidden');
+  uiCloseOverlay('lp-view-overlay');
   lpViewId = null;
 }
 
@@ -4096,7 +4860,7 @@ function lpDeleteFromView() {
    DELETE CONFIRM
 ════════════════════════════════════════════════════════════════════════════ */
 function lpCloseDelete() {
-  document.getElementById('lp-del-overlay').classList.add('hidden');
+  uiCloseOverlay('lp-del-overlay');
   lpDeleteId = null;
 }
 
@@ -4127,6 +4891,7 @@ function lpOverlayClick(e, which) {
   if (which === 'form') lpCloseForm();
   else if (which === 'view') lpCloseView();
   else if (which === 'del')  lpCloseDelete();
+  else if (which === 'dup')  lpCloseDupWarning();
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -4142,6 +4907,11 @@ function lpOverlayClick(e, which) {
 /* ── Constants ───────────────────────────────────────────────────────────── */
 const CAF_FILE_NAME = 'Team Josh CAF.xlsx';
 const CAF_CSS = ['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor'];
+
+/* ── Solo member photos — keyed by name (filename without .png extension).
+   Populated by loadLogo() from the "Solo Pics/" folder after auth.
+   Consumed by cafRenderTiles() and elRenderTiles(). */
+const soloPics = {};
 
 /* ── File resolution cache ───────────────────────────────────────────────── */
 let cafDriveId = null;
@@ -4508,7 +5278,17 @@ function cafRenderTiles() {
     } else {
       sub = '<div class="caf-tile-count">' + (counts[m.toLowerCase()] || 0) + ' Active</div>';
     }
+
+    /* Photo if available (png/jpg/jpeg from Solo Pics) — name-only fallback when absent */
+    const photoSrc  = !isAll && soloPics[m];
+    const photoHtml = photoSrc
+      ? '<div class="member-photo-wrap">' +
+          '<img class="member-photo" src="' + photoSrc + '" alt="' + cafEsc(m) + '">' +
+        '</div>'
+      : '';
+
     return '<div class="' + cls + '" data-css="' + cafEsc(m) + '">' +
+           photoHtml +
            '<div class="caf-tile-name">' + cafEsc(m) + '</div>' + sub + '</div>';
   }).join('');
 
@@ -4942,8 +5722,9 @@ function cafCancelReq() {
 
 /* ── Close field-selection dialog ───────────────────────────────────────── */
 function cafCloseReqDlg() {
-  document.getElementById('caf-req-overlay').classList.add('hidden');
-  document.getElementById('caf-req-body').innerHTML = '';
+  uiCloseOverlay('caf-req-overlay', () => {
+    document.getElementById('caf-req-body').innerHTML = '';
+  });
 }
 
 /* ── Generate email template from selected fields ───────────────────────── */
@@ -4979,6 +5760,9 @@ function cafGenerateTemplate() {
       ' <span class="caf-tmpl-entity">[' + cafEsc(entityCode) + ']</span>'
     : '<strong>' + cafEsc(acct) + '</strong>';
 
+  /* ── Email subject (dynamic: Account Name + Entity Code) ── */
+  const emailSubject = 'Request Update: Team Josh CAF \u2013 ' + clientPlain;
+
   /* ── HTML email (ClipboardItem text/html) ── */
   const trHtml = selected.map(c =>
     '<tr>' +
@@ -4991,6 +5775,10 @@ function cafGenerateTemplate() {
   ).join('');
 
   cafReqHtml =
+    '<p style="margin:0 0 2px;font-family:Arial,sans-serif;font-size:11px;color:#6D7990"><strong>Email Subject</strong></p>' +
+    '<p style="margin:0 0 14px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#00144A">' +
+      cafEsc(emailSubject) + '</p>' +
+    '<hr style="margin:0 0 14px;border:none;border-top:1px solid #D0D8E6">' +
     '<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px">Hello,</p>' +
     '<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px">Good day.</p>' +
     '<p style="margin:0 0 10px;font-family:Arial,sans-serif;font-size:13px">' +
@@ -5013,6 +5801,7 @@ function cafGenerateTemplate() {
 
   /* ── Plain-text fallback ── */
   cafReqPlain =
+    'Email Subject: ' + emailSubject + '\n\n' +
     'Hello,\n\nGood day.\n\n' +
     'The following details need to be updated for ' + clientPlain + ':\n\n' +
     selected.map(c =>
@@ -5035,6 +5824,10 @@ function cafGenerateTemplate() {
       'Click <strong>Copy Email Template</strong> below, paste into a new email, ' +
       'fill in the <em>Updated Information</em> column, then send to ' +
       '<a href="mailto:Josh.Nacional@sap.com">Josh.Nacional@sap.com</a>.' +
+    '</div>' +
+    '<div class="caf-tmpl-subject-wrap">' +
+      '<div class="caf-tmpl-subject-lbl">Email Subject</div>' +
+      '<div class="caf-tmpl-subject-val">' + cafEsc(emailSubject) + '</div>' +
     '</div>' +
     '<div class="caf-tmpl-preview">' +
       '<div class="caf-tmpl-para">Hello,</div>' +
@@ -5072,15 +5865,17 @@ function cafGenerateTemplate() {
 
 /* ── Back to field-selection (preserves selections) ─────────────────────── */
 function cafGoBack() {
-  document.getElementById('caf-tmpl-overlay').classList.add('hidden');
-  document.getElementById('caf-tmpl-body').innerHTML = '';
-  cafOpenRequestUpdate(-1); /* restores cafReqRow + cafReqSelectedIndices */
+  uiCloseOverlay('caf-tmpl-overlay', () => {
+    document.getElementById('caf-tmpl-body').innerHTML = '';
+    cafOpenRequestUpdate(-1); /* restores cafReqRow + cafReqSelectedIndices */
+  });
 }
 
 /* ── Done button: close everything ──────────────────────────────────────── */
 function cafDoneReq() {
-  document.getElementById('caf-tmpl-overlay').classList.add('hidden');
-  document.getElementById('caf-tmpl-body').innerHTML = '';
+  uiCloseOverlay('caf-tmpl-overlay', () => {
+    document.getElementById('caf-tmpl-body').innerHTML = '';
+  });
   cafReqRow             = null;
   cafReqSelectedIndices = [];
   cafReqHtml            = '';
@@ -5089,8 +5884,9 @@ function cafDoneReq() {
 
 /* ── Close template dialog (X button / overlay click) ───────────────────── */
 function cafCloseTmplDlg() {
-  document.getElementById('caf-tmpl-overlay').classList.add('hidden');
-  document.getElementById('caf-tmpl-body').innerHTML = '';
+  uiCloseOverlay('caf-tmpl-overlay', () => {
+    document.getElementById('caf-tmpl-body').innerHTML = '';
+  });
   cafReqRow             = null;
   cafReqSelectedIndices = [];
   cafReqHtml            = '';
@@ -5327,7 +6123,16 @@ function elRenderTiles() {
     const pcTxt = isAll ? (p + '% Complete') : (p + '%');
     const pStyle = isActive ? 'color:rgba(255,255,255,.85)' : ('color:' + col);
 
+    /* Photo if available (png/jpg/jpeg from Solo Pics) — name-only fallback when absent */
+    const photoSrc  = !isAll && soloPics[m];
+    const photoHtml = photoSrc
+      ? '<div class="member-photo-wrap">' +
+          '<img class="member-photo" src="' + photoSrc + '" alt="' + cafEsc(m) + '">' +
+        '</div>'
+      : '';
+
     return '<div class="' + cls + '" data-cs="' + cafEsc(m) + '">' +
+             photoHtml +
              '<div class="el-tile-name">' + cafEsc(m) + '</div>' +
              '<div class="el-tile-pct" style="' + pStyle + '">' + pcTxt + '</div>' +
            '</div>';
@@ -5339,6 +6144,32 @@ function elRenderTiles() {
       elRender();
     });
   });
+}
+
+/* ── Deadline date helpers ───────────────────────────────────────────────── */
+function elParseDate(str) {
+  /* Parse a date string as returned by the Excel text representation.
+     new Date() handles most common formats: "September 29, 2026",
+     "9/29/2026", "29-Sep-2026", ISO strings, etc. */
+  if (!str || str === '—') return null;
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function elDeadlineStatus(intDeadlineStr) {
+  /* Returns 'overdue' | 'due-soon' | 'normal' based on CS Internal Deadline.
+     'due-soon'  = deadline within the next 7 days (inclusive of today).
+     'overdue'   = deadline has already passed (yesterday or earlier).
+     'normal'    = more than 7 days away, or date cannot be parsed. */
+  const deadline = elParseDate(intDeadlineStr);
+  if (!deadline) return 'normal';
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  deadline.setHours(0, 0, 0, 0);
+  const daysLeft = Math.ceil((deadline - today) / 86400000);
+  if (daysLeft < 0)  return 'overdue';
+  if (daysLeft <= 7) return 'due-soon';
+  return 'normal';
 }
 
 /* ── Render: Course compliance table ─────────────────────────────────────── */
@@ -5356,20 +6187,31 @@ function elRenderTable() {
     return s ? '<span class="el-status el-status-other">' + cafEsc(s) + '</span>' : '\u2014';
   };
 
+  /* CS headers centered to align with status pills */
   const headers =
     '<th class="el-th-course">eLearning Course</th>' +
     '<th class="el-th-intdead">CS Internal Deadline</th>' +
     '<th class="el-th-sapdead">SAP Deadline</th>' +
-    showCs.map(cs => '<th>' + cafEsc(cs) + '</th>').join('');
+    showCs.map(cs => '<th class="el-th-cs">' + cafEsc(cs) + '</th>').join('');
 
-  const dataRows = elData.courses.map(c =>
-    '<tr>' +
-      '<td class="el-td-course">' + cafEsc(c.name) + '</td>' +
+  const dataRows = elData.courses.map(c => {
+    /* Determine deadline warning — only flag if at least one displayed CS is still pending */
+    const hasPending = showCs.some(cs => (c.status[cs] || '').toLowerCase() === 'pending');
+    const dlStatus   = hasPending ? elDeadlineStatus(c.intDeadline) : 'normal';
+    const rowCls     = dlStatus === 'overdue'  ? ' class="el-row-overdue"'  :
+                       dlStatus === 'due-soon' ? ' class="el-row-due-soon"' : '';
+    const warnBadge  = hasPending && dlStatus !== 'normal'
+      ? ' <span class="el-deadline-badge el-badge-' + dlStatus + '">' +
+          (dlStatus === 'overdue' ? 'Overdue' : 'Due Soon') + '</span>'
+      : '';
+
+    return '<tr' + rowCls + '>' +
+      '<td class="el-td-course">' + cafEsc(c.name) + warnBadge + '</td>' +
       '<td class="el-td-intdead el-deadline-int">' + cafEsc(c.intDeadline) + '</td>' +
       '<td class="el-td-sapdead el-deadline-sap">' + cafEsc(c.sapDeadline) + '</td>' +
       showCs.map(cs => '<td class="el-td-status">' + statusPill(c.status[cs]) + '</td>').join('') +
-    '</tr>'
-  ).join('');
+    '</tr>';
+  }).join('');
 
   const colSpan = 3 + showCs.length;
   tbl.innerHTML =
@@ -5391,8 +6233,10 @@ function elRenderPending() {
   elData.courses.forEach(course => {
     showCs.forEach(cs => {
       if ((course.status[cs] || '').toLowerCase() === 'pending') {
+        const dlStatus = elDeadlineStatus(course.intDeadline);
         pending.push({ cs, course: course.name,
-          intDead: course.intDeadline, sapDead: course.sapDeadline });
+          intDead: course.intDeadline, sapDead: course.sapDeadline,
+          dlStatus });
       }
     });
   });
@@ -5406,14 +6250,20 @@ function elRenderPending() {
     ? '<tr><th>CS</th><th>Course</th><th>CS Internal Deadline</th><th>SAP Deadline</th></tr>'
     : '<tr><th>Course</th><th>CS Internal Deadline</th><th>SAP Deadline</th></tr>';
 
-  const rows = pending.map(p =>
-    '<tr>' +
-    (showAll ? '<td><span class="el-cs-name-badge">' + cafEsc(p.cs) + '</span></td>' : '') +
-    '<td>' + cafEsc(p.course) + '</td>' +
-    '<td class="el-deadline-int">' + cafEsc(p.intDead) + '</td>' +
-    '<td class="el-deadline-sap">' + cafEsc(p.sapDead) + '</td>' +
-    '</tr>'
-  ).join('');
+  const rows = pending.map(p => {
+    const rowCls    = p.dlStatus === 'overdue'  ? ' class="el-row-overdue"'  :
+                      p.dlStatus === 'due-soon' ? ' class="el-row-due-soon"' : '';
+    const warnBadge = p.dlStatus !== 'normal'
+      ? ' <span class="el-deadline-badge el-badge-' + p.dlStatus + '">' +
+          (p.dlStatus === 'overdue' ? 'Overdue' : 'Due Soon') + '</span>'
+      : '';
+    return '<tr' + rowCls + '>' +
+      (showAll ? '<td><span class="el-cs-name-badge">' + cafEsc(p.cs) + '</span></td>' : '') +
+      '<td>' + cafEsc(p.course) + warnBadge + '</td>' +
+      '<td class="el-deadline-int">' + cafEsc(p.intDead) + '</td>' +
+      '<td class="el-deadline-sap">' + cafEsc(p.sapDead) + '</td>' +
+    '</tr>';
+  }).join('');
 
   el.innerHTML =
     '<table class="el-pending-tbl">' +
@@ -5445,18 +6295,34 @@ function elRenderUpcoming() {
     return;
   }
 
-  el.innerHTML = upcoming.map(c =>
-    '<div class="el-upcoming-row">' +
-      '<div class="el-upcoming-name">' + cafEsc(c.name) + '</div>' +
-      '<div class="el-upcoming-metas">' +
-        '<span class="el-upcoming-meta-int">' + cafEsc(c.intDead) + '</span>' +
-        '<span class="el-upcoming-meta-sep">\u00b7</span>' +
-        '<span class="el-upcoming-meta-sap">' + cafEsc(c.sapDead) + '</span>' +
-      '</div>' +
-      '<div class="el-upcoming-badge el-pending-badge">' + c.pendingCount +
-        (c.pendingCount === 1 ? ' Pending' : ' Pending') + '</div>' +
-    '</div>'
-  ).join('');
+  /* Build table rows — apply deadline warning to row and status badge */
+  const rows = upcoming.map(c => {
+    const dlStatus  = elDeadlineStatus(c.intDead);
+    const rowCls    = dlStatus === 'overdue'  ? ' class="el-row-overdue"'  :
+                      dlStatus === 'due-soon' ? ' class="el-row-due-soon"' : '';
+    const badgeCls  = dlStatus === 'overdue'  ? 'el-upc-status-badge el-upc-overdue'  :
+                      dlStatus === 'due-soon' ? 'el-upc-status-badge el-upc-due-soon' :
+                                               'el-upc-status-badge el-upc-normal';
+    return '<tr' + rowCls + '>' +
+      '<td class="el-upc-course">' + cafEsc(c.name) + '</td>' +
+      '<td class="el-upc-date el-deadline-int">' + cafEsc(c.intDead) + '</td>' +
+      '<td class="el-upc-date el-deadline-sap">' + cafEsc(c.sapDead) + '</td>' +
+      '<td class="el-upc-status-cell">' +
+        '<span class="' + badgeCls + '">' + c.pendingCount + '\u00a0Pending</span>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  el.innerHTML =
+    '<table class="el-upcoming-tbl">' +
+    '<thead><tr>' +
+      '<th class="el-upc-course">Course</th>' +
+      '<th class="el-upc-th-intdead">CS Internal Deadline</th>' +
+      '<th class="el-upc-th-sapdead">SAP Deadline</th>' +
+      '<th class="el-upc-th-status">Team Status</th>' +
+    '</tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+    '</table>';
 }
 
 /* ── Master render ───────────────────────────────────────────────────────── */
@@ -5469,6 +6335,147 @@ function elRender() {
   elRenderUpcoming();
 }
 
+
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LEAVE PLANNER — DAY-DETAIL POPOVER
+   Opens when "+X more" badge is clicked; shows all leave entries for the day
+   with circular avatars, names, and coloured type badges.
+════════════════════════════════════════════════════════════════════════════ */
+
+function lpOpenPopover(anchorEl, dateStr, allLeaves) {
+  const pop   = document.getElementById('lp-pop');
+  const title = document.getElementById('lp-pop-title');
+  const list  = document.getElementById('lp-pop-list');
+  if (!pop || !title || !list) return;
+
+  /* Title: "LEAVE ON AUGUST 23, 2026" */
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const label = MONTH_NAMES[mo - 1].toUpperCase() + ' ' + d + ', ' + y;
+  title.textContent = 'LEAVE ON ' + label;
+
+  /* Build rows */
+  list.innerHTML = '';
+  allLeaves.forEach(lv => {
+    const meta = lpGetMeta(lv.leaveType, lv.customType);
+    const row  = document.createElement('div');
+    row.className = 'lp-pop-row';
+
+    /* Avatar */
+    const av  = document.createElement('div');
+    av.className = 'lp-pop-av';
+    const pic = (typeof soloPics !== 'undefined') && soloPics[lv.name];
+    if (pic) {
+      const img = document.createElement('img');
+      img.src = pic;
+      img.alt = '';
+      av.appendChild(img);
+    } else {
+      const init = document.createElement('span');
+      init.className   = 'lp-pop-av-init';
+      init.textContent = (lv.name || '?').charAt(0).toUpperCase();
+      av.appendChild(init);
+    }
+
+    /* Name */
+    const name = document.createElement('span');
+    name.className   = 'lp-pop-name';
+    name.textContent = lv.name;
+
+    /* Leave-type badge */
+    const badge = document.createElement('span');
+    badge.className        = 'lp-pop-badge';
+    badge.textContent      = meta.abbr || 'OTH';
+    badge.style.background = meta.bg;
+    badge.style.color      = meta.fg;
+
+    row.appendChild(av);
+    row.appendChild(name);
+    row.appendChild(badge);
+
+    row.addEventListener('click', e => {
+      e.stopPropagation();
+      lpClosePopover();
+      if (typeof lpOpenView === 'function') lpOpenView(lv.id);
+    });
+
+    list.appendChild(row);
+  });
+
+  /* Show popover first so we can measure its size */
+  pop.classList.remove('hidden');
+  lpPositionPopover(anchorEl);
+}
+
+function lpClosePopover() {
+  const pop = document.getElementById('lp-pop');
+  if (!pop || pop.classList.contains('hidden') || pop.classList.contains('is-closing')) return;
+  pop.classList.add('is-closing');
+  setTimeout(() => { pop.classList.remove('is-closing'); pop.classList.add('hidden'); }, 160);
+}
+
+function lpPositionPopover(anchorEl) {
+  const pop = document.getElementById('lp-pop');
+  if (!pop || !anchorEl) return;
+
+  const rect = anchorEl.getBoundingClientRect();
+  const pw   = pop.offsetWidth  || 260;
+  const ph   = pop.offsetHeight || 200;
+  const vw   = window.innerWidth;
+  const vh   = window.innerHeight;
+  const gap  = 6;
+
+  /* Prefer below the cell; flip above if clipped */
+  let top  = rect.bottom + gap;
+  let left = rect.left;
+
+  if (top + ph > vh - 8)  top  = rect.top - ph - gap;
+  if (left + pw > vw - 8) left = vw - pw - 8;
+  if (left < 8)           left = 8;
+  if (top  < 8)           top  = 8;
+
+  pop.style.top  = top  + 'px';
+  pop.style.left = left + 'px';
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DUPLICATE LEAVE WARNING
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Called when a new ADD would produce a duplicate (same employee, same/
+   overlapping date range). Shows a premium iOS-style warning dialog with
+   the conflicting existing entry and an "Edit Existing Leave" shortcut.   */
+function lpOpenDupWarning(existingLv) {
+  const meta      = lpGetMeta(existingLv.leaveType, existingLv.customType);
+  const typeLabel = existingLv.leaveType === 'Other'
+    ? (existingLv.customType || 'Other')
+    : existingLv.leaveType;
+  const dateRange = existingLv.startDate === existingLv.endDate
+    ? lpFmtDate(existingLv.startDate)
+    : lpFmtDate(existingLv.startDate) + ' \u2013 ' + lpFmtDate(existingLv.endDate);
+
+  /* Populate badge */
+  const badge = document.getElementById('lp-dup-entry-badge');
+  badge.textContent      = meta.abbr || 'OTH';
+  badge.style.background = meta.bg;
+  badge.style.color      = meta.fg;
+
+  /* Populate name and date details */
+  document.getElementById('lp-dup-name').textContent        = existingLv.name;
+  document.getElementById('lp-dup-entry-dates').textContent = typeLabel + '  \u00B7  ' + dateRange;
+
+  /* Wire the "Edit Existing Leave" button to open the correct record */
+  document.getElementById('lp-dup-edit-btn').onclick = () => {
+    lpCloseDupWarning();
+    lpOpenEditDialog(existingLv.id);
+  };
+
+  document.getElementById('lp-dup-overlay').classList.remove('hidden');
+}
+
+function lpCloseDupWarning() {
+  uiCloseOverlay('lp-dup-overlay');
+}
 
 </script>
 </body>
