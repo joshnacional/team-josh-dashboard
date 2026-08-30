@@ -604,8 +604,8 @@ html.is-capturing :focus-visible{outline:none !important}
   display:block;visibility:hidden;transition:filter .2s ease;
 }
 .tab-icon.loaded{visibility:visible}
-/* Active tile: invert icon to white (works for any dark SAP pictogram) */
-.tab-btn.active .tab-icon.loaded{filter:brightness(0) invert(1)}
+/* Active tile: keep icon dark — readable on #E2D8FF light background */
+.tab-btn.active .tab-icon.loaded{filter:none}
 /* Dark mode inactive tile: icon must be light enough to read on dark surface */
 html[data-theme="dark"] .tab-icon.loaded{filter:brightness(0) invert(1) opacity(.68)}
 html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) invert(1)}
@@ -616,13 +616,20 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   border-color:rgba(93,54,255,.28);
   color:#5D36FF;
 }
-/* Active: blue gradient + elevated shadow + subtle inset highlight */
+/* Active: light Indigo bg + deep Indigo text — pictograms stay dark */
 .tab-btn.active{
+  background:#E2D8FF;
+  border-color:#5D36FF;
+  color:#1C0C6E;
+  box-shadow:0 4px 14px rgba(93,54,255,.20),0 1px 4px rgba(93,54,255,.10);
+  transform:translateY(-1px);
+}
+/* Dark mode active: gradient + white text for contrast on dark surface */
+html[data-theme="dark"] .tab-btn.active{
   background:linear-gradient(140deg,#5D36FF 0%,#4820E8 100%);
   border-color:transparent;
   color:#fff;
   box-shadow:0 4px 16px rgba(93,54,255,.42),0 1px 4px rgba(93,54,255,.18),inset 0 1px 0 rgba(255,255,255,.18);
-  transform:translateY(-1px);
 }
 .tab-section{display:block;position:relative}
 .tab-section.hidden{display:none}
@@ -3067,6 +3074,27 @@ async function loadLogo(token) {
       console.warn('[Favicon] thumb.png not found — using logo as fallback');
     }
 
+    /* Step 4.2: Load SignIn_Page.jpg background for the sign-in overlay ────
+       Uses the SAME fetchAssetDataUrl mechanism as thumb.png — authenticated
+       binary download → base64 data URL → cached permanently in localStorage.
+       assetItems is already resolved above (no extra API calls needed).
+       The CSS variable --tj-signin-bg is set immediately so the background
+       is visible while the sign-in overlay is still shown during data load.
+       On return visits the IIFE at script start restores from localStorage
+       synchronously, before any API call or auth.                           */
+    const signinBgUrl = await fetchAssetDataUrl(assetItems, SIGNIN_BG_FILE_NAME, token);
+    if (signinBgUrl) {
+      document.documentElement.style.setProperty(
+        '--tj-signin-bg', 'url("' + signinBgUrl + '")'
+      );
+      try { localStorage.setItem('tj_cached_signin_bg', signinBgUrl); } catch(e) {
+        console.warn('[SignInBG] localStorage quota exceeded — background will not persist across sessions');
+      }
+      console.log('[SignInBG] Loaded and cached:', SIGNIN_BG_FILE_NAME);
+    } else {
+      console.warn('[SignInBG] File not found in asset folder:', SIGNIN_BG_FILE_NAME);
+    }
+
     /* Step 5: Load nav pictograms (only from Logos subfolder) */
     if (logosFolder) {
       const troUrl = await fetchAssetDataUrl(assetItems, '301620_Trophy_R.png', token);
@@ -3222,89 +3250,14 @@ async function loadBgImage(token) {
 
 /* ════════════════════════════════════════════════════════════════════════════
    SIGN-IN PAGE BACKGROUND LOADER
-   Loads SignIn_Page.jpg from the Logos folder using the same binary-fetch
-   mechanism as thumb.png and SAP 3D.jpg:
-     1. graphGetBinary   — authenticated download via Graph API
-     2. URL.createObjectURL — applied immediately so the background appears
-        while the overlay is still visible (during the 2-5 s data fetch)
-     3. blobToDataUrl (async) — converts to a permanent base64 data URL and
-        caches in localStorage under 'tj_cached_signin_bg'
-
-   On return visits the IIFE at the top of the script restores the cached
-   data URL synchronously, before any API call, so the sign-in page is
-   always branded with no network request needed.
-
-   This avoids the @microsoft.graph.downloadUrl CDN approach, whose pre-auth
-   links expire after ~1 hour and would leave the sign-in page without a
-   background on return visits.
+   NOTE (v43+): Loading is now handled in loadLogo Step 4.2, which reuses
+   the already-resolved assetItems list — no extra folder-navigation API calls.
+   This function is kept as a no-op so existing call-sites in loadAndBuild
+   remain valid without modification.
 ════════════════════════════════════════════════════════════════════════════ */
 async function loadSignInBg(token) {
-  try {
-    if (!excelDriveId || !excelItemId) await resolveExcelFile(token);
-
-    /* ── Navigate: Excel item → data folder → root dir (same as loadLogo) ── */
-    const excelMeta = await graphGet(
-      '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference', token
-    );
-    const dataFolderId = excelMeta.parentReference.id;
-
-    const dataFolderMeta = await graphGet(
-      '/drives/' + excelDriveId + '/items/' + dataFolderId + '?$select=parentReference', token
-    );
-    const rootDirId = dataFolderMeta.parentReference.id;
-
-    /* ── List root dir; locate Logos subfolder ── */
-    const rootResp = await graphGet(
-      '/drives/' + excelDriveId + '/items/' + rootDirId + '/children?$select=id,name', token
-    );
-    const rootItems   = (rootResp.value || []);
-    const logosFolder = rootItems.find(f => f.name === 'Logos');
-
-    let searchItems = rootItems;
-    if (logosFolder) {
-      const logosResp = await graphGet(
-        '/drives/' + excelDriveId + '/items/' + logosFolder.id + '/children?$select=id,name', token
-      );
-      searchItems = logosResp.value || [];
-      console.log('[SignInBG] Searching Logos subfolder for:', SIGNIN_BG_FILE_NAME);
-    }
-
-    /* ── Case-insensitive filename match (same as fetchAssetDataUrl) ── */
-    const signinLower = SIGNIN_BG_FILE_NAME.toLowerCase();
-    const item = searchItems.find(f => f.name === SIGNIN_BG_FILE_NAME)
-              || searchItems.find(f => f.name.toLowerCase() === signinLower);
-
-    if (!item) {
-      console.warn('[SignInBG] File not found:', SIGNIN_BG_FILE_NAME,
-                   '| Files in folder:', searchItems.map(f => f.name).join(', '));
-      return;
-    }
-
-    /* ── Fetch binary — identical mechanism to thumb.png and SAP 3D.jpg ── */
-    const blob = await graphGetBinary(
-      '/drives/' + excelDriveId + '/items/' + item.id + '/content', token
-    );
-
-    /* ── Apply immediately via Object URL ── */
-    const objectUrl = URL.createObjectURL(blob);
-    document.documentElement.style.setProperty(
-      '--tj-signin-bg', 'url("' + objectUrl + '")'
-    );
-    console.log('[SignInBG] Applied via Object URL:', item.name);
-
-    /* ── Cache as permanent base64 data URL (async, non-blocking) ──────────
-       Stored in localStorage so the IIFE restores it on every subsequent
-       page load — no API call, no token, no expiry.  Same pattern as
-       tj_cached_thumb and tj_cached_bg.                                    */
-    blobToDataUrl(blob).then(function(dataUrl) {
-      try { localStorage.setItem('tj_cached_signin_bg', dataUrl); } catch(e) {
-        console.warn('[SignInBG] localStorage quota exceeded — background will not persist across sessions');
-      }
-    }).catch(function() {});
-
-  } catch(e) {
-    console.warn('[SignInBG] Could not load sign-in background:', e.message);
-  }
+  /* No-op: SignIn_Page.jpg is loaded in loadLogo (Step 4.2).
+     Keeping this stub preserves the loadAndBuild call signature. */
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
