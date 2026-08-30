@@ -29,9 +29,10 @@
                                    Commendation bars, IRT violations
 
    Secondary chart tones:
-     #A889FF  Client Created / Successful  (Indigo 4 light)
-     #B0BFCC  Progressing / Insufficient   (neutral grey)
-     #7858FF  Outstanding / Call Conversations  (Indigo 6)
+     #B894FF  Client Created (Case Count) / Outstanding (MTD Avg)  (Indigo 4)
+     #5B7388  Successful (MTD Avg) / Commendation / Survey header  (Grey 6)
+     #A9B4BE  Progressing (MTD Avg)                                (Grey 4)
+     #B0BFCC  Progressing / Insufficient (Quality, PFTC, IRT)      (neutral grey)
    ─────────────────────────────────────────────────────────────────────────
    Semantic colors (do NOT change):
      #2CE0BF  Teal — PFTC/Quality
@@ -1676,17 +1677,17 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
         <div class="chart-wrap h175"><canvas id="chartCpCount"></canvas></div>
         <div class="legend">
           <div class="leg-item"><div class="leg-dot" style="background:#5D36FF"></div>CS Created</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#A889FF"></div>Client Created</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#B894FF"></div>Client Created</div>
         </div>
 
         <div class="card-divider"></div>
         <div class="sec-hdr">MTD Average</div>
         <div class="chart-wrap h175"><canvas id="chartCpAvg"></canvas></div>
         <div class="legend">
-          <div class="leg-item"><div class="leg-dot" style="background:#B0BFCC"></div>Progressing &lt;1.5</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#A889FF"></div>Successful 1.5&ndash;2.49</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#7858FF"></div>Outstanding 2.5&ndash;3.49</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>Extraordinary 3.5+</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#A9B4BE"></div>Progressing &lt;1.5</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>Successful 1.5&ndash;2.49</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#B894FF"></div>Outstanding 2.5&ndash;3.49</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5D36FF"></div>Extraordinary 3.5+</div>
         </div>
 
         <div class="card-divider"></div>
@@ -3221,20 +3222,27 @@ async function loadBgImage(token) {
 
 /* ════════════════════════════════════════════════════════════════════════════
    SIGN-IN PAGE BACKGROUND LOADER
-   Loads SignIn_Page.jpg from the Logos folder using @microsoft.graph.downloadUrl
-   — a pre-authenticated CDN link Microsoft returns with every file metadata call.
-   This is a tiny JSON string, NOT a megabyte binary download, so:
-     • It completes in milliseconds → CSS property is set before hideSignInOverlay()
-     • The URL itself is stored in localStorage (no base64 / no quota issues)
-     • The browser fetches and renders the image directly from Microsoft's CDN
-   The URL is refreshed on every login (valid ~1 h).  On return visits the IIFE
-   restores the cached URL instantly, so the sign-in page is always branded.
+   Loads SignIn_Page.jpg from the Logos folder using the same binary-fetch
+   mechanism as thumb.png and SAP 3D.jpg:
+     1. graphGetBinary   — authenticated download via Graph API
+     2. URL.createObjectURL — applied immediately so the background appears
+        while the overlay is still visible (during the 2-5 s data fetch)
+     3. blobToDataUrl (async) — converts to a permanent base64 data URL and
+        caches in localStorage under 'tj_cached_signin_bg'
+
+   On return visits the IIFE at the top of the script restores the cached
+   data URL synchronously, before any API call, so the sign-in page is
+   always branded with no network request needed.
+
+   This avoids the @microsoft.graph.downloadUrl CDN approach, whose pre-auth
+   links expire after ~1 hour and would leave the sign-in page without a
+   background on return visits.
 ════════════════════════════════════════════════════════════════════════════ */
 async function loadSignInBg(token) {
   try {
     if (!excelDriveId || !excelItemId) await resolveExcelFile(token);
 
-    /* ── Navigate: Excel item → data folder → root dir ── */
+    /* ── Navigate: Excel item → data folder → root dir (same as loadLogo) ── */
     const excelMeta = await graphGet(
       '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference', token
     );
@@ -3246,7 +3254,7 @@ async function loadSignInBg(token) {
     const rootDirId = dataFolderMeta.parentReference.id;
 
     /* ── List root dir; locate Logos subfolder ── */
-    const rootResp  = await graphGet(
+    const rootResp = await graphGet(
       '/drives/' + excelDriveId + '/items/' + rootDirId + '/children?$select=id,name', token
     );
     const rootItems   = (rootResp.value || []);
@@ -3261,7 +3269,7 @@ async function loadSignInBg(token) {
       console.log('[SignInBG] Searching Logos subfolder for:', SIGNIN_BG_FILE_NAME);
     }
 
-    /* ── Case-insensitive filename match ── */
+    /* ── Case-insensitive filename match (same as fetchAssetDataUrl) ── */
     const signinLower = SIGNIN_BG_FILE_NAME.toLowerCase();
     const item = searchItems.find(f => f.name === SIGNIN_BG_FILE_NAME)
               || searchItems.find(f => f.name.toLowerCase() === signinLower);
@@ -3272,38 +3280,27 @@ async function loadSignInBg(token) {
       return;
     }
 
-    /* ── Fetch item metadata — @microsoft.graph.downloadUrl is a pre-auth
-       CDN link the browser can load directly without Authorization headers.
-       Requesting WITHOUT $select so the annotation is included.             ── */
-    const meta = await graphGet(
-      '/drives/' + excelDriveId + '/items/' + item.id, token
+    /* ── Fetch binary — identical mechanism to thumb.png and SAP 3D.jpg ── */
+    const blob = await graphGetBinary(
+      '/drives/' + excelDriveId + '/items/' + item.id + '/content', token
     );
-    const dlUrl = meta['@microsoft.graph.downloadUrl'];
 
-    if (dlUrl) {
-      /* Store raw URL and apply — no base64, no quota issues */
-      try { localStorage.setItem('tj_cached_signin_bg', dlUrl); } catch(e) {
-        console.warn('[SignInBG] Could not cache URL in localStorage');
+    /* ── Apply immediately via Object URL ── */
+    const objectUrl = URL.createObjectURL(blob);
+    document.documentElement.style.setProperty(
+      '--tj-signin-bg', 'url("' + objectUrl + '")'
+    );
+    console.log('[SignInBG] Applied via Object URL:', item.name);
+
+    /* ── Cache as permanent base64 data URL (async, non-blocking) ──────────
+       Stored in localStorage so the IIFE restores it on every subsequent
+       page load — no API call, no token, no expiry.  Same pattern as
+       tj_cached_thumb and tj_cached_bg.                                    */
+    blobToDataUrl(blob).then(function(dataUrl) {
+      try { localStorage.setItem('tj_cached_signin_bg', dataUrl); } catch(e) {
+        console.warn('[SignInBG] localStorage quota exceeded — background will not persist across sessions');
       }
-      document.documentElement.style.setProperty('--tj-signin-bg', 'url("' + dlUrl + '")');
-      console.log('[SignInBG] Applied via pre-auth download URL:', item.name);
-
-    } else {
-      /* Fallback — some SharePoint configs omit downloadUrl; fetch binary instead */
-      console.warn('[SignInBG] downloadUrl absent in metadata, falling back to binary fetch');
-      const blob = await graphGetBinary(
-        '/drives/' + excelDriveId + '/items/' + item.id + '/content', token
-      );
-      const objUrl = URL.createObjectURL(blob);
-      document.documentElement.style.setProperty('--tj-signin-bg', 'url("' + objUrl + '")');
-      console.log('[SignInBG] Applied via Object URL (fallback):', item.name);
-      /* Try to cache as data URL — may fail on large images due to quota */
-      blobToDataUrl(blob).then(function(dataUrl) {
-        try { localStorage.setItem('tj_cached_signin_bg', dataUrl); } catch(e) {
-          console.warn('[SignInBG] localStorage quota exceeded — background will reload on next sign-in');
-        }
-      }).catch(function() {});
-    }
+    }).catch(function() {});
 
   } catch(e) {
     console.warn('[SignInBG] Could not load sign-in background:', e.message);
@@ -3763,10 +3760,19 @@ function irtCompLabel(pct) {
   if (pct >= 90) return 'Needs Attention';
   return 'Critical';
 }
+/* Returns a very light semantic tint for the tile background — respects
+   the current theme so the tint is always subtle and readable.            */
+function irtTileBg(pct) {
+  if (pct === null || pct === undefined) return '';
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (pct >= 97) return dark ? '#1B1640' : '#EDE8FF'; /* Passing        — light Indigo  */
+  if (pct >= 90) return dark ? '#2A1800' : '#FFF1EA'; /* Needs Attention — light Orange  */
+  return dark ? '#2A0A0A' : '#FFECEC';                 /* Critical       — light Red      */
+}
 
 const SC = {
-  Progressing:'#B0BFCC', Successful:'#A889FF',
-  Outstanding:'#7858FF', Extraordinary:'#5B7388'
+  Progressing:'#A9B4BE', Successful:'#5B7388',
+  Outstanding:'#B894FF', Extraordinary:'#5D36FF'
 };
 
 function ttCpCount(chart, di) {
@@ -3774,7 +3780,7 @@ function ttCpCount(chart, di) {
   const cs   = chart.data.datasets[0].data[di];
   const cl   = chart.data.datasets[1].data[di];
   return ttHdr(name) + ttRow('#5D36FF','CS Created',cs)
-       + ttRow('#A889FF','Client Created',cl) + ttSep() + ttTotal('Total',cs+cl) + ttHint();
+       + ttRow('#B894FF','Client Created',cl) + ttSep() + ttTotal('Total',cs+cl) + ttHint();
 }
 function ttCpAvg(chart, di) {
   const name = chart.data.labels[di];
@@ -4109,10 +4115,11 @@ function renderIrtOrt(p) {
     function metricCard(label, pct, isComb) {
       if (pct === null || pct === undefined) return '';
       const col    = irtCompColor(pct);
+      const bg     = irtTileBg(pct);
       const tag    = irtCompLabel(pct);
       const cls    = 'irt-tc' + (isComb ? ' irt-tc-comb' : '');
       const barW   = Math.min(100, Math.max(0, pct)).toFixed(1);
-      return '<div class="' + cls + '" style="border-top-color:' + col + '">' +
+      return '<div class="' + cls + '" style="border-top-color:' + col + ';background:' + bg + '">' +
         '<div class="irt-tc-lbl">' + label + '</div>' +
         '<div class="irt-tc-val" style="color:' + col + '">' + pct.toFixed(1) + '%</div>' +
         '<div class="irt-tc-status" style="color:' + col + '">' + tag + '</div>' +
@@ -4158,17 +4165,17 @@ function buildCharts(p) {
     cpLb,
     [
       { label:'CS Created',     data:cpCs, backgroundColor:'#5D36FF', borderRadius:2 },
-      { label:'Client Created', data:cpCl, backgroundColor:'#A889FF', borderRadius:2 }
+      { label:'Client Created', data:cpCl, backgroundColor:'#B894FF', borderRadius:2 }
     ],
     ax.cc_max, 0, ttCpCount
   ));
 
   /* ── MTD Average ───────────────────────────────────────────────────── */
   const avgDs = [
-    { label:'Progressing',   data:cpAP, backgroundColor:'#B0BFCC', borderRadius:2 },
-    { label:'Successful',    data:cpAS, backgroundColor:'#A889FF', borderRadius:2 },
-    { label:'Outstanding',   data:cpAO, backgroundColor:'#7858FF', borderRadius:2 },
-    { label:'Extraordinary', data:cpAE, backgroundColor:'#5B7388', borderRadius:2 }
+    { label:'Progressing',   data:cpAP, backgroundColor:'#A9B4BE', borderRadius:2 },
+    { label:'Successful',    data:cpAS, backgroundColor:'#5B7388', borderRadius:2 },
+    { label:'Outstanding',   data:cpAO, backgroundColor:'#B894FF', borderRadius:2 },
+    { label:'Extraordinary', data:cpAE, backgroundColor:'#5D36FF', borderRadius:2 }
   ];
   const avgCfg = stackedCfg(cpLb, avgDs, ax.avg_max, 0, ttCpAvg);
   avgDs.forEach(ds => {
