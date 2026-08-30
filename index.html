@@ -357,9 +357,10 @@ html.is-capturing :focus-visible{outline:none !important}
   padding:44px 36px;
   max-width:400px;
   border-radius:16px;
-  background:rgba(255,255,255,0.10);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.14);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
 }
 .signin-logo-img{
   height:72px;
@@ -371,14 +372,15 @@ html.is-capturing :focus-visible{outline:none !important}
 .signin-title{
   font-size:17px;
   font-weight:700;
-  color:var(--ct);
+  color:#FFFFFF;
   margin-bottom:6px;
   letter-spacing:.1px;
+  text-shadow:0 1px 4px rgba(0,0,0,0.35);
   transition:color .25s;
 }
 .signin-sub{
   font-size:12px;
-  color:var(--cm);
+  color:rgba(255,255,255,0.82);
   margin-bottom:28px;
   line-height:1.75;
   transition:color .25s;
@@ -402,7 +404,7 @@ html.is-capturing :focus-visible{outline:none !important}
 .btn-ms-signin:hover{background:#4820E8}
 .signin-hint{
   font-size:9.5px;
-  color:var(--cm);
+  color:rgba(255,255,255,0.60);
   transition:color .25s;
 }
 
@@ -616,9 +618,9 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   border-color:rgba(93,54,255,.28);
   color:#5D36FF;
 }
-/* Active: Indigo 4 bg + deep Indigo text — pictograms stay dark */
+/* Active: Indigo 2 bg + deep Indigo text — pictograms stay dark */
 .tab-btn.active{
-  background:#B894FF;
+  background:#E2D8FF;
   border-color:#5D36FF;
   color:#1C0C6E;
   text-shadow:0 1px 0 rgba(255,255,255,.45), 0 1px 6px rgba(93,54,255,.30);
@@ -2175,7 +2177,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
         src="Logos/Team%20Josh%20Aqua%20Logo.png"
         onerror="(function(i){i.onerror=null;var c=localStorage.getItem('tj_cached_logo');if(c&&c!==i.src){i.src=c;}else{i.style.display='none';}})(this)"
         alt="Team Josh">
-      <div class="signin-title">Team Josh Executive Dashboard</div>
+      <div class="signin-title">Executive Dashboard</div>
       <div class="signin-sub" id="signin-sub">
         Sign in with your Microsoft 365 account to load live data from SharePoint.
       </div>
