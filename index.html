@@ -14,23 +14,32 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 <style>
 /* ════════════════════════════════════════════════════════════════════════════
-   APPROVED COLOR PALETTE  (v10 — explicitly declared)
+   APPROVED COLOR PALETTE  (v11 — Indigo theme)
    ─────────────────────────────────────────────────────────────────────────
-   Primary blue          #0070F2   header, CS Created bars, Emails bars,
-                                   primary accents, btn-signin text
-   Dark blue-gray        #5B738B   Extraordinary bars, Case Survey header,
+   Indigo 7  (primary)   #5D36FF   header, CS Created bars, Emails bars,
+                                   primary buttons, active tabs, accents
+   Indigo 6  (hover)     #7858FF   hover states, Call Conversations bars,
+                                   Outstanding bars
+   Indigo 10 (deep text) #1C0C6E   deep text accents, --ct, tooltip headers
+   Indigo 2  (subtle bg) #E2D8FF   card heads, hover backgrounds, today cell
+   Teal      (semantic)  #2CE0BF   PFTC Appreciate bars, Quality at-target,
+                                   PFTC card accent — do not replace
+   Grey 6                #5B7388   Extraordinary bars, Survey header,
                                    Survey ranking current-month bars,
-                                   Commendation bars
-   Teal accent           #2CE0BF   PFTC Appreciate bars, Quality at-target,
-                                   PFTC card accent
+                                   Commendation bars, IRT violations
 
-   Secondary chart tones (retained for multi-series distinction):
-     #89D1FF  Client Created / Successful
-     #B0C6D6  Progressing
-     #1B90FF  Outstanding / Call Conversations
+   Secondary chart tones:
+     #A889FF  Client Created / Successful  (Indigo 4 light)
+     #B0BFCC  Progressing / Insufficient   (neutral grey)
+     #7858FF  Outstanding / Call Conversations  (Indigo 6)
    ─────────────────────────────────────────────────────────────────────────
-   Do NOT use purple, violet, indigo, or gradient variants of any of the
-   above colors.  All three approved colors are pure-blue-family at hue ~213°.
+   Semantic colors (do NOT change):
+     #2CE0BF  Teal — PFTC/Quality
+     #BB0000  Red — danger/delete
+     #DF1278  Magenta — CAF Request Update
+     #E89700  Mango — warnings/duplicate-leave
+     #107E3E  Green — copy-success / completed
+     #E76500  Orange — internal deadline
 ════════════════════════════════════════════════════════════════════════════ */
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -42,8 +51,8 @@
   --pg:    #D9DDE3;
   --db:    #EEF2F7;
   --cb:    #FFFFFF;
-  --ch:    #E8F0FB;
-  --ct:    #00144A;
+  --ch:    #E2D8FF;
+  --ct:    #1C0C6E;
   --cx:    #1D2329;
   --cm:    #6D7990;
   --cd:    #D0D8E6;
@@ -55,14 +64,14 @@
   --cs:    0 2px 8px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
   --ttbg:  #FFFFFF;
   --ttbd:  #D0D8E6;
-  --tthc:  #00144A;
+  --tthc:  #1C0C6E;
   --ttlc:  #6D7990;
-  --ttvc:  #00144A;
+  --ttvc:  #1C0C6E;
   --ttsc:  #E8EFF7;
   --ttic:  #A0AABB;
   --tths:  #F0F2F5;
   --tick:  #1D2329;
-  --tickb: #00144A;
+  --tickb: #1C0C6E;
   --grid:  #EAECEE;
   --dlbl:  #1D2329;
   --qnul:  #EAECEE;
@@ -74,14 +83,14 @@ html[data-theme="dark"] {
   --pg:    #0A111C;
   --db:    #10192A;
   --cb:    #172030;
-  --ch:    #1C2840;
+  --ch:    #231845;
   --ct:    #A8C4DC;
   --cx:    #BDD2E6;
   --cm:    #5C7890;
   --cd:    #263545;
   --cg:    #1E2D3D;
   --cf:    #4A6278;
-  --rh:    #1C2840;
+  --rh:    #231845;
   --rb:    #1E2D3D;
   --ds:    0 8px 40px rgba(0,0,0,.52),0 2px 10px rgba(0,0,0,.28);
   --cs:    0 2px 10px rgba(0,0,0,.38),0 1px 3px rgba(0,0,0,.22);
@@ -135,7 +144,7 @@ body{
    HEADER  (v4 — unchanged, plus new sub-elements)
 ════════════════════════════════════════════════════════════════════════════ */
 .hdr{
-  background:#0070F2;
+  background:#5D36FF;
   display:flex;
   align-items:center;
   padding:0 16px;
@@ -247,7 +256,7 @@ html.is-capturing :focus-visible{outline:none !important}
 .btn-signin{
   background:rgba(255,255,255,.90);
   border:1px solid rgba(255,255,255,.70);
-  color:#0070F2;
+  color:#5D36FF;
   font-weight:600;
   margin-left:8px;
 }
@@ -328,7 +337,7 @@ html.is-capturing :focus-visible{outline:none !important}
 }
 .welcome-progress-bar{
   height:100%;width:0%;border-radius:2px;
-  background:linear-gradient(90deg,#0070F2,#4CB1FF);
+  background:linear-gradient(90deg,#5D36FF,#9E88FF);
 }
 .welcome-countdown{
   font-size:11px;color:var(--cm);font-weight:500;
@@ -374,7 +383,7 @@ html.is-capturing :focus-visible{outline:none !important}
   transition:color .25s;
 }
 .btn-ms-signin{
-  background:#0070F2;
+  background:#5D36FF;
   color:#fff;
   border:none;
   padding:10px 26px;
@@ -389,7 +398,7 @@ html.is-capturing :focus-visible{outline:none !important}
   margin-bottom:14px;
   transition:background .15s;
 }
-.btn-ms-signin:hover{background:#0057C2}
+.btn-ms-signin:hover{background:#4820E8}
 .signin-hint{
   font-size:9.5px;
   color:var(--cm);
@@ -461,7 +470,7 @@ html.is-capturing :focus-visible{outline:none !important}
    SURVEY TABLE  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
 .sv-table{width:100%;border-collapse:collapse;font-size:10px;flex-shrink:0}
-.sv-table th{background:#5B738B;color:#fff;font-weight:700;font-size:9px;letter-spacing:.3px;padding:4px 6px;text-align:center}
+.sv-table th{background:#5B7388;color:#fff;font-weight:700;font-size:9px;letter-spacing:.3px;padding:4px 6px;text-align:center}
 .sv-table th:first-child{text-align:left}
 .sv-table td{padding:3px 6px;border-bottom:1px solid var(--rb);color:var(--cx);transition:border-color .25s, color .25s}
 .svt-name{font-weight:600;color:var(--ct);transition:color .25s}
@@ -501,7 +510,7 @@ html.is-capturing :focus-visible{outline:none !important}
 .irt-sc-table th.irt-th-comb{color:var(--ct);background:var(--ch);border-radius:6px 6px 0 0;transition:color .25s,background .25s}
 .irt-sc-table td{padding:3px 5px;border-bottom:1px solid var(--cg);vertical-align:middle;transition:border-color .25s}
 .irt-sc-table td:first-child{font-weight:700;font-size:9.5px;color:var(--ct);transition:color .25s}
-.irt-sc-table td.irt-td-comb{background:rgba(0,112,242,.03);border-left:1px solid var(--cd);transition:background .25s,border-color .25s}
+.irt-sc-table td.irt-td-comb{background:rgba(93,54,255,.03);border-left:1px solid var(--cd);transition:background .25s,border-color .25s}
 .irt-sc-table tr:last-child td{border-bottom:none}
 .irt-sc-table tr:hover td{background:var(--rh);transition:background .12s}
 .irt-sc-table tr:hover td.irt-td-comb{background:var(--ch)}
@@ -539,7 +548,7 @@ html.is-capturing :focus-visible{outline:none !important}
    CHART TOOLTIP  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
 #chart-tt{position:fixed;z-index:1500;background:var(--ttbg);border:1px solid var(--ttbd);border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.18);padding:8px 10px;pointer-events:none;opacity:0;transition:opacity .12s ease, background .25s, border-color .25s;min-width:148px;max-width:220px;font-family:"72","72full",-apple-system,"Segoe UI",Arial,sans-serif}
-#chart-tt.sticky{border-color:#0070F2;box-shadow:0 4px 20px rgba(0,112,242,.22)}
+#chart-tt.sticky{border-color:#5D36FF;box-shadow:0 4px 20px rgba(93,54,255,.22)}
 .tt-hdr{font-size:10.5px;font-weight:700;color:var(--tthc);padding-bottom:5px;margin-bottom:5px;border-bottom:1px solid var(--ttsc);transition:color .25s, border-color .25s}
 .tt-row{display:flex;align-items:center;gap:6px;margin:2.5px 0;font-size:9.5px}
 .tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
@@ -603,15 +612,15 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
 .tab-btn:hover:not(.active){
   transform:scale(1.045) translateY(-2px);
   box-shadow:0 8px 22px rgba(0,0,0,.12),0 3px 6px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.70);
-  border-color:rgba(0,112,242,.28);
-  color:#0070F2;
+  border-color:rgba(93,54,255,.28);
+  color:#5D36FF;
 }
 /* Active: blue gradient + elevated shadow + subtle inset highlight */
 .tab-btn.active{
-  background:linear-gradient(140deg,#0070F2 0%,#0057C2 100%);
+  background:linear-gradient(140deg,#5D36FF 0%,#4820E8 100%);
   border-color:transparent;
   color:#fff;
-  box-shadow:0 4px 16px rgba(0,112,242,.42),0 1px 4px rgba(0,112,242,.18),inset 0 1px 0 rgba(255,255,255,.18);
+  box-shadow:0 4px 16px rgba(93,54,255,.42),0 1px 4px rgba(93,54,255,.18),inset 0 1px 0 rgba(255,255,255,.18);
   transform:translateY(-1px);
 }
 .tab-section{display:block;position:relative}
@@ -646,19 +655,19 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:background .15s,border-color .15s;flex-shrink:0;font-family:inherit;
 }
-.lp-nav-btn:hover{background:var(--ch);border-color:#0070F2}
+.lp-nav-btn:hover{background:var(--ch);border-color:#5D36FF}
 .lp-month-label{
   font-size:15px;font-weight:700;color:var(--ct);
   min-width:170px;text-align:center;transition:color .25s;
 }
 .lp-header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .lp-add-btn{
-  background:#0070F2;color:#fff;border:none;
+  background:#5D36FF;color:#fff;border:none;
   padding:6px 14px;border-radius:8px;font-size:11.5px;
   font-family:inherit;font-weight:600;cursor:pointer;
   transition:background .15s;white-space:nowrap;
 }
-.lp-add-btn:hover{background:#0057C2}
+.lp-add-btn:hover{background:#4820E8}
 
 /* ── Instructional guide banner (replaces the + Add Leave button) ─────────
    Communicates the OFFICIAL / PLANNER distinction.
@@ -666,7 +675,7 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
 .lp-guide-banner{
   background:var(--ch);
   border:1px solid var(--cd);
-  border-left:3px solid #0070F2;
+  border-left:3px solid #5D36FF;
   border-radius:8px;
   padding:7px 13px 7px 10px;
   max-width:320px;
@@ -684,17 +693,17 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
 }
 .lp-guide-vis{
   font-size:9px;font-weight:800;letter-spacing:.55px;
-  text-transform:uppercase;color:#0070F2;
+  text-transform:uppercase;color:#5D36FF;
 }
 .lp-guide-body{
   font-size:10px;color:var(--cm);line-height:1.45;
   margin:0;transition:color .25s;
 }
 .lp-guide-fiori{
-  color:#0070F2;font-weight:700;
+  color:#5D36FF;font-weight:700;
 }
 .lp-guide-action{
-  font-size:10px;font-weight:700;color:#0070F2;
+  font-size:10px;font-weight:700;color:#5D36FF;
   margin:3px 0 0;line-height:1.45;
 }
 .lp-today-btn{
@@ -702,7 +711,7 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   padding:5px 12px;border-radius:8px;font-size:11px;font-family:inherit;
   cursor:pointer;transition:background .15s,border-color .15s;
 }
-.lp-today-btn:hover{background:var(--ch);border-color:#0070F2}
+.lp-today-btn:hover{background:var(--ch);border-color:#5D36FF}
 
 /* ── LP Legend ────────────────────────────────────────────────────────────── */
 .lp-legend{
@@ -719,7 +728,7 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   background:var(--cb);border:1px solid var(--cd);border-radius:10px;
   overflow:hidden;transition:background .25s,border-color .25s;
 }
-.lp-dow-headers{display:grid;grid-template-columns:repeat(7,1fr);background:#0070F2}
+.lp-dow-headers{display:grid;grid-template-columns:repeat(7,1fr);background:#5D36FF}
 .lp-dow-headers > div{
   text-align:center;padding:7px 4px;
   font-size:10.5px;font-weight:700;color:#fff;
@@ -741,12 +750,12 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
 .lp-day:nth-child(7n){border-right:none}
 .lp-day.other-month{background:var(--rb);cursor:default}
 .lp-day.other-month:hover{background:var(--rb)}
-.lp-day.today{background:#E8F0FB;border:1.5px solid #0070F2}
-html[data-theme="dark"] .lp-day.today{background:#1C2840;border-color:#4CB1FF}
+.lp-day.today{background:#E2D8FF;border:1.5px solid #5D36FF}
+html[data-theme="dark"] .lp-day.today{background:#231845;border-color:#9E88FF}
 .lp-day-num{font-size:11px;font-weight:700;color:var(--ct);text-align:right;margin-bottom:3px;line-height:1;transition:color .25s}
 .lp-day.other-month .lp-day-num{color:var(--cf)}
-.lp-day.today .lp-day-num{color:#0070F2}
-html[data-theme="dark"] .lp-day.today .lp-day-num{color:#4CB1FF}
+.lp-day.today .lp-day-num{color:#5D36FF}
+html[data-theme="dark"] .lp-day.today .lp-day-num{color:#9E88FF}
 .lp-day-entries{display:flex;flex-direction:column;gap:2px}
 
 /* ── Leave entry pill ─────────────────────────────────────────────────────── */
@@ -899,7 +908,7 @@ html[data-theme="dark"] .lp-dup-icon{
 }
 .lp-spinner{
   width:28px;height:28px;border:3px solid var(--cd);
-  border-top-color:#0070F2;border-radius:50%;
+  border-top-color:#5D36FF;border-radius:50%;
   animation:spin .7s linear infinite;
 }
 
@@ -1005,18 +1014,18 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 }
 .lp-field select:focus,
 .lp-field input:focus{
-  border-color:#0070F2;box-shadow:0 0 0 2px rgba(0,112,242,.12);
+  border-color:#5D36FF;box-shadow:0 0 0 2px rgba(93,54,255,.12);
 }
 .lp-dialog-footer{
   display:flex;gap:8px;padding:10px 14px 14px;
   border-top:1px solid var(--cd);transition:border-color .25s;
 }
 .lp-btn-primary{
-  background:#0070F2;color:#fff;border:none;padding:7px 18px;
+  background:#5D36FF;color:#fff;border:none;padding:7px 18px;
   border-radius:8px;font-family:inherit;font-size:11.5px;font-weight:600;
   cursor:pointer;transition:background .15s;
 }
-.lp-btn-primary:hover{background:#0057C2}
+.lp-btn-primary:hover{background:#4820E8}
 .lp-btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .lp-btn-secondary{
   background:var(--cb);color:var(--ct);border:1px solid var(--cd);
@@ -1062,14 +1071,14 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 .caf-hdr-left{display:flex;align-items:center;gap:8px}
 .caf-hdr-title{font-size:12px;font-weight:700;color:var(--ct);
   letter-spacing:.3px;text-transform:uppercase;transition:color .25s}
-.caf-month-pill{background:#0070F2;color:#fff;font-size:9px;font-weight:700;
+.caf-month-pill{background:#5D36FF;color:#fff;font-size:9px;font-weight:700;
   letter-spacing:.5px;padding:2px 9px;border-radius:20px;
   text-transform:uppercase;line-height:1.6}
 .caf-search{background:var(--cb);border:1.5px solid var(--cd);border-radius:8px;
   color:var(--cx);font-family:inherit;font-size:11px;padding:5px 12px;
   outline:none;width:210px;transition:border-color .15s,background .25s,color .25s;
   flex-shrink:0}
-.caf-search:focus{border-color:#0070F2;box-shadow:0 0 0 3px rgba(0,112,242,.10)}
+.caf-search:focus{border-color:#5D36FF;box-shadow:0 0 0 3px rgba(93,54,255,.10)}
 .caf-search::placeholder{color:var(--cm)}
 
 /* ── CSS Member tiles ───────────────────────────────────────────────────── */
@@ -1089,11 +1098,11 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   transform:scale(1.04) translateY(-2px);
   box-shadow:0 6px 18px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06),
              inset 0 1px 0 rgba(255,255,255,.55);
-  border-color:rgba(0,112,242,.30)}
+  border-color:rgba(93,54,255,.30)}
 .caf-tile-active{
-  background:linear-gradient(140deg,#0070F2 0%,#0057C2 100%);
+  background:linear-gradient(140deg,#5D36FF 0%,#4820E8 100%);
   border-color:transparent;
-  box-shadow:0 4px 14px rgba(0,112,242,.40),0 1px 4px rgba(0,112,242,.18),
+  box-shadow:0 4px 14px rgba(93,54,255,.40),0 1px 4px rgba(93,54,255,.18),
              inset 0 1px 0 rgba(255,255,255,.16);
   transform:translateY(-1px)}
 .caf-tile-muted{opacity:.38;box-shadow:none;transform:none !important}
@@ -1146,8 +1155,8 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   padding:6px 9px;text-align:left;border-bottom:1.5px solid var(--cd);
   white-space:nowrap;cursor:pointer;user-select:none;
   transition:background .25s,color .25s,border-color .25s}
-.caf-tbl th:hover{background:var(--cg);color:#0070F2}
-.caf-tbl th.caf-sort-asc,.caf-tbl th.caf-sort-desc{color:#0070F2}
+.caf-tbl th:hover{background:var(--cg);color:#5D36FF}
+.caf-tbl th.caf-sort-asc,.caf-tbl th.caf-sort-desc{color:#5D36FF}
 .caf-sort-icon{font-size:8px;margin-left:3px;opacity:.40;display:inline-block;
   transition:opacity .15s}
 .caf-tbl th.caf-sort-asc .caf-sort-icon,
@@ -1159,7 +1168,7 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   border-radius:4px;color:var(--cx);font-family:inherit;font-size:9px;
   padding:3px 6px;outline:none;box-sizing:border-box;
   transition:border-color .15s,background .25s,color .25s}
-.caf-fi:focus{border-color:#0070F2;box-shadow:0 0 0 2px rgba(0,112,242,.10)}
+.caf-fi:focus{border-color:#5D36FF;box-shadow:0 0 0 2px rgba(93,54,255,.10)}
 .caf-fi::placeholder{color:var(--cf)}
 .caf-tbl td{padding:6px 9px;border-bottom:1px solid var(--rb);color:var(--cx);
   vertical-align:top;word-break:break-word;max-width:200px;
@@ -1169,9 +1178,9 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 /* Status badges */
 .caf-s{display:inline-block;font-size:8.5px;font-weight:700;
   padding:2px 8px;border-radius:8px;white-space:nowrap;line-height:1.5}
-.caf-s-active{background:#E1F4FF;color:#004A93}
+.caf-s-active{background:#E1F4FF;color:#1C0C6E}
 .caf-s-inactive{background:var(--cg);color:var(--cm)}
-html[data-theme="dark"] .caf-s-active{background:#0A2545;color:#89D1FF}
+html[data-theme="dark"] .caf-s-active{background:#170E38;color:#A889FF}
 html[data-theme="dark"] .caf-s-inactive{background:#1E2D3D;color:#5C7890}
 /* Touchbase badges */
 .caf-tb{display:inline-block;font-size:8.5px;font-weight:700;
@@ -1269,7 +1278,7 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
   color:var(--cx);cursor:pointer;padding:3px 0;border-radius:4px;
   transition:color .25s}
 .caf-dlg-chk-lbl:hover{color:var(--ct)}
-.caf-dlg-chk-lbl input[type=checkbox]{accent-color:#0070F2;
+.caf-dlg-chk-lbl input[type=checkbox]{accent-color:#5D36FF;
   width:13px;height:13px;flex-shrink:0;cursor:pointer}
 .caf-dlg-validation{font-size:9.5px;color:#BB0000;margin-bottom:8px;
   display:none}
@@ -1282,12 +1291,12 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
   padding:6px 14px;border-radius:7px;cursor:pointer;
   transition:background .15s,border-color .15s}
 .caf-dlg-cancel:hover{background:var(--cg)}
-.caf-dlg-primary{background:linear-gradient(140deg,#0070F2,#0057C2);
+.caf-dlg-primary{background:linear-gradient(140deg,#5D36FF,#4820E8);
   border:none;color:#fff;font-family:inherit;font-size:10px;font-weight:700;
   padding:6px 16px;border-radius:7px;cursor:pointer;
-  box-shadow:0 2px 8px rgba(0,112,242,.28);
+  box-shadow:0 2px 8px rgba(93,54,255,.28);
   transition:box-shadow .15s,transform .1s ease}
-.caf-dlg-primary:hover{box-shadow:0 4px 14px rgba(0,112,242,.40);
+.caf-dlg-primary:hover{box-shadow:0 4px 14px rgba(93,54,255,.40);
   transform:translateY(-1px)}
 .caf-dlg-primary:active{transform:scale(.97)}
 /* Template preview dialog */
@@ -1298,16 +1307,16 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
   margin-bottom:12px;transition:background .25s,border-color .25s,color .25s}
 .caf-tmpl-guide{font-size:11px;color:var(--cx);line-height:1.65;
   margin-bottom:14px;background:var(--ch);border-radius:6px;
-  padding:10px 14px;border-left:3px solid #0070F2;
+  padding:10px 14px;border-left:3px solid #5D36FF;
   transition:background .25s,color .25s}
-.caf-tmpl-guide a{color:#0070F2;text-decoration:none;font-weight:600}
+.caf-tmpl-guide a{color:#5D36FF;text-decoration:none;font-weight:600}
 .caf-tmpl-guide a:hover{text-decoration:underline}
-.caf-copy-btn{background:linear-gradient(140deg,#0070F2,#0057C2);
+.caf-copy-btn{background:linear-gradient(140deg,#5D36FF,#4820E8);
   border:none;color:#fff;font-family:inherit;font-size:10.5px;font-weight:700;
   padding:8px 20px;border-radius:8px;cursor:pointer;width:100%;
-  box-shadow:0 2px 8px rgba(0,112,242,.28);
+  box-shadow:0 2px 8px rgba(93,54,255,.28);
   transition:box-shadow .15s,transform .1s ease,background .2s}
-.caf-copy-btn:hover{box-shadow:0 4px 16px rgba(0,112,242,.38);
+.caf-copy-btn:hover{box-shadow:0 4px 16px rgba(93,54,255,.38);
   transform:translateY(-1px)}
 .caf-copy-btn:active{transform:scale(.97)}
 .caf-copy-btn.copied{background:linear-gradient(140deg,#107E3E,#0B6B34);
@@ -1380,11 +1389,11 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
 .el-tile:hover:not(.el-tile-active){
   transform:scale(1.04) translateY(-2px);
   box-shadow:0 6px 18px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
-  border-color:rgba(0,112,242,.30)}
+  border-color:rgba(93,54,255,.30)}
 .el-tile-active{
-  background:linear-gradient(140deg,#0070F2 0%,#0057C2 100%);
+  background:linear-gradient(140deg,#5D36FF 0%,#4820E8 100%);
   border-color:transparent;
-  box-shadow:0 4px 14px rgba(0,112,242,.40),0 1px 4px rgba(0,112,242,.18);
+  box-shadow:0 4px 14px rgba(93,54,255,.40),0 1px 4px rgba(93,54,255,.18);
   transform:translateY(-1px)}
 .el-tile-muted{opacity:.38;box-shadow:none;transform:none !important}
 .el-tile-muted:hover{opacity:.70;transform:scale(1.02) translateY(-1px) !important}
@@ -1449,7 +1458,7 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
   white-space:nowrap;
   transition:background .25s,color .25s,border-color .25s}
 .el-th-intdead{color:#E76500 !important}
-.el-th-sapdead{color:#0070F2 !important}
+.el-th-sapdead{color:#5D36FF !important}
 .el-tbl td{padding:6px 10px;border-bottom:1px solid var(--rb);
   color:var(--cx);vertical-align:middle;
   transition:border-color .25s,color .25s}
@@ -1488,7 +1497,7 @@ html[data-theme="dark"] .el-status-pending{background:#3D2000;color:#FFB366}
   font-size:8.5px;font-weight:700;padding:2px 8px;border-radius:6px;
   transition:background .25s,color .25s}
 .el-deadline-int{color:#E76500;white-space:nowrap}
-.el-deadline-sap{color:#0070F2;white-space:nowrap}
+.el-deadline-sap{color:#5D36FF;white-space:nowrap}
 /* Upcoming rows */
 .el-upcoming-row{display:flex;align-items:center;gap:8px;
   padding:6px 0;border-bottom:1px solid var(--rb);transition:border-color .25s}
@@ -1499,7 +1508,7 @@ html[data-theme="dark"] .el-status-pending{background:#3D2000;color:#FFB366}
   transition:color .25s}
 .el-upcoming-meta-sep{margin:0 4px;opacity:.5}
 .el-upcoming-meta-int{color:#E76500}
-.el-upcoming-meta-sap{color:#0070F2}
+.el-upcoming-meta-sap{color:#5D36FF}
 .el-upcoming-badge{font-size:8.5px;font-weight:700;padding:2px 8px;
   border-radius:8px;white-space:nowrap}
 .el-pending-badge{background:#FFF0E0;color:#8A4500}
@@ -1544,7 +1553,7 @@ html[data-theme="dark"] .el-badge-due-soon{background:rgba(231,101,0,.26);color:
   white-space:nowrap;
   transition:background .25s,color .25s,border-color .25s}
 .el-upc-th-intdead{color:#E76500 !important}
-.el-upc-th-sapdead{color:#0070F2 !important}
+.el-upc-th-sapdead{color:#5D36FF !important}
 .el-upc-th-status{text-align:center !important}
 .el-upcoming-tbl td{
   padding:6px 10px;border-bottom:1px solid var(--rb);
@@ -1569,7 +1578,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 /* ── Email subject block in Update Request template ─────────────────────── */
 .caf-tmpl-subject-wrap{
   background:var(--ch);border-radius:8px;padding:10px 14px;
-  margin-bottom:10px;border-left:3px solid #0070F2;
+  margin-bottom:10px;border-left:3px solid #5D36FF;
   transition:background .25s}
 .caf-tmpl-subject-lbl{
   font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
@@ -1659,25 +1668,25 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
     <!-- ═══ CASE PRODUCTIVITY (col 1, full height) ══════════════════════ -->
     <div class="card card-cp">
-      <div class="card-accent" style="background:#0070F2"></div>
+      <div class="card-accent" style="background:#5D36FF"></div>
       <div class="card-head">Case Productivity</div>
       <div class="card-body">
 
         <div class="sec-hdr">Closed Case Count</div>
         <div class="chart-wrap h175"><canvas id="chartCpCount"></canvas></div>
         <div class="legend">
-          <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>CS Created</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Client Created</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5D36FF"></div>CS Created</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#A889FF"></div>Client Created</div>
         </div>
 
         <div class="card-divider"></div>
         <div class="sec-hdr">MTD Average</div>
         <div class="chart-wrap h175"><canvas id="chartCpAvg"></canvas></div>
         <div class="legend">
-          <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>Progressing &lt;1.5</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Successful 1.5&ndash;2.49</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#1B90FF"></div>Outstanding 2.5&ndash;3.49</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Extraordinary 3.5+</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#B0BFCC"></div>Progressing &lt;1.5</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#A889FF"></div>Successful 1.5&ndash;2.49</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#7858FF"></div>Outstanding 2.5&ndash;3.49</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>Extraordinary 3.5+</div>
         </div>
 
         <div class="card-divider"></div>
@@ -1697,7 +1706,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
     <!-- ═══ TOUCH BASE (col 2, top) ═════════════════════════════════════ -->
     <div class="card">
-      <div class="card-accent" style="background:#0070F2"></div>
+      <div class="card-accent" style="background:#5D36FF"></div>
       <div class="card-head">Touch Base</div>
       <div class="card-body">
         <div class="sec-hdr">Touch Base Emails</div>
@@ -1710,7 +1719,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
     <!-- ═══ CASE SURVEYS (col 3, top) ══════════════════════════════════ -->
     <div class="card">
-      <div class="card-accent" style="background:#5B738B"></div>
+      <div class="card-accent" style="background:#5B7388"></div>
       <div class="card-head">Case Surveys</div>
       <div class="card-body">
         <div class="sec-hdr">Month-on-Month Comparison &mdash; <span id="sv-months"></span></div>
@@ -1733,18 +1742,18 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
     <!-- ═══ QUALITY (col 2, bottom) ═════════════════════════════════════ -->
     <div class="card">
-      <div class="card-accent" style="background:#1B90FF"></div>
+      <div class="card-accent" style="background:#7858FF"></div>
       <div class="card-head">Quality</div>
       <div class="card-body">
         <div id="q-note" class="q-note"></div>
         <div class="sec-hdr">Individual Quality Ranking</div>
         <div class="chart-wrap h190"><canvas id="chartQuality"></canvas></div>
         <div class="legend">
-          <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>Extraordinary — 100%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5D36FF"></div>Extraordinary — 100%</div>
           <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>Outstanding — 98–99.99%</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Successful — 96–97.99%</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Progressing — 94–95.99%</div>
-          <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>Insufficient — below 94%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#A889FF"></div>Successful — 96–97.99%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>Progressing — 94–95.99%</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#B0BFCC"></div>Insufficient — below 94%</div>
         </div>
       </div>
     </div>
@@ -1760,17 +1769,17 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
           <!-- Performance Ratings -->
           <div style="display:flex;flex-direction:column;gap:3px">
             <div style="font-size:9px;font-weight:700;color:var(--ct);letter-spacing:.3px;margin-bottom:1px;text-transform:uppercase">Performance Ratings</div>
-            <div class="leg-item"><div class="leg-dot" style="background:#0070F2"></div>Extraordinary — 22+ pts</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#5D36FF"></div>Extraordinary — 22+ pts</div>
             <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>Outstanding — 20–21 pts</div>
-            <div class="leg-item"><div class="leg-dot" style="background:#89D1FF"></div>Successful — 17–19 pts</div>
-            <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>Progressing — 14–16 pts (1 Esc.)</div>
-            <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>Insufficient — ≤13 pts (2+ Esc.)</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#A889FF"></div>Successful — 17–19 pts</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>Progressing — 14–16 pts (1 Esc.)</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#B0BFCC"></div>Insufficient — ≤13 pts (2+ Esc.)</div>
           </div>
           <!-- Points Guide -->
           <div style="display:flex;flex-direction:column;gap:3px;border-left:1px solid var(--cd);padding-left:10px;transition:border-color .25s">
             <div style="font-size:9px;font-weight:700;color:var(--ct);letter-spacing:.3px;margin-bottom:1px;text-transform:uppercase">Points Guide</div>
             <div class="leg-item"><div class="leg-dot" style="background:#2CE0BF"></div>1 pt — Appreciate</div>
-            <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>10 pts — Commendation</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>10 pts — Commendation</div>
           </div>
         </div>
       </div>
@@ -1781,7 +1790,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
   <!-- ═══ IRT / ORT COMPLIANCE ════════════════════════════════════════════ -->
   <div class="irt-section">
     <div class="card">
-      <div class="card-accent" style="background:#0070F2"></div>
+      <div class="card-accent" style="background:#5D36FF"></div>
       <div class="card-head">IRT / ORT Compliance</div>
       <div class="card-body">
         <div class="irt-body">
@@ -1791,8 +1800,8 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
             <div class="sec-hdr">Violations by CS</div>
             <div class="chart-wrap h200"><canvas id="chartIrtOrt"></canvas></div>
             <div class="legend" style="margin-top:5px">
-              <div class="leg-item"><div class="leg-dot" style="background:#5B738B"></div>IRT Violations</div>
-              <div class="leg-item"><div class="leg-dot" style="background:#B0C6D6"></div>ORT Violations</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#5B7388"></div>IRT Violations</div>
+              <div class="leg-item"><div class="leg-dot" style="background:#B0BFCC"></div>ORT Violations</div>
             </div>
           </div>
 
@@ -1831,7 +1840,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
         <!-- Compliance legend -->
         <div class="irt-legend">
           <div class="leg-item">
-            <div class="leg-dot" style="background:#0070F2"></div>
+            <div class="leg-dot" style="background:#5D36FF"></div>
             <strong>97%+</strong>&nbsp;Passing
           </div>
           <div class="leg-item">
@@ -3356,11 +3365,11 @@ let _lastPftcSorted = null;
 
 /* ── PFTC badge color helper ────────────────────────────────────────────── */
 function pftcBadgeColors(pts) {
-  if (pts >= 22) return { bg:'#0070F2', fg:'#FFFFFF' }; /* Extraordinary */
+  if (pts >= 22) return { bg:'#5D36FF', fg:'#FFFFFF' }; /* Extraordinary */
   if (pts >= 20) return { bg:'#2CE0BF', fg:'#1D2329' }; /* Outstanding   */
-  if (pts >= 17) return { bg:'#89D1FF', fg:'#00144A' }; /* Successful    */
-  if (pts >= 14) return { bg:'#5B738B', fg:'#FFFFFF' }; /* Progressing   */
-  return              { bg:'#B0C6D6', fg:'#1D2329' };   /* Insufficient  */
+  if (pts >= 17) return { bg:'#A889FF', fg:'#1C0C6E' }; /* Successful    */
+  if (pts >= 14) return { bg:'#5B7388', fg:'#FFFFFF' }; /* Progressing   */
+  return              { bg:'#B0BFCC', fg:'#1D2329' };   /* Insufficient  */
 }
 
 /* ── PFTC rating badge plugin (afterDraw — draws colored pills on canvas) ─ */
@@ -3728,11 +3737,11 @@ function ttHint()    { return '<div class="tt-hint">Click to pin &nbsp;&bull;&nb
 /* ── Quality & IRT/ORT rating helpers ───────────────────────────────────── */
 function qlRatingColor(pct) {
   if (!pct || pct <= 0) return themeQnulColor();
-  if (pct >= 100) return '#0070F2';
+  if (pct >= 100) return '#5D36FF';
   if (pct >= 98)  return '#2CE0BF';
-  if (pct >= 96)  return '#89D1FF';
-  if (pct >= 94)  return '#5B738B';
-  return '#B0C6D6';
+  if (pct >= 96)  return '#A889FF';
+  if (pct >= 94)  return '#5B7388';
+  return '#B0BFCC';
 }
 function qlRatingName(pct) {
   if (!pct || pct <= 0) return 'Not recorded';
@@ -3744,7 +3753,7 @@ function qlRatingName(pct) {
 }
 function irtCompColor(pct) {
   if (pct === null || pct === undefined) return '#6D7990';
-  if (pct >= 97) return '#0070F2';
+  if (pct >= 97) return '#5D36FF';
   if (pct >= 90) return '#E76500';
   return '#D20A0A';
 }
@@ -3756,16 +3765,16 @@ function irtCompLabel(pct) {
 }
 
 const SC = {
-  Progressing:'#B0C6D6', Successful:'#89D1FF',
-  Outstanding:'#1B90FF', Extraordinary:'#5B738B'
+  Progressing:'#B0BFCC', Successful:'#A889FF',
+  Outstanding:'#7858FF', Extraordinary:'#5B7388'
 };
 
 function ttCpCount(chart, di) {
   const name = chart.data.labels[di];
   const cs   = chart.data.datasets[0].data[di];
   const cl   = chart.data.datasets[1].data[di];
-  return ttHdr(name) + ttRow('#0070F2','CS Created',cs)
-       + ttRow('#89D1FF','Client Created',cl) + ttSep() + ttTotal('Total',cs+cl) + ttHint();
+  return ttHdr(name) + ttRow('#5D36FF','CS Created',cs)
+       + ttRow('#A889FF','Client Created',cl) + ttSep() + ttTotal('Total',cs+cl) + ttHint();
 }
 function ttCpAvg(chart, di) {
   const name = chart.data.labels[di];
@@ -3780,12 +3789,12 @@ function ttCpAvg(chart, di) {
 }
 function ttEmails(chart, di) {
   return ttHdr(chart.data.labels[di])
-       + ttRow('#0070F2','Touch Base Emails', chart.data.datasets[0].data[di])
+       + ttRow('#5D36FF','Touch Base Emails', chart.data.datasets[0].data[di])
        + ttHint();
 }
 function ttCalls(chart, di) {
   return ttHdr(chart.data.labels[di])
-       + ttRow('#1B90FF','Call Conversations', chart.data.datasets[0].data[di])
+       + ttRow('#7858FF','Call Conversations', chart.data.datasets[0].data[di])
        + ttHint();
 }
 function ttSvRank(chart, di, prevM, currM) {
@@ -3794,7 +3803,7 @@ function ttSvRank(chart, di, prevM, currM) {
   const diff = curr - prev;
   return ttHdr(chart.data.labels[di])
        + ttRow(themeSvpvColor(), prevM, prev)
-       + ttRow('#5B738B', currM, curr)
+       + ttRow('#5B7388', currM, curr)
        + ttSep() + ttTotal('Change', (diff >= 0 ? '+' : '') + diff)
        + ttHint();
 }
@@ -3814,7 +3823,7 @@ function ttPftc(chart, di) {
   const com  = chart.data.datasets[1].data[di];
   return ttHdr(name)
        + ttRow('#2CE0BF','Appreciate (×1)', app)
-       + ttRow('#5B738B','Commendation (×10)', com)
+       + ttRow('#5B7388','Commendation (×10)', com)
        + ttSep() + ttTotal('Total Points', app + com * 10)
        + ttHint();
 }
@@ -3824,8 +3833,8 @@ function ttIrtOrt(chart, di, cpMap) {
   const ort  = chart.data.datasets[1].data[di];
   const m    = cpMap ? cpMap[name] : null;
   let html   = ttHdr(name)
-    + ttRow('#5B738B','IRT Violations', irt)
-    + ttRow('#B0C6D6','ORT Violations', ort)
+    + ttRow('#5B7388','IRT Violations', irt)
+    + ttRow('#B0BFCC','ORT Violations', ort)
     + ttSep() + ttTotal('Total Violations', irt + ort);
   if (m) {
     html += ttSep();
@@ -4000,10 +4009,10 @@ function processData(D) {
    SECTION 16 — HTML RENDERERS  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
 const STATUS_STYLE = {
-  Progressing:   { bg:'#B0C6D6', fg:'#1D2329' },
-  Successful:    { bg:'#89D1FF', fg:'#00144A' },
-  Outstanding:   { bg:'#1B90FF', fg:'#FFFFFF' },
-  Extraordinary: { bg:'#5B738B', fg:'#FFFFFF' }
+  Progressing:   { bg:'#B0BFCC', fg:'#1D2329' },
+  Successful:    { bg:'#A889FF', fg:'#1C0C6E' },
+  Outstanding:   { bg:'#7858FF', fg:'#FFFFFF' },
+  Extraordinary: { bg:'#5B7388', fg:'#FFFFFF' }
 };
 
 function renderHeader(cfg) {
@@ -4148,18 +4157,18 @@ function buildCharts(p) {
   mkChart('chartCpCount', stackedCfg(
     cpLb,
     [
-      { label:'CS Created',     data:cpCs, backgroundColor:'#0070F2', borderRadius:2 },
-      { label:'Client Created', data:cpCl, backgroundColor:'#89D1FF', borderRadius:2 }
+      { label:'CS Created',     data:cpCs, backgroundColor:'#5D36FF', borderRadius:2 },
+      { label:'Client Created', data:cpCl, backgroundColor:'#A889FF', borderRadius:2 }
     ],
     ax.cc_max, 0, ttCpCount
   ));
 
   /* ── MTD Average ───────────────────────────────────────────────────── */
   const avgDs = [
-    { label:'Progressing',   data:cpAP, backgroundColor:'#B0C6D6', borderRadius:2 },
-    { label:'Successful',    data:cpAS, backgroundColor:'#89D1FF', borderRadius:2 },
-    { label:'Outstanding',   data:cpAO, backgroundColor:'#1B90FF', borderRadius:2 },
-    { label:'Extraordinary', data:cpAE, backgroundColor:'#5B738B', borderRadius:2 }
+    { label:'Progressing',   data:cpAP, backgroundColor:'#B0BFCC', borderRadius:2 },
+    { label:'Successful',    data:cpAS, backgroundColor:'#A889FF', borderRadius:2 },
+    { label:'Outstanding',   data:cpAO, backgroundColor:'#7858FF', borderRadius:2 },
+    { label:'Extraordinary', data:cpAE, backgroundColor:'#5B7388', borderRadius:2 }
   ];
   const avgCfg = stackedCfg(cpLb, avgDs, ax.avg_max, 0, ttCpAvg);
   avgDs.forEach(ds => {
@@ -4175,7 +4184,7 @@ function buildCharts(p) {
   /* ── Touch Base Emails ─────────────────────────────────────────────── */
   mkChart('chartEmails', baseCfg(
     em.map(r => r.name),
-    [{ label:'Emails', data:em.map(r=>r.emails), backgroundColor:'#0070F2',
+    [{ label:'Emails', data:em.map(r=>r.emails), backgroundColor:'#5D36FF',
        borderRadius:2, barThickness:14 }],
     ax.em_max, 0, ttEmails
   ));
@@ -4183,7 +4192,7 @@ function buildCharts(p) {
   /* ── Call Conversations ────────────────────────────────────────────── */
   mkChart('chartCalls', baseCfg(
     ca.map(r => r.name),
-    [{ label:'Calls', data:ca.map(r=>r.calls), backgroundColor:'#1B90FF',
+    [{ label:'Calls', data:ca.map(r=>r.calls), backgroundColor:'#7858FF',
        borderRadius:2, barThickness:14 }],
     ax.call_max, 0, ttCalls
   ));
@@ -4195,7 +4204,7 @@ function buildCharts(p) {
       { label:cfg.prev_month_name, data:svRank.map(r=>r.prev),
         backgroundColor: themeSvpvColor(), borderRadius:2, barThickness:10 },
       { label:cfg.month_name,      data:svRank.map(r=>r.curr),
-        backgroundColor:'#5B738B', borderRadius:2, barThickness:10 }
+        backgroundColor:'#5B7388', borderRadius:2, barThickness:10 }
     ],
     ax.sv_max, 0,
     (chart, di) => ttSvRank(chart, di, cfg.prev_month_name, cfg.month_name)
@@ -4227,7 +4236,7 @@ function buildCharts(p) {
     pfLb,
     [
       { label:'Appreciate',   data:pf.map(r=>r.appreciate),   backgroundColor:'#2CE0BF', borderRadius:2 },
-      { label:'Commendation', data:pf.map(r=>r.commendation), backgroundColor:'#5B738B', borderRadius:2 }
+      { label:'Commendation', data:pf.map(r=>r.commendation), backgroundColor:'#5B7388', borderRadius:2 }
     ],
     ax.pf_max, 0, ttPftc
   );
@@ -4244,8 +4253,8 @@ function buildCharts(p) {
     const irtCfg = stackedCfg(
       irtAlpha.map(r => r.name),
       [
-        { label:'IRT Violations', data: irtIrt, backgroundColor:'#5B738B', borderRadius:2 },
-        { label:'ORT Violations', data: irtOrt, backgroundColor:'#B0C6D6', borderRadius:2 }
+        { label:'IRT Violations', data: irtIrt, backgroundColor:'#5B7388', borderRadius:2 },
+        { label:'ORT Violations', data: irtOrt, backgroundColor:'#B0BFCC', borderRadius:2 }
       ],
       ax.irt_max, 0,
       (chart, di) => ttIrtOrt(chart, di, irtCpMap)
@@ -4380,14 +4389,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 const LP_DATA_FILE = 'team-josh-leaves.json';
 
 const LP_META = {
-  'Vacation Leave':            { bg:'#0070F2', fg:'#FFFFFF', abbr:'VL'    },
+  'Vacation Leave':            { bg:'#5D36FF', fg:'#FFFFFF', abbr:'VL'    },
   'Sick Leave':                { bg:'#BB0000', fg:'#FFFFFF', abbr:'SL'    },
   'Solo Parent Leave':         { bg:'#7B2FBE', fg:'#FFFFFF', abbr:'SPL'   },
   'Maternity/Paternity Leave': { bg:'#C0197D', fg:'#FFFFFF', abbr:'ML/PL' },
   'Unpaid Leave':              { bg:'#6D7990', fg:'#FFFFFF', abbr:'UL'    },
   'Bereavement Leave':         { bg:'#3D4F5D', fg:'#FFFFFF', abbr:'BL'    },
   'Holiday Leave':             { bg:'#107E3E', fg:'#FFFFFF', abbr:'HL'    },
-  'Half-day VL':               { bg:'#71B9FF', fg:'#00144A', abbr:'HDVL'  },
+  'Half-day VL':               { bg:'#71B9FF', fg:'#1C0C6E', abbr:'HDVL'  },
   'Other':                     { bg:'#2CE0BF', fg:'#1D2329', abbr:null    }
 };
 
@@ -5621,7 +5630,7 @@ function cafRenderSummary(rows) {
       val : s.total,
       pct : null,
       sub : 'Records in current view',
-      acc : '#0070F2'
+      acc : '#5D36FF'
     },
     {
       lbl : 'Active Clients',
@@ -5635,14 +5644,14 @@ function cafRenderSummary(rows) {
       val : s.call,
       pct : pct(s.call),
       sub : 'Touchbase = Call',
-      acc : '#5B738B'
+      acc : '#5B7388'
     },
     {
       lbl : 'Touchbase \u2014 Email',
       val : s.email,
       pct : pct(s.email),
       sub : 'Touchbase = Email',
-      acc : '#89D1FF'
+      acc : '#A889FF'
     },
   ];
   el.innerHTML = cards.map(c =>
@@ -6077,7 +6086,7 @@ function cafGenerateTemplate() {
 
   cafReqHtml =
     '<p style="margin:0 0 2px;font-family:Arial,sans-serif;font-size:11px;color:#6D7990"><strong>Email Subject</strong></p>' +
-    '<p style="margin:0 0 14px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#00144A">' +
+    '<p style="margin:0 0 14px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#1C0C6E">' +
       cafEsc(emailSubject) + '</p>' +
     '<hr style="margin:0 0 14px;border:none;border-top:1px solid #D0D8E6">' +
     '<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px">Hello,</p>' +
@@ -6087,13 +6096,13 @@ function cafGenerateTemplate() {
       cafEsc(clientPlain) + '</strong>:</p>' +
     '<table style="border-collapse:collapse;width:100%;font-family:Arial,sans-serif">' +
       '<thead>' +
-        '<tr style="background:#E8F0FB">' +
+        '<tr style="background:#E2D8FF">' +
           '<th style="border:1px solid #D0D8E6;padding:7px 12px;text-align:left;' +
-               'font-size:12px;color:#00144A">Detail</th>' +
+               'font-size:12px;color:#1C0C6E">Detail</th>' +
           '<th style="border:1px solid #D0D8E6;padding:7px 12px;text-align:left;' +
-               'font-size:12px;color:#00144A">Current Information</th>' +
+               'font-size:12px;color:#1C0C6E">Current Information</th>' +
           '<th style="border:1px solid #D0D8E6;padding:7px 12px;text-align:left;' +
-               'font-size:12px;color:#00144A">Updated Information</th>' +
+               'font-size:12px;color:#1C0C6E">Updated Information</th>' +
         '</tr>' +
       '</thead>' +
       '<tbody>' + trHtml + '</tbody>' +
@@ -6257,7 +6266,7 @@ let elSelected = 'ALL';  /* selected CS filter ('ALL' or CS member name)   */
 
 /* ── Compliance color threshold ─────────────────────────────────────────── */
 function elColor(pct) {
-  if (pct >= 97) return '#0070F2';
+  if (pct >= 97) return '#5D36FF';
   if (pct >= 90) return '#E76500';
   return '#D20A0A';
 }
@@ -6377,7 +6386,7 @@ function elRenderSummary() {
     { lbl: 'Total Courses',
       val: elData.courses.length,
       sub: 'eLearning courses',
-      acc: '#0070F2' },
+      acc: '#5D36FF' },
     { lbl: 'Completed',
       val: counts.completed,
       sub: 'Completed assignments',
