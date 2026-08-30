@@ -616,12 +616,13 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   border-color:rgba(93,54,255,.28);
   color:#5D36FF;
 }
-/* Active: light Indigo bg + deep Indigo text — pictograms stay dark */
+/* Active: Indigo 4 bg + deep Indigo text — pictograms stay dark */
 .tab-btn.active{
-  background:#E2D8FF;
+  background:#B894FF;
   border-color:#5D36FF;
   color:#1C0C6E;
-  box-shadow:0 4px 14px rgba(93,54,255,.20),0 1px 4px rgba(93,54,255,.10);
+  text-shadow:0 1px 0 rgba(255,255,255,.45), 0 1px 6px rgba(93,54,255,.30);
+  box-shadow:0 4px 14px rgba(93,54,255,.28),0 1px 4px rgba(93,54,255,.14);
   transform:translateY(-1px);
 }
 /* Dark mode active: gradient + white text for contrast on dark surface */
@@ -629,6 +630,7 @@ html[data-theme="dark"] .tab-btn.active{
   background:linear-gradient(140deg,#5D36FF 0%,#4820E8 100%);
   border-color:transparent;
   color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.40), 0 0 8px rgba(255,255,255,.15);
   box-shadow:0 4px 16px rgba(93,54,255,.42),0 1px 4px rgba(93,54,255,.18),inset 0 1px 0 rgba(255,255,255,.18);
 }
 .tab-section{display:block;position:relative}
@@ -3074,25 +3076,65 @@ async function loadLogo(token) {
       console.warn('[Favicon] thumb.png not found — using logo as fallback');
     }
 
-    /* Step 4.2: Load SignIn_Page.jpg background for the sign-in overlay ────
-       Uses the SAME fetchAssetDataUrl mechanism as thumb.png — authenticated
-       binary download → base64 data URL → cached permanently in localStorage.
-       assetItems is already resolved above (no extra API calls needed).
-       The CSS variable --tj-signin-bg is set immediately so the background
-       is visible while the sign-in overlay is still shown during data load.
-       On return visits the IIFE at script start restores from localStorage
-       synchronously, before any API call or auth.                           */
-    const signinBgUrl = await fetchAssetDataUrl(assetItems, SIGNIN_BG_FILE_NAME, token);
-    if (signinBgUrl) {
-      document.documentElement.style.setProperty(
-        '--tj-signin-bg', 'url("' + signinBgUrl + '")'
-      );
-      try { localStorage.setItem('tj_cached_signin_bg', signinBgUrl); } catch(e) {
-        console.warn('[SignInBG] localStorage quota exceeded — background will not persist across sessions');
-      }
-      console.log('[SignInBG] Loaded and cached:', SIGNIN_BG_FILE_NAME);
+    /* Step 4.2: Sign-in background — two-phase, non-blocking ────────────────
+       Phase 1 (~200 ms): single metadata API call → @microsoft.graph.downloadUrl
+         → CSS var set immediately so the background is visible while the
+         sign-in overlay is still shown during fetchDashboardData (2-5 s window).
+         No binary download in this phase — the browser loads the image directly
+         from Microsoft's CDN via the pre-auth URL.
+       Phase 2 (async): binary download → base64 data URL → localStorage cache
+         so the IIFE restores the background on every future page load with zero
+         network requests.  Falls back to caching the CDN URL if localStorage
+         quota is exceeded (expires ~1 h; refreshed automatically on each sign-in).
+       assetItems is already resolved above — no extra API calls for navigation.  */
+    const _signinItem = (assetItems || []).find(f => f.name === SIGNIN_BG_FILE_NAME)
+                     || (assetItems || []).find(f => f.name.toLowerCase() === SIGNIN_BG_FILE_NAME.toLowerCase());
+    if (_signinItem) {
+      graphGet('/drives/' + excelDriveId + '/items/' + _signinItem.id, token)
+        .then(function(meta) {
+          const dlUrl = meta['@microsoft.graph.downloadUrl'];
+          if (!dlUrl) return;
+          /* ── Apply immediately ── */
+          document.documentElement.style.setProperty(
+            '--tj-signin-bg', 'url("' + dlUrl.replace(/"/g, '%22') + '")'
+          );
+          console.log('[SignInBG] Phase 1 — background applied via CDN URL');
+          /* ── Phase 2: async binary → permanent data URL ── */
+          graphGetBinary('/drives/' + excelDriveId + '/items/' + _signinItem.id + '/content', token)
+            .then(function(blob) { return blobToDataUrl(blob); })
+            .then(function(dataUrl) {
+              try {
+                localStorage.setItem('tj_cached_signin_bg', dataUrl);
+                console.log('[SignInBG] Phase 2 — cached as permanent data URL');
+              } catch(e) {
+                /* localStorage quota exceeded — cache the short CDN URL as fallback
+                   (expires ~1 h but is refreshed on every sign-in)                 */
+                try { localStorage.setItem('tj_cached_signin_bg', dlUrl); } catch(e2) {}
+                console.warn('[SignInBG] localStorage quota full — CDN URL cached as fallback');
+              }
+            })
+            .catch(function() {
+              try { localStorage.setItem('tj_cached_signin_bg', dlUrl); } catch(e) {}
+            });
+        })
+        .catch(function(e) {
+          /* Metadata call failed — fall back to direct binary fetch */
+          console.warn('[SignInBG] Phase 1 failed:', e.message, '— using binary fallback');
+          graphGetBinary('/drives/' + excelDriveId + '/items/' + _signinItem.id + '/content', token)
+            .then(function(blob) {
+              const objUrl = URL.createObjectURL(blob);
+              document.documentElement.style.setProperty('--tj-signin-bg', 'url("' + objUrl + '")');
+              return blobToDataUrl(blob);
+            })
+            .then(function(dataUrl) {
+              try { localStorage.setItem('tj_cached_signin_bg', dataUrl); } catch(e) {}
+              console.log('[SignInBG] Phase 1 fallback — applied via Object URL');
+            })
+            .catch(function() {});
+        });
     } else {
-      console.warn('[SignInBG] File not found in asset folder:', SIGNIN_BG_FILE_NAME);
+      console.warn('[SignInBG] File not found:', SIGNIN_BG_FILE_NAME,
+                   '| Available in folder:', (assetItems || []).map(f => f.name).join(', '));
     }
 
     /* Step 5: Load nav pictograms (only from Logos subfolder) */
