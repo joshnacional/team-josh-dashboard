@@ -81,34 +81,34 @@
 
 /* ── Dark mode ─────────────────────────────────────────────────────────────── */
 html[data-theme="dark"] {
-  --pg:    #0A111C;
-  --db:    #10192A;
-  --cb:    #172030;
-  --ch:    #231845;
-  --ct:    #A8C4DC;
-  --cx:    #BDD2E6;
-  --cm:    #5C7890;
-  --cd:    #263545;
-  --cg:    #1E2D3D;
-  --cf:    #4A6278;
-  --rh:    #231845;
-  --rb:    #1E2D3D;
+  --pg:    #0A111C;              /* UNCHANGED — outer page bg, floor             */
+  --db:    #10192A;              /* UNCHANGED — dashboard wrapper bg              */
+  --cb:    #1C2A3E;              /* was #172030 — card/panel bg (+6 L pts)        */
+  --ch:    #281E4E;              /* was #231845 — card heads, Indigo tint kept    */
+  --ct:    #A8C4DC;              /* UNCHANGED                                     */
+  --cx:    #BDD2E6;              /* UNCHANGED                                     */
+  --cm:    #5C7890;              /* UNCHANGED                                     */
+  --cd:    #2E3F56;              /* was #263545 — borders/dividers, more visible  */
+  --cg:    #243548;              /* was #1E2D3D — inner bg, progress tracks       */
+  --cf:    #4A6278;              /* UNCHANGED                                     */
+  --rh:    #281E4E;              /* was #231845 — row headers, synced to --ch     */
+  --rb:    #243548;              /* was #1E2D3D — row body, synced to --cg        */
   --ds:    0 8px 40px rgba(0,0,0,.52),0 2px 10px rgba(0,0,0,.28);
   --cs:    0 2px 10px rgba(0,0,0,.38),0 1px 3px rgba(0,0,0,.22);
-  --ttbg:  #172030;
-  --ttbd:  #2E4560;
-  --tthc:  #BDD2E6;
-  --ttlc:  #5C7890;
-  --ttvc:  #D0E4F4;
-  --ttsc:  #243445;
-  --ttic:  #4A6070;
-  --tths:  #1E2D3D;
-  --tick:  #84A8C4;
-  --tickb: #84A8C4;
-  --grid:  #1E2D3D;
-  --dlbl:  #B0CAE0;
-  --qnul:  #243445;
-  --svpv:  #2E4258;
+  --ttbg:  #1C2A3E;              /* was #172030 — tooltip bg, synced to --cb      */
+  --ttbd:  #2E4560;              /* UNCHANGED                                     */
+  --tthc:  #BDD2E6;              /* UNCHANGED                                     */
+  --ttlc:  #5C7890;              /* UNCHANGED                                     */
+  --ttvc:  #D0E4F4;              /* UNCHANGED                                     */
+  --ttsc:  #243445;              /* UNCHANGED                                     */
+  --ttic:  #4A6070;              /* UNCHANGED                                     */
+  --tths:  #243548;              /* was #1E2D3D — tooltip row bg, synced to --cg  */
+  --tick:  #84A8C4;              /* UNCHANGED                                     */
+  --tickb: #84A8C4;              /* UNCHANGED                                     */
+  --grid:  #243548;              /* was #1E2D3D — chart grid lines, synced to --cg*/
+  --dlbl:  #B0CAE0;              /* UNCHANGED                                     */
+  --qnul:  #263749;              /* was #243445 — null/empty cell bg              */
+  --svpv:  #2E4258;              /* UNCHANGED                                     */
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
