@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Team Josh Executive Dashboard</title>
+<!-- Favicon: falls back to a TJ monogram; swapped to the real logo once
+     it is available from either localStorage cache or the Graph API.    -->
+<link id="tj-favicon" rel="icon" type="image/svg+xml"
+      href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzAwNzBGMiIvPjx0ZXh0IHg9IjE2IiB5PSIyMi41IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5USjwvdGV4dD48L3N2Zz4=">
 <!-- MSAL.js 2.x (browser) for delegated Microsoft 365 authentication -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
@@ -206,6 +210,36 @@ body{
 /* Screenshot button */
 .btn-screenshot{margin-left:4px}
 
+/* During html2canvas capture: strip focus rings / outlines from every element
+   so the captured PNG matches the dashboard's normal visual appearance.      */
+html.is-capturing :focus,
+html.is-capturing :focus-visible{outline:none !important}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SAP 3D BACKGROUND WATERMARK
+   Loaded dynamically from SharePoint (Logos/SAP 3D.jpg) and cached in
+   localStorage('tj_cached_bg').  Applied via CSS custom property --tj-bg so
+   every target updates simultaneously on first load and every return visit.
+════════════════════════════════════════════════════════════════════════════ */
+:root{--tj-bg:none;--tj-signin-bg:none}
+
+/* Pseudo-element renders the image at 20% opacity behind all content        */
+.tab-section::before,
+.caf-dlg::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--tj-bg,none) center/cover no-repeat;
+  opacity:.20;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Lift every direct child above z-index:0 so UI elements always render
+   on top of the watermark — no z-index needed on individual components     */
+.tab-section>*,
+.caf-dlg>*{position:relative}
+
 /* Full Screen button */
 .btn-fullscreen{margin-left:4px}
 
@@ -225,12 +259,17 @@ body{
 .signin-overlay{
   position:absolute;
   inset:0;
-  background:var(--db);
+  background-color:var(--db);
+  background-image:var(--tj-signin-bg,none);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
+  padding-top:clamp(64px,12vh,160px);
   z-index:60;
-  transition:background .25s;
+  transition:background-color .25s;
 }
 .signin-overlay.hidden{display:none}
 
@@ -307,6 +346,10 @@ body{
   text-align:center;
   padding:44px 36px;
   max-width:400px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.10);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
 .signin-logo-img{
   height:72px;
@@ -571,7 +614,7 @@ html[data-theme="dark"] .tab-btn.active .tab-icon.loaded{filter:brightness(0) in
   box-shadow:0 4px 16px rgba(0,112,242,.42),0 1px 4px rgba(0,112,242,.18),inset 0 1px 0 rgba(255,255,255,.18);
   transform:translateY(-1px);
 }
-.tab-section{display:block}
+.tab-section{display:block;position:relative}
 .tab-section.hidden{display:none}
 
 /* ── Tab-section enter / exit animation ──────────────────────────────────
@@ -1189,7 +1232,7 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
   display:flex;align-items:center;justify-content:center;
   z-index:1200;padding:16px;box-sizing:border-box}
 .caf-dlg-overlay.hidden{display:none}
-.caf-dlg{background:var(--cb);border-radius:14px;
+.caf-dlg{background:var(--cb);border-radius:14px;position:relative;
   box-shadow:0 24px 64px rgba(0,0,0,.22),0 6px 20px rgba(0,0,0,.12);
   width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;
   overflow:hidden;transition:background .25s}
@@ -2155,10 +2198,32 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
    return visit with zero network requests. */
 (function () {
   try {
+    /* Restore Team Josh logo on sign-in page */
     const cached = localStorage.getItem('tj_cached_logo');
     if (cached) {
       const el = document.getElementById('signin-logo-img');
       if (el) el.src = cached;
+    }
+    /* Restore SAP 3D background watermark (tabs + dialog) */
+    const cachedBg = localStorage.getItem('tj_cached_bg');
+    if (cachedBg) {
+      document.documentElement.style.setProperty('--tj-bg', 'url(' + cachedBg + ')');
+    }
+    /* Restore SignIn_Page.jpg background for the sign-in overlay.
+       Value is either a pre-auth https:// URL or a data: URL — both are
+       quoted inside url() so special characters in the https URL are safe. */
+    const cachedSignInBg = localStorage.getItem('tj_cached_signin_bg');
+    if (cachedSignInBg) {
+      document.documentElement.style.setProperty(
+        '--tj-signin-bg', 'url("' + cachedSignInBg.replace(/"/g, '%22') + '")'
+      );
+    }
+    /* Favicon: prefer thumb.png; fall back to Team Josh logo */
+    const cachedThumb = localStorage.getItem('tj_cached_thumb');
+    const cachedFavSrc = cachedThumb || localStorage.getItem('tj_cached_logo');
+    if (cachedFavSrc) {
+      const fav = document.getElementById('tj-favicon');
+      if (fav) fav.href = cachedFavSrc;
     }
   } catch (e) {}
 }());
@@ -2180,7 +2245,10 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
    ════════════════════════════════════════════════════════════════════════════ */
 const CLIENT_ID       = '4358753a-4b60-47a0-a98d-b8d7e22b7f64';
 const EXCEL_SHARE_URL = 'https://sap-my.sharepoint.com/:x:/p/josh_nacional/IQDg9mOkBuWLQKBnUxtI20A6ASMJLnVpsNN-m06cXWLfLx8';
-const LOGO_FILE_NAME  = 'Team Josh Aqua Logo.png';
+const LOGO_FILE_NAME      = 'Team Josh Aqua Logo.png';
+const BG_FILE_NAME        = 'SAP 3D.jpg';
+const SIGNIN_BG_FILE_NAME = 'SignIn_Page.jpg';
+const THUMB_FILE_NAME     = 'thumb.png';
 const GRAPH_SCOPES    = ['Files.ReadWrite.All'];
 const TENANT_AUTHORITY = 'https://login.microsoftonline.com/42f7676c-f455-423c-82f6-dc2d99791af7';
 /* MSAL_AUTHORITY alias kept so rest of code (graph helpers) still compiles */
@@ -2971,6 +3039,24 @@ async function loadLogo(token) {
       console.warn('[Logo] File not found:', LOGO_FILE_NAME);
     }
 
+    /* Step 4.1: Load thumb.png for browser-tab favicon ─────────────────────
+       Uses the dedicated thumb.png icon; falls back to the Team Josh logo
+       so the favicon is always branded even before thumb.png is cached.   */
+    const thumbUrl = await fetchAssetDataUrl(assetItems, THUMB_FILE_NAME, token);
+    if (thumbUrl) {
+      try { localStorage.setItem('tj_cached_thumb', thumbUrl); } catch(e) {}
+      const favEl = document.getElementById('tj-favicon');
+      if (favEl) favEl.href = thumbUrl;
+      console.log('[Favicon] Loaded:', THUMB_FILE_NAME);
+    } else {
+      /* Fall back to logo when thumb.png is not yet in the Logos folder */
+      if (logoUrl) {
+        const favEl = document.getElementById('tj-favicon');
+        if (favEl) favEl.href = logoUrl;
+      }
+      console.warn('[Favicon] thumb.png not found — using logo as fallback');
+    }
+
     /* Step 5: Load nav pictograms (only from Logos subfolder) */
     if (logosFolder) {
       const troUrl = await fetchAssetDataUrl(assetItems, '301620_Trophy_R.png', token);
@@ -3044,6 +3130,174 @@ async function loadLogo(token) {
     }
   } catch(e) {
     console.warn('[Assets] Could not load assets (non-critical):', e.message);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SAP 3D BACKGROUND LOADER
+   Completely independent of loadLogo() so a failure in either function never
+   blocks the other.  Uses URL.createObjectURL for immediate, zero-overhead
+   display; also caches a data-URL in localStorage for sign-in page watermark
+   on return visits.
+════════════════════════════════════════════════════════════════════════════ */
+async function loadBgImage(token) {
+  try {
+    /* Ensure drive/item IDs are resolved */
+    if (!excelDriveId || !excelItemId) await resolveExcelFile(token);
+
+    /* Navigate: Excel item → data folder → root dir */
+    const excelMeta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference',
+      token
+    );
+    const dataFolderId = excelMeta.parentReference.id;
+
+    const dataFolderMeta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + dataFolderId + '?$select=parentReference',
+      token
+    );
+    const rootDirId = dataFolderMeta.parentReference.id;
+
+    /* List root dir — look for Logos subfolder */
+    const rootResp  = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + rootDirId + '/children?$select=id,name',
+      token
+    );
+    const rootItems   = (rootResp.value || []);
+    const logosFolder = rootItems.find(f => f.name === 'Logos');
+
+    let searchItems = rootItems;
+    if (logosFolder) {
+      const logosResp = await graphGet(
+        '/drives/' + excelDriveId + '/items/' + logosFolder.id + '/children?$select=id,name',
+        token
+      );
+      searchItems = logosResp.value || [];
+      console.log('[BG] Searching Logos subfolder for:', BG_FILE_NAME);
+    }
+
+    /* Case-insensitive filename match (handles SharePoint name normalisation) */
+    const bgLower = BG_FILE_NAME.toLowerCase();
+    const item = searchItems.find(f => f.name === BG_FILE_NAME)
+              || searchItems.find(f => f.name.toLowerCase() === bgLower);
+
+    if (!item) {
+      console.warn('[BG] File not found in asset folder:', BG_FILE_NAME,
+                   '| Available:', searchItems.map(f => f.name).join(', '));
+      return;
+    }
+
+    /* Fetch binary */
+    const blob = await graphGetBinary(
+      '/drives/' + excelDriveId + '/items/' + item.id + '/content', token
+    );
+
+    /* ── Apply immediately via Object URL (tiny string, no encoding lag) ── */
+    const objectUrl = URL.createObjectURL(blob);
+    document.documentElement.style.setProperty('--tj-bg', 'url(' + objectUrl + ')');
+    console.log('[BG] Applied via Object URL:', item.name);
+
+    /* ── Cache as data URL for sign-in page on return visits ─────────────
+       Done asynchronously so it never delays the background appearing.     */
+    blobToDataUrl(blob).then(function(dataUrl) {
+      try { localStorage.setItem('tj_cached_bg', dataUrl); } catch(e) {
+        console.warn('[BG] localStorage quota exceeded — watermark will not persist across sessions');
+      }
+    }).catch(function() {});
+
+  } catch(e) {
+    console.warn('[BG] Could not load background image:', e.message);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SIGN-IN PAGE BACKGROUND LOADER
+   Loads SignIn_Page.jpg from the Logos folder using @microsoft.graph.downloadUrl
+   — a pre-authenticated CDN link Microsoft returns with every file metadata call.
+   This is a tiny JSON string, NOT a megabyte binary download, so:
+     • It completes in milliseconds → CSS property is set before hideSignInOverlay()
+     • The URL itself is stored in localStorage (no base64 / no quota issues)
+     • The browser fetches and renders the image directly from Microsoft's CDN
+   The URL is refreshed on every login (valid ~1 h).  On return visits the IIFE
+   restores the cached URL instantly, so the sign-in page is always branded.
+════════════════════════════════════════════════════════════════════════════ */
+async function loadSignInBg(token) {
+  try {
+    if (!excelDriveId || !excelItemId) await resolveExcelFile(token);
+
+    /* ── Navigate: Excel item → data folder → root dir ── */
+    const excelMeta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference', token
+    );
+    const dataFolderId = excelMeta.parentReference.id;
+
+    const dataFolderMeta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + dataFolderId + '?$select=parentReference', token
+    );
+    const rootDirId = dataFolderMeta.parentReference.id;
+
+    /* ── List root dir; locate Logos subfolder ── */
+    const rootResp  = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + rootDirId + '/children?$select=id,name', token
+    );
+    const rootItems   = (rootResp.value || []);
+    const logosFolder = rootItems.find(f => f.name === 'Logos');
+
+    let searchItems = rootItems;
+    if (logosFolder) {
+      const logosResp = await graphGet(
+        '/drives/' + excelDriveId + '/items/' + logosFolder.id + '/children?$select=id,name', token
+      );
+      searchItems = logosResp.value || [];
+      console.log('[SignInBG] Searching Logos subfolder for:', SIGNIN_BG_FILE_NAME);
+    }
+
+    /* ── Case-insensitive filename match ── */
+    const signinLower = SIGNIN_BG_FILE_NAME.toLowerCase();
+    const item = searchItems.find(f => f.name === SIGNIN_BG_FILE_NAME)
+              || searchItems.find(f => f.name.toLowerCase() === signinLower);
+
+    if (!item) {
+      console.warn('[SignInBG] File not found:', SIGNIN_BG_FILE_NAME,
+                   '| Files in folder:', searchItems.map(f => f.name).join(', '));
+      return;
+    }
+
+    /* ── Fetch item metadata — @microsoft.graph.downloadUrl is a pre-auth
+       CDN link the browser can load directly without Authorization headers.
+       Requesting WITHOUT $select so the annotation is included.             ── */
+    const meta = await graphGet(
+      '/drives/' + excelDriveId + '/items/' + item.id, token
+    );
+    const dlUrl = meta['@microsoft.graph.downloadUrl'];
+
+    if (dlUrl) {
+      /* Store raw URL and apply — no base64, no quota issues */
+      try { localStorage.setItem('tj_cached_signin_bg', dlUrl); } catch(e) {
+        console.warn('[SignInBG] Could not cache URL in localStorage');
+      }
+      document.documentElement.style.setProperty('--tj-signin-bg', 'url("' + dlUrl + '")');
+      console.log('[SignInBG] Applied via pre-auth download URL:', item.name);
+
+    } else {
+      /* Fallback — some SharePoint configs omit downloadUrl; fetch binary instead */
+      console.warn('[SignInBG] downloadUrl absent in metadata, falling back to binary fetch');
+      const blob = await graphGetBinary(
+        '/drives/' + excelDriveId + '/items/' + item.id + '/content', token
+      );
+      const objUrl = URL.createObjectURL(blob);
+      document.documentElement.style.setProperty('--tj-signin-bg', 'url("' + objUrl + '")');
+      console.log('[SignInBG] Applied via Object URL (fallback):', item.name);
+      /* Try to cache as data URL — may fail on large images due to quota */
+      blobToDataUrl(blob).then(function(dataUrl) {
+        try { localStorage.setItem('tj_cached_signin_bg', dataUrl); } catch(e) {
+          console.warn('[SignInBG] localStorage quota exceeded — background will reload on next sign-in');
+        }
+      }).catch(function() {});
+    }
+
+  } catch(e) {
+    console.warn('[SignInBG] Could not load sign-in background:', e.message);
   }
 }
 
@@ -3246,29 +3500,58 @@ async function takeScreenshot() {
     showToast('Screenshot library still loading — please try again in a moment.');
     return;
   }
+
+  /* Re-entry guard — use a flag rather than btn.disabled so the button's
+     visual state stays normal and won't appear changed in the capture.    */
+  if (takeScreenshot._busy) return;
+  takeScreenshot._busy = true;
+
   const btn      = document.getElementById('btnScreenshot');
   const origHTML = btn.innerHTML;
-  btn.disabled   = true;
-  btn.innerHTML  = '<span class="btn-icon">&#x23F3;</span> Capturing…';
 
   const el = document.querySelector('.dashboard');
+  const origOverflow = el.style.overflow;
+  const origBR       = el.style.borderRadius;
 
-  /* Remove overflow:hidden + border-radius so html2canvas sees full height */
-  const origOverflow  = el.style.overflow;
-  const origBR        = el.style.borderRadius;
-  el.style.overflow   = 'visible';
+  /* Expose full scroll-height to html2canvas */
+  el.style.overflow     = 'visible';
   el.style.borderRadius = '0';
 
   /* Scroll to top so the entire element is in the capture window */
   const origScrollY = window.scrollY;
   window.scrollTo(0, 0);
 
-  /* One-frame pause for the browser to repaint */
+  /* Remove browser focus from any element so focus rings don't appear
+     in the captured image (clicked button, active tab, etc.)           */
+  if (document.activeElement && document.activeElement !== document.body) {
+    document.activeElement.blur();
+  }
+
+  /* Add capture class → CSS strips all :focus / :focus-visible outlines */
+  document.documentElement.classList.add('is-capturing');
+
+  /* Lock the visible tab section at full opacity before capture.
+     The tabIn CSS animation (opacity 0→1, 220 ms) can be mid-progress
+     if the user recently switched tabs; html2canvas reads computed
+     opacity for HTML elements but reads <canvas> via toDataURL()
+     (bypassing CSS opacity), causing HTML text to appear washed-out
+     while Chart.js bars look correct.  Setting an inline opacity:1
+     freezes the element at full opacity without touching CSS classes
+     (no animation restart when the inline style is removed later).   */
+  const _visSection = document.querySelector('.tab-section:not(.hidden)');
+  if (_visSection) _visSection.style.opacity = '1';
+
+  /* Wait for the tabIn animation (220 ms) to complete, focus rings
+     to clear, and any blur/class-change transitions to settle.       */
+  await new Promise(r => setTimeout(r, 300));
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
   try {
+    /* Match the device's actual pixel density; minimum 2× for sharpness  */
+    const scale = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
+
     const canvas = await html2canvas(el, {
-      scale       : 2,
+      scale,
       useCORS     : true,
       allowTaint  : false,
       logging     : false,
@@ -3276,8 +3559,8 @@ async function takeScreenshot() {
       scrollY     : 0,
       width       : el.offsetWidth,
       height      : el.scrollHeight,
-      windowWidth : el.offsetWidth,
-      windowHeight: el.scrollHeight,
+      windowWidth : el.offsetWidth,     /* match element, not viewport    */
+      windowHeight: el.scrollHeight,    /* expose full scroll height      */
     });
 
     /* Filename from the dashboard's displayed month/year */
@@ -3286,24 +3569,33 @@ async function takeScreenshot() {
                     ? monthEl.textContent.trim() : 'Dashboard';
     const fname   = 'Team Josh Dashboard - ' + month + '.png';
 
-    const link = document.createElement('a');
+    const link    = document.createElement('a');
     link.download = fname;
     link.href     = canvas.toDataURL('image/png');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
+    /* Show "Saved!" feedback only AFTER the image is captured so the
+       temporary label never appears in the screenshot itself.          */
+    btn.innerHTML = '<span class="btn-icon">&#x2713;</span> Saved!';
     showToast('Saved: ' + fname);
+    await new Promise(r => setTimeout(r, 1800));
+
   } catch(err) {
     console.error('[Screenshot]', err);
     showToast('Screenshot failed — please try again.');
   } finally {
-    /* Always restore original state */
+    /* Always restore every temporary change */
+    document.documentElement.classList.remove('is-capturing');
     el.style.overflow     = origOverflow;
     el.style.borderRadius = origBR;
     window.scrollTo(0, origScrollY);
-    btn.innerHTML = origHTML;
-    btn.disabled  = false;
+    btn.innerHTML         = origHTML;
+    /* Restore inline opacity (removes the lock; animation is already
+       complete so the element stays at opacity:1 without restarting) */
+    if (_visSection) _visSection.style.opacity = '';
+    takeScreenshot._busy  = false;
   }
 }
 
@@ -4017,6 +4309,10 @@ async function loadAndBuild(token) {
      so starting here means the real Team Josh logo will appear on the
      sign-in screen for that window before hideSignInOverlay() fires. */
   loadLogo(t).catch(() => {});
+  /* Load SAP 3D watermark background (tabs + dialog) — independent loader */
+  loadBgImage(t).catch(() => {});
+  /* Load SignIn_Page.jpg background — independent loader */
+  loadSignInBg(t).catch(() => {});
   const D = await fetchDashboardData(t);
   buildDashboard(D);
   hideSignInOverlay();
