@@ -2666,17 +2666,21 @@ function _wlPlaySound() {
 const _WL_MALE_NAMES = [
   'Google UK English Male',
   'Daniel',                                                    /* macOS/iOS UK  */
+  'Daniel (Enhanced)',                                         /* macOS enhanced */
   'Microsoft George Online (Natural) - English (United Kingdom)',
   'Microsoft George - English (United Kingdom)',
+  'Microsoft Ryan Online (Natural) - English (United Kingdom)',
+  'Microsoft James Online (Natural) - English (United Kingdom)',
   'Microsoft Mark Online (Natural) - English (United States)',
+  'Microsoft Brian Online (Natural) - English (United States)',
   'Microsoft David Online (Natural) - English (United States)',
   'Microsoft David Desktop - English (United States)',
   'Alex',                                                      /* macOS/iOS US  */
   'Reed',  'Gordon', 'Fred',  'Tom',    'Aaron',               /* macOS         */
   'Jamie', 'Eddy',   'Rishi', 'Albert', 'Grandpa',             /* macOS/iOS ext */
 ];
-/* Female name fragments to exclude from generic English fallback */
-const _WL_FEMALE_RE = /\b(female|woman|girl|samantha|victoria|karen|susan|alice|emma|aria|serena|moira|fiona|veena|joanna|allison|ava|zira|cortana|natasha|helena|zoe|nora|nicky|stephanie|tessa)\b/i;
+/* Female voice names/fragments to EXCLUDE from generic English fallback */
+const _WL_FEMALE_RE = /\b(female|woman|girl|samantha|victoria|karen|susan|alice|emma|aria|serena|moira|fiona|veena|joanna|allison|ava|zira|cortana|natasha|helena|zoe|nora|nicky|stephanie|tessa|google\s+us\s+english)\b/i;
 
 /* Wait for speech voices to be available (Chrome needs voiceschanged event) */
 function _wlGetVoices() {
@@ -2701,7 +2705,7 @@ async function _wlSpeak() {
     voice = voices.find(v => v.name === name);
     if (voice) { console.log('[WL Voice] Matched:', voice.name); break; }
   }
-  /* 2. Any voice with "male" in the name */
+  /* 2. Any voice with "male" in the name (e.g. "Google UK English Male") */
   if (!voice) {
     voice = voices.find(v => /\bmale\b/i.test(v.name));
     if (voice) console.log('[WL Voice] Male-keyword match:', voice.name);
@@ -2711,20 +2715,25 @@ async function _wlSpeak() {
     voice = voices.find(v => v.lang === 'en-GB' && !_WL_FEMALE_RE.test(v.name));
     if (voice) console.log('[WL Voice] en-GB non-female fallback:', voice.name);
   }
-  /* 4. Any English voice that is NOT a known female name */
+  /* 4. Any English voice with "male" in name (broader search) */
+  if (!voice) {
+    voice = voices.find(v => v.lang.startsWith('en') && /\bmale\b/i.test(v.name));
+    if (voice) console.log('[WL Voice] en male-keyword broad match:', voice.name);
+  }
+  /* 5. Last resort: any English non-female — pitch forced to 0.1 to compensate */
   if (!voice) {
     voice = voices.find(v => v.lang.startsWith('en') && !_WL_FEMALE_RE.test(v.name));
-    if (voice) console.log('[WL Voice] en non-female fallback:', voice.name);
+    if (voice) console.warn('[WL Voice] Last-resort en non-female (pitch override):', voice.name);
   }
   if (!voice) {
-    console.warn('[WL Voice] No suitable male voice found. Available:', voices.map(v => v.name + '(' + v.lang + ')').join(', '));
+    console.warn('[WL Voice] No suitable voice found. Available:', voices.map(v => v.name + '(' + v.lang + ')').join(', '));
   }
 
   return new Promise(resolve => {
     const utt = new SpeechSynthesisUtterance('Welcome to Team Josh Executive Dashboard.');
     if (voice) utt.voice = voice;
     utt.rate   = 0.87;
-    utt.pitch  = 0.72;  /* lower pitch enforces deeper/male character */
+    utt.pitch  = 0.1;   /* minimum pitch — forces deep/male tone regardless of voice */
     utt.volume = 0.82;
     utt.onend  = resolve;
     utt.onerror = e => { console.warn('[WL Voice] Speech error:', e.error); resolve(); };
@@ -2762,19 +2771,19 @@ function _wlPopulateSlots() {
 }
 
 /* ── Independently load all 8 Solo Pics directly via Graph API ───────────
-   Does NOT poll soloPics / wait for loadLogo().  Navigates straight to the
-   "Solo Pics" OneDrive folder and downloads all member photos in parallel.
-   This runs as soon as excelDriveId is resolved, which happens within the
-   first few seconds of loadAndBuild(), long before loadLogo() finishes.   */
+   Calls resolveExcelFile() directly (same pattern as loadLogo) — no polling.
+   Navigates straight to "Solo Pics" OneDrive folder and downloads all member
+   photos in parallel.  Folder name matched case-insensitively for robustness. */
 async function _wlLoadPhotos(token) {
-  /* Step 0 — wait for excelDriveId (set by resolveExcelFile in loadAndBuild) */
-  const MAX_DRIVE_WAIT = 15000;     /* 15 s ceiling                            */
-  const t0 = Date.now();
-  while ((!excelDriveId || !excelItemId) && Date.now() - t0 < MAX_DRIVE_WAIT) {
-    await _wlWait(200);
+  /* Step 0 — ensure drive IDs are resolved (same pattern as loadLogo — no polling) */
+  try {
+    if (!excelDriveId || !excelItemId) await resolveExcelFile(token);
+  } catch(eRes) {
+    console.warn('[WL] resolveExcelFile failed — photos skipped:', eRes.message);
+    return;
   }
   if (!excelDriveId || !excelItemId) {
-    console.warn('[WL] Drive IDs not resolved — photos skipped');
+    console.warn('[WL] Drive IDs not resolved after resolveExcelFile — photos skipped');
     return;
   }
   try {
@@ -2790,12 +2799,12 @@ async function _wlLoadPhotos(token) {
     );
     const rootId   = dataMeta.parentReference.id;
 
-    /* Step 3 — root dir children → locate "Solo Pics" folder */
+    /* Step 3 — root dir children → locate "Solo Pics" folder (case-insensitive) */
     const rootResp = await graphGet(
       '/drives/' + excelDriveId + '/items/' + rootId + '/children?$select=id,name', token
     );
-    const spFolder = (rootResp.value || []).find(f => f.name === 'Solo Pics');
-    if (!spFolder) { console.warn('[WL] "Solo Pics" folder not found'); return; }
+    const spFolder = (rootResp.value || []).find(f => f.name.toLowerCase() === 'solo pics');
+    if (!spFolder) { console.warn('[WL] "Solo Pics" folder not found in:', (rootResp.value||[]).map(f=>f.name).join(', ')); return; }
 
     /* Step 4 — list Solo Pics → image files */
     const spResp  = await graphGet(
