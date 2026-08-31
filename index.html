@@ -7274,7 +7274,7 @@ function lpCloseDupWarning() {
    UI CLICK SOUND  (Web Audio API — no external assets)
    Sound #6 — Soft Switch Click
    Single-layer bandpass noise centred at 450 Hz, Q = 1.2, 22 ms decay.
-   Clean, subtle, mechanical-switch character. Peak gain: 0.07 (production).
+   Clean, subtle, mechanical-switch character. Peak gain: 0.57 (+50% from v63).
 ════════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -7313,7 +7313,7 @@ function lpCloseDupWarning() {
       /* Gain envelope: 0.8 ms attack → 22 ms exponential decay */
       var g = ctx.createGain();
       g.gain.setValueAtTime(0.001, now);
-      g.gain.linearRampToValueAtTime(0.07, now + 0.0008);
+      g.gain.linearRampToValueAtTime(0.57, now + 0.0008);
       g.gain.exponentialRampToValueAtTime(0.001, now + 0.022);
 
       ns.connect(bp); bp.connect(g); g.connect(ctx.destination);
