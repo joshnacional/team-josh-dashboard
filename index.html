@@ -353,7 +353,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
   opacity:0;
   transition:opacity 280ms ease,transform 320ms cubic-bezier(.16,1,.3,1);
 }
-.wl-slot.wl-slot-visible{opacity:1;transform:translate(0,0) scale(1)!important}
+.wl-slot.wl-slot-visible{opacity:1!important;transform:translate(0,0) scale(1)!important}
 .wl-slot img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
 
 /* ── Center logo — 170 px circular badge (clear radius = 95 px, gap 10 px) */
@@ -2754,8 +2754,7 @@ function _wlInitSlots() {
     if (!slot) return;
     slot.style.top       = pos.top  + 'px';
     slot.style.left      = pos.left + 'px';
-    slot.style.transform = _WL_ENTRANCES[i];   /* entrance offset before animation */
-    slot.style.opacity   = '0';
+    slot.style.transform = _WL_ENTRANCES[i];   /* entrance offset — CSS handles opacity:0 */
   });
 }
 
@@ -2768,6 +2767,16 @@ function _wlPopulateSlots() {
     if (url) { img.src = url; img.style.display = 'block'; }
     else      { img.style.display = 'none'; }   /* empty circle — no placeholder text */
   });
+}
+
+/* ── Update a single slot as its photo arrives (real-time fill-in) ──────── */
+function _wlPopulateSingleSlot(name) {
+  const i = _WL_MEMBERS.indexOf(name);
+  if (i < 0) return;
+  const img = document.getElementById('wl-img-' + i);
+  if (!img) return;
+  const url = soloPics[name];
+  if (url) { img.src = url; img.style.display = 'block'; }
 }
 
 /* ── Independently load all 8 Solo Pics directly via Graph API ───────────
@@ -2813,20 +2822,19 @@ async function _wlLoadPhotos(token) {
     const spItems = (spResp.value || []).filter(f => /\.(png|jpg|jpeg)$/i.test(f.name));
     if (!spItems.length) { console.warn('[WL] No images in Solo Pics'); return; }
 
-    /* Step 5 — download welcome-member photos in parallel */
+    /* Step 5 — download member photos in parallel; populate each slot immediately
+       Use URL.createObjectURL — avoids slow base64 encoding of large portrait files */
     await Promise.all(spItems.map(async f => {
       const stem = f.name.replace(/\.(png|jpg|jpeg)$/i, '');
       if (!_WL_MEMBERS.includes(stem)) return;   /* skip non-team files        */
-      if (soloPics[stem]) { console.log('[WL] Already cached:', stem); return; }
+      if (soloPics[stem]) { console.log('[WL] Already cached:', stem); _wlPopulateSingleSlot(stem); return; }
       try {
-        const blob   = await graphGetBinary(
+        const blob = await graphGetBinary(
           '/drives/' + excelDriveId + '/items/' + f.id + '/content', token
         );
-        const dataUrl = await blobToDataUrl(blob);
-        if (dataUrl) {
-          soloPics[stem] = dataUrl;
-          console.log('[WL] Photo ready:', f.name, '\u2192 key:', stem);
-        }
+        soloPics[stem] = URL.createObjectURL(blob);   /* instant — no base64 encode */
+        _wlPopulateSingleSlot(stem);                  /* fill slot the moment it's ready */
+        console.log('[WL] Photo ready:', f.name, '\u2192 key:', stem);
       } catch(ep) {
         console.warn('[WL] Photo download failed:', f.name, ep.message);
       }
@@ -2873,14 +2881,20 @@ async function _wlRunSequence() {
   _wlInitSlots();
   _wlSetStatus('Initializing\u2026');
 
-  /* ── Actively load all 8 Solo Pics via Graph API (not via loadLogo poll) ── */
+  /* ── Kick off photo loading in background (fire-and-forget) ────────────
+     Photos populate individual slots in real-time via _wlPopulateSingleSlot
+     as each one arrives.  Bubble formation runs on its own fixed schedule
+     so the sequence is never blocked by slow or failed photo downloads.   */
   try {
     const tok = await getToken();
-    await _wlLoadPhotos(tok);
+    _wlLoadPhotos(tok);   /* intentionally NOT awaited */
   } catch(eTok) {
-    console.warn('[WL] Photo load error:', eTok.message);
+    console.warn('[WL] Token error — photo load skipped:', eTok.message);
   }
-  _wlPopulateSlots();
+
+  /* ── Brief init pause (~1 s) then reveal formation ── */
+  await _wlWait(900);
+  _wlPopulateSlots();   /* capture any photos that finished during the pause  */
 
   /* ── Hide spinner, trigger organic bubble formation ── */
   const loadState = document.getElementById('wl-loading-state');
