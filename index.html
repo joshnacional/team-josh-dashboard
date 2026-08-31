@@ -2886,8 +2886,9 @@ function parseQuality(values) {
   const hi      = findHeaderRow(values);
   const headers = values[hi].map(h => h != null ? String(h).trim() : '');
 
-  const nameIdx = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
-  const rateIdx = findCol(headers, ['Quality Rating','Rating','Quality','Score']) ?? 1;
+  const nameIdx   = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
+  const rateIdx   = findCol(headers, ['Quality Rating','Rating','Quality','Score']) ?? 1;
+  const pseudoIdx = findCol(headers, ['CSS Pseudonames','Pseudonames','Pseudo']);  /* optional privacy column */
 
   const raw = [];
   for (let i = hi + 1; i < values.length; i++) {
@@ -2897,7 +2898,8 @@ function parseQuality(values) {
     const isNull = (rv === null || rv === undefined || rv === '');
     const rating = isNull ? null : parseNum(rv);
     const pct    = isNull ? 0    : Math.round(rating * 100 * 10) / 10;
-    raw.push({ name: String(row[nameIdx]), rating, pct });
+    const pseudo = (pseudoIdx != null && row[pseudoIdx]) ? String(row[pseudoIdx]).trim() : null;
+    raw.push({ name: String(row[nameIdx]), pseudo, rating, pct });
   }
 
   const all_null     = raw.every(r => r.rating === null);
@@ -3972,7 +3974,7 @@ function processData(D) {
 
   const ql   = D.quality;
   _lastQlSorted = ql.sorted;
-  const qLb  = ql.sorted.map(r => r.name);
+  const qLb  = ql.sorted.map(r => r.pseudo || QUALITY_PSEUDO[r.name] || r.name);  /* Quality-only pseudonym */
   const qPct = ql.sorted.map(r => r.pct);
   const qCol = ql.sorted.map(r => qlRatingColor(r.pct));
   const qMin = ql.all_null ? 0  : 70;
@@ -4015,6 +4017,22 @@ function processData(D) {
 /* ════════════════════════════════════════════════════════════════════════════
    SECTION 16 — HTML RENDERERS  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════════════
+   QUALITY PSEUDONYM MAP  — privacy display for Quality section only.
+   Priority: (1) "CSS Pseudonames" Excel column  (2) this JS map  (3) real name.
+   To activate via Excel: add column "CSS Pseudonames" to the Quality sheet,
+   immediately to the right of "CSS Name", and populate with the values below.
+════════════════════════════════════════════════════════════════════════════ */
+const QUALITY_PSEUDO = {
+  'Oliver Macaraig':   'Support 0018',
+  'Roanne Flores':     'Support 0138',
+  'Hart Cera':         'Support 0055',
+  'Rob De Mesa':       'Support 0284',
+  'Hannah Cachola':    'Support 0281',
+  'Dhean Ian Opong':   'Support 0263',
+  'Jay Thor Quinones': 'Support 0458'
+};
+
 const STATUS_STYLE = {
   Progressing:   { bg:'#A9B4BE', fg:'#1D2329' },   /* Grey 4  — matches MTD Avg legend */
   Successful:    { bg:'#5B738B', fg:'#FFFFFF' },   /* Grey 6  — matches MTD Avg legend */
