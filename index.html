@@ -6813,6 +6813,67 @@ function lpCloseDupWarning() {
   uiCloseOverlay('lp-dup-overlay');
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   UI TAP SOUND  (Web Audio API — no external assets)
+   Soft iOS-style tap synthesised on every interactive-control click.
+   Oscillator: sine  |  Sweep: 1100→700 Hz over 70 ms  |  Gain peak: 0.038
+════════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  var _ctx = null;
+
+  /* Lazy AudioContext — created on first real user click so browsers that
+     block autoplay never prevent the page from loading.                  */
+  function getCtx() {
+    if (!_ctx) {
+      try { _ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch (e) { return null; }
+    }
+    return _ctx;
+  }
+
+  /* Synthesise one 70 ms tap pulse.
+     A sine wave swept from 1100 Hz down to 700 Hz over the decay phase
+     gives the characteristic soft "tock" of a physical tap, rather than
+     a tone or beep.  Attack: 2 ms linear ramp.  Decay: exponential.    */
+  function tap() {
+    var ctx = getCtx();
+    if (!ctx) return;
+    try {
+      if (ctx.state === 'suspended') ctx.resume();
+      var now  = ctx.currentTime;
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1100, now);
+      osc.frequency.exponentialRampToValueAtTime(700, now + 0.07);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.038, now + 0.002);   /* 2 ms attack  */
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07); /* 70 ms decay */
+
+      osc.start(now);
+      osc.stop(now + 0.075);
+    } catch (e) {}
+  }
+
+  /* Single delegated listener covers every interactive dashboard control:
+       button        — tabs, header controls, all dialog buttons
+       .lp-day       — leave planner day cells (leave pills bubble up here)
+       th.caf-th-sort — CAF sortable column headers
+     closest() ensures one tap per physical click regardless of DOM depth. */
+  var SEL = 'button, .lp-day, th.caf-th-sort';
+
+  document.addEventListener('click', function (e) {
+    var hit = e.target.closest(SEL);
+    var db  = document.querySelector('.dashboard');
+    if (hit && db && db.contains(hit)) tap();
+  }, false);
+}());
+
 </script>
 </body>
 </html>
