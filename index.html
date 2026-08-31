@@ -81,8 +81,8 @@
 
 /* ── Dark mode ─────────────────────────────────────────────────────────────── */
 html[data-theme="dark"] {
-  --pg:    #0A111C;              /* UNCHANGED — outer page bg, floor             */
-  --db:    #10192A;              /* UNCHANGED — dashboard wrapper bg              */
+  --pg:    #475E75;              /* SAP Grey 7 (Grey 7) — LOCKED Dark Mode canvas  */
+  --db:    #475E75;              /* SAP Grey 7 (Grey 7) — LOCKED Dark Mode floor   */
   --cb:    #1C2A3E;              /* was #172030 — card/panel bg (+6 L pts)        */
   --ch:    #281E4E;              /* was #231845 — card heads, Indigo tint kept    */
   --ct:    #A8C4DC;              /* UNCHANGED                                     */
@@ -249,6 +249,10 @@ html.is-capturing :focus-visible{outline:none !important}
    on top of the watermark — no z-index needed on individual components     */
 .tab-section>*,
 .caf-dlg>*{position:relative}
+
+/* Dark mode: suppress decorative watermark — clean solid canvas             */
+html[data-theme="dark"] .tab-section::before,
+html[data-theme="dark"] .caf-dlg::before{opacity:0}
 
 /* Full Screen button */
 .btn-fullscreen{margin-left:4px}
