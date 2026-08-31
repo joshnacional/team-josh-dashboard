@@ -6814,9 +6814,11 @@ function lpCloseDupWarning() {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   UI TAP SOUND  (Web Audio API — no external assets)
-   Soft iOS-style tap synthesised on every interactive-control click.
-   Oscillator: sine  |  Sweep: 1100→700 Hz over 70 ms  |  Gain peak: 0.038
+   UI CLICK SOUND  (Web Audio API — no external assets)
+   Crisp button-press synthesised from two bandpass noise layers.
+   No pitch sweep, no oscillator tone — purely noise-based click.
+   Layer 1 — click transient : HP 600 Hz + LP 7 kHz, 25 ms decay, gain 0.50
+   Layer 2 — impact body     : LP 180 Hz,             12 ms decay, gain 0.40
 ════════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -6832,39 +6834,61 @@ function lpCloseDupWarning() {
     return _ctx;
   }
 
-  /* Synthesise one 70 ms tap pulse.
-     A sine wave swept from 1100 Hz down to 700 Hz over the decay phase
-     gives the characteristic soft "tock" of a physical tap, rather than
-     a tone or beep.  Attack: 2 ms linear ramp.  Decay: exponential.    */
+  /* Build one buffer of white noise and return a configured source node. */
+  function noiseSource(ctx, durationSec) {
+    var sr  = ctx.sampleRate;
+    var len = Math.ceil(sr * durationSec);
+    var buf = ctx.createBuffer(1, len, sr);
+    var d   = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    var src = ctx.createBufferSource();
+    src.buffer = buf;
+    return src;
+  }
+
   function tap() {
     var ctx = getCtx();
     if (!ctx) return;
     try {
       if (ctx.state === 'suspended') ctx.resume();
-      var now  = ctx.currentTime;
-      var osc  = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+      var now = ctx.currentTime;
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1100, now);
-      osc.frequency.exponentialRampToValueAtTime(700, now + 0.07);
+      /* ── Layer 1: click transient — broadband snap (600 Hz–7 kHz) ──────
+         High-pass removes low rumble; low-pass softens harsh top-end.
+         0.8 ms attack, 25 ms exponential decay.  Gain peak: 0.50          */
+      var s1 = noiseSource(ctx, 0.040);
+      var hp = ctx.createBiquadFilter();
+      hp.type = 'highpass'; hp.frequency.value = 600; hp.Q.value = 0.7;
+      var lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';  lp.frequency.value = 7000; lp.Q.value = 0.7;
+      var g1 = ctx.createGain();
+      g1.gain.setValueAtTime(0.001, now);
+      g1.gain.linearRampToValueAtTime(0.50,  now + 0.0008); /* 0.8 ms attack */
+      g1.gain.exponentialRampToValueAtTime(0.001, now + 0.025); /* 25 ms decay  */
+      s1.connect(hp); hp.connect(lp); lp.connect(g1); g1.connect(ctx.destination);
+      s1.start(now); s1.stop(now + 0.040);
 
-      gain.gain.setValueAtTime(0.001, now);
-      gain.gain.linearRampToValueAtTime(0.038, now + 0.002);   /* 2 ms attack  */
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07); /* 70 ms decay */
+      /* ── Layer 2: impact body — low-frequency thud (< 180 Hz) ───────────
+         Gives the sound physical weight without pitch/tone character.
+         0.8 ms attack, 12 ms exponential decay.  Gain peak: 0.40          */
+      var s2 = noiseSource(ctx, 0.025);
+      var lp2 = ctx.createBiquadFilter();
+      lp2.type = 'lowpass'; lp2.frequency.value = 180; lp2.Q.value = 0.6;
+      var g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0.001, now);
+      g2.gain.linearRampToValueAtTime(0.40,  now + 0.0008); /* 0.8 ms attack */
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.012); /* 12 ms decay  */
+      s2.connect(lp2); lp2.connect(g2); g2.connect(ctx.destination);
+      s2.start(now); s2.stop(now + 0.025);
 
-      osc.start(now);
-      osc.stop(now + 0.075);
     } catch (e) {}
   }
 
   /* Single delegated listener covers every interactive dashboard control:
-       button        — tabs, header controls, all dialog buttons
-       .lp-day       — leave planner day cells (leave pills bubble up here)
+       button         — tabs, header controls, all dialog buttons
+       .lp-day        — leave planner day cells (leave pills bubble up here)
        th.caf-th-sort — CAF sortable column headers
-     closest() ensures one tap per physical click regardless of DOM depth. */
+     closest() ensures one click fires one tap, regardless of DOM depth.  */
   var SEL = 'button, .lp-day, th.caf-th-sort';
 
   document.addEventListener('click', function (e) {
