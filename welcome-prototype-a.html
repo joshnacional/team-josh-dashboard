@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Josh — Welcome Prototype A (JARVIS Wake-Up)</title>
+<style>
+/* ═══════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #07090F;
+  --indigo:   #5D36FF;
+  --indigo2:  #7858FF;
+  --indigo3:  #241850;
+  --text:     #FFFFFF;
+  --text2:    rgba(255,255,255,0.65);
+  --text3:    rgba(255,255,255,0.35);
+  --glow:     rgba(93,54,255,0.22);
+}
+
+body {
+  font-family: '72 Brand','72','Segoe UI',system-ui,sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Subtle grid overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(93,54,255,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(93,54,255,0.028) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════════════ */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 2;
+  transition: opacity 0.45s ease;
+}
+.screen.hidden { opacity: 0; pointer-events: none; }
+
+/* ═══════════════════════════════════════════════════
+   PROTOTYPE BADGE
+═══════════════════════════════════════════════════ */
+#proto-badge {
+  position: fixed; top: 18px; left: 22px;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.9px; text-transform: uppercase;
+  color: var(--indigo);
+  background: rgba(93,54,255,0.10);
+  border: 1px solid rgba(93,54,255,0.28);
+  border-radius: 6px; padding: 5px 11px;
+  z-index: 100;
+}
+
+/* Replay button — top-right */
+#btn-replay-top {
+  position: fixed; top: 15px; right: 22px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.4px;
+  color: var(--text3); background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px; padding: 5px 12px;
+  cursor: pointer; font-family: inherit;
+  transition: color 0.18s, border-color 0.18s;
+  z-index: 100; display: none;
+}
+#btn-replay-top:hover { color: var(--text2); border-color: rgba(255,255,255,0.28); }
+
+/* ═══════════════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════════════ */
+#screen-auth { z-index: 10; }
+
+.auth-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  padding: 44px 40px 36px;
+  max-width: 360px; width: 90%;
+  text-align: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+}
+
+.auth-logo-wrap { height: 56px; margin-bottom: 26px; display: flex; align-items: center; justify-content: center; }
+.auth-logo      { height: 56px; max-width: 200px; object-fit: contain; }
+.auth-logo-text { font-size: 20px; font-weight: 700; color: var(--indigo); letter-spacing: 0.5px; }
+
+.auth-title { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+.auth-sub   { font-size: 12.5px; color: var(--text2); line-height: 1.65; margin-bottom: 28px; }
+
+.auth-variant {
+  display: inline-block; margin-bottom: 22px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.9px;
+  text-transform: uppercase; color: var(--indigo);
+  background: rgba(93,54,255,0.12);
+  border: 1px solid rgba(93,54,255,0.25);
+  border-radius: 5px; padding: 4px 9px;
+}
+
+.btn-signin {
+  width: 100%; background: var(--indigo); color: #fff;
+  border: none; border-radius: 10px;
+  padding: 13px 24px; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; letter-spacing: 0.15px;
+  transition: background 0.18s, transform 0.12s;
+  font-family: inherit;
+}
+.btn-signin:hover   { background: var(--indigo2); transform: translateY(-1px); }
+.btn-signin:active  { transform: translateY(0); }
+.btn-signin:disabled{ opacity: 0.55; cursor: default; transform: none; }
+
+.auth-err { margin-top: 14px; font-size: 11.5px; color: #E05555; line-height: 1.5; min-height: 18px; }
+
+/* ═══════════════════════════════════════════════════
+   LOADING SCREEN
+═══════════════════════════════════════════════════ */
+#screen-loading { z-index: 8; gap: 16px; }
+
+.spin-ring {
+  width: 52px; height: 52px;
+  border: 2px solid rgba(93,54,255,0.18);
+  border-top-color: var(--indigo);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 12.5px; color: var(--text2); letter-spacing: 0.3px; }
+
+/* ═══════════════════════════════════════════════════
+   SEQUENCE SCREEN
+═══════════════════════════════════════════════════ */
+#screen-sequence { z-index: 6; }
+
+/* Ambient glow behind photo */
+.glow-ring {
+  position: absolute;
+  width: 380px; height: 380px; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(93,54,255,0.14) 0%, transparent 68%);
+  animation: glowPulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes glowPulse {
+  0%,100% { transform: scale(1.00); opacity: 0.7; }
+  50%      { transform: scale(1.12); opacity: 0.4; }
+}
+
+/* Photo circle */
+.photo-ring {
+  position: relative;
+  width: 256px; height: 256px; border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(93,54,255,0.55);
+  box-shadow: 0 0 36px rgba(93,54,255,0.22), 0 0 72px rgba(93,54,255,0.09);
+  background: var(--indigo3);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.photo-ring img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block;
+}
+
+.photo-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(140deg, #1A1038 0%, #3D20A8 100%);
+  font-size: 88px; font-weight: 700;
+  color: rgba(255,255,255,0.60);
+}
+
+/* Scan line overlay */
+.scan-line {
+  position: absolute; left: 0; top: -3px;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, transparent 0%, rgba(93,54,255,0.75) 40%, rgba(180,150,255,0.85) 50%, rgba(93,54,255,0.75) 60%, transparent 100%);
+  opacity: 0; z-index: 10; pointer-events: none;
+}
+.scan-line.active { animation: scanDown 0.65s ease-in-out forwards; }
+@keyframes scanDown {
+  0%   { top: -3px; opacity: 0.95; }
+  80%  { top: 102%; opacity: 0.55; }
+  100% { top: 102%; opacity: 0; }
+}
+
+/* Stage wrapper (animated as a unit) */
+.stage { display: flex; flex-direction: column; align-items: center; position: relative; }
+
+/* Member name */
+.member-name {
+  margin-top: 22px;
+  font-size: 17px; font-weight: 600;
+  letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--text); text-align: center; height: 26px;
+}
+
+/* Progress dots */
+.prog-dots { display: flex; gap: 8px; margin-top: 28px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.28s, transform 0.28s;
+}
+.dot.active { background: var(--indigo); transform: scale(1.5); }
+.dot.done   { background: rgba(93,54,255,0.40); }
+
+/* Bottom status */
+.seq-status {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  font-size: 10.5px; color: var(--text3); letter-spacing: 1px;
+  text-transform: uppercase; white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════
+   LOGO SCREEN
+═══════════════════════════════════════════════════ */
+#screen-logo { z-index: 7; flex-direction: column; gap: 0; }
+
+.logo-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.logo-img       { height: 80px; max-width: 280px; object-fit: contain;
+                  filter: drop-shadow(0 0 22px rgba(93,54,255,0.30)); }
+.logo-text-fb   { font-size: 26px; font-weight: 700; color: var(--indigo); letter-spacing: 0.8px; }
+
+.voice-status   {
+  margin-top: 28px; font-size: 11px; color: var(--text3);
+  letter-spacing: 0.6px; height: 18px; text-align: center;
+  transition: color 0.3s;
+}
+
+/* Waveform bars shown while voice plays */
+.wave-wrap { display: flex; gap: 3px; align-items: center; margin-top: 18px; height: 20px; }
+.wave-bar  {
+  width: 3px; border-radius: 2px; background: rgba(93,54,255,0.55);
+  animation: waveAnim 0.9s ease-in-out infinite;
+}
+.wave-bar:nth-child(1) { animation-delay: 0s;    animation-duration: 0.80s; }
+.wave-bar:nth-child(2) { animation-delay: 0.12s; animation-duration: 0.90s; }
+.wave-bar:nth-child(3) { animation-delay: 0.24s; animation-duration: 0.75s; }
+.wave-bar:nth-child(4) { animation-delay: 0.08s; animation-duration: 1.00s; }
+.wave-bar:nth-child(5) { animation-delay: 0.20s; animation-duration: 0.85s; }
+@keyframes waveAnim {
+  0%,100% { height: 4px;  opacity: 0.5; }
+  50%      { height: 18px; opacity: 1.0; }
+}
+.wave-wrap.hidden { display: none; }
+
+/* ═══════════════════════════════════════════════════
+   COMPLETE SCREEN
+═══════════════════════════════════════════════════ */
+#screen-complete { z-index: 9; gap: 18px; }
+.complete-msg  { font-size: 14px; color: var(--text2); letter-spacing: 0.2px; }
+.btn-replay {
+  background: transparent; color: var(--indigo);
+  border: 1.5px solid rgba(93,54,255,0.45);
+  border-radius: 9px; padding: 11px 28px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.3px;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.18s, border-color 0.18s;
+}
+.btn-replay:hover { background: rgba(93,54,255,0.10); border-color: var(--indigo); }
+</style>
+</head>
+<body>
+
+<!-- Prototype badge -->
+<div id="proto-badge">Prototype A &mdash; JARVIS Wake-Up</div>
+<button id="btn-replay-top" onclick="replay()">Replay</button>
+
+<!-- ════ AUTH ════════════════════════════════════ -->
+<div class="screen" id="screen-auth">
+  <div class="auth-card">
+    <div class="auth-logo-wrap">
+      <img id="auth-logo" class="auth-logo" src="" alt="Team Josh" style="display:none">
+      <span id="auth-logo-text" class="auth-logo-text">TEAM JOSH</span>
+    </div>
+    <div class="auth-title">Executive Dashboard</div>
+    <div class="auth-sub">Welcome experience prototype.<br>Sign in to begin the sequence.</div>
+    <div class="auth-variant">Prototype A &mdash; JARVIS Wake-Up</div>
+    <button class="btn-signin" id="btn-signin" onclick="doSignIn()">Sign in with Microsoft 365</button>
+    <div class="auth-err" id="auth-err"></div>
+  </div>
+</div>
+
+<!-- ════ LOADING ══════════════════════════════════ -->
+<div class="screen hidden" id="screen-loading">
+  <div class="spin-ring"></div>
+  <div class="loading-text" id="loading-text">Loading team photos&hellip;</div>
+</div>
+
+<!-- ════ SEQUENCE ════════════════════════════════ -->
+<div class="screen hidden" id="screen-sequence">
+  <div class="glow-ring"></div>
+  <div class="stage" id="stage">
+    <div class="photo-ring" id="photo-ring">
+      <div class="photo-placeholder" id="photo-ph"></div>
+      <img id="photo-img" alt="" style="opacity:0">
+      <div class="scan-line" id="scan-line"></div>
+    </div>
+    <div class="member-name" id="member-name"></div>
+    <div class="prog-dots" id="prog-dots"></div>
+  </div>
+  <div class="seq-status" id="seq-status">Initializing&hellip;</div>
+</div>
+
+<!-- ════ LOGO ═════════════════════════════════════ -->
+<div class="screen hidden" id="screen-logo">
+  <div class="logo-wrap" id="logo-wrap">
+    <img id="logo-img" class="logo-img" src="" alt="Team Josh" style="display:none">
+    <div id="logo-text-fb" class="logo-text-fb" style="display:none">TEAM JOSH</div>
+    <div class="wave-wrap hidden" id="wave-wrap">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+    <div class="voice-status" id="voice-status"></div>
+  </div>
+</div>
+
+<!-- ════ COMPLETE ════════════════════════════════ -->
+<div class="screen hidden" id="screen-complete">
+  <div class="complete-msg">Welcome sequence complete.</div>
+  <button class="btn-replay" onclick="replay()">Replay Sequence</button>
+</div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════ */
+const CLIENT_ID  = '4358753a-4b60-47a0-a98d-b8d7e22b7f64';
+const TENANT     = '42f7676c-f455-423c-82f6-dc2d99791af7';
+const SHARE_URL  = 'https://sap-my.sharepoint.com/:x:/p/josh_nacional/IQDg9mOkBuWLQKBnUxtI20A6ASMJLnVpsNN-m06cXWLfLx8';
+const SCOPES     = ['Files.ReadWrite.All'];
+const AUTHORITY  = 'https://login.microsoftonline.com/' + TENANT;
+const GRAPH      = 'https://graph.microsoft.com/v1.0';
+const MEMBERS    = ['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor'];
+
+/* ── Sequence timing (ms) ── */
+const T_STAGGER     = 540;   /* ms between member start times        */
+const T_FADE_IN     = 220;   /* ms photo fades in                    */
+const T_HOLD        = 400;   /* ms photo is fully visible            */
+const T_FADE_OUT    = 200;   /* ms photo fades out                   */
+const T_LOGO_DELAY  = 280;   /* ms after last member before logo     */
+const T_LOGO_HOLD   = 600;   /* ms logo is visible before voice      */
+const T_VOICE_GAP   = 320;   /* ms silence between logo and voice    */
+const T_AFTER_VOICE = 550;   /* ms after voice before complete       */
+
+/* ═══════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════ */
+let _token   = null;
+let _driveId = null;
+let _itemId  = null;
+let _photos  = {};     /* { memberName: dataUrl } */
+let _logoUrl = null;
+let _running = false;
+let _voices  = null;
+
+/* ═══════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════ */
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/* ═══════════════════════════════════════════════════════
+   PKCE AUTH
+═══════════════════════════════════════════════════════ */
+function b64u(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+async function makePkce() {
+  const v = b64u(crypto.getRandomValues(new Uint8Array(32)));
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+  return { v, c: b64u(d) };
+}
+const rnd = () => b64u(crypto.getRandomValues(new Uint8Array(16)));
+
+function saveTk(d) {
+  sessionStorage.setItem('tj_at',  d.access_token  || '');
+  if (d.refresh_token) sessionStorage.setItem('tj_rt', d.refresh_token);
+  sessionStorage.setItem('tj_exp', String(Date.now() + (d.expires_in||3600)*1000));
+}
+const getAt   = () => sessionStorage.getItem('tj_at') || '';
+const getRt   = () => sessionStorage.getItem('tj_rt') || '';
+const isValid = () => !!getAt() && Date.now() < parseInt(sessionStorage.getItem('tj_exp')||'0') - 60000;
+
+async function postToken(body) {
+  const r = await fetch(AUTHORITY + '/oauth2/v2.0/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(body)
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(() => ({}));
+    throw new Error(e.error_description || 'Token request failed: HTTP ' + r.status);
+  }
+  return r.json();
+}
+
+async function silentRefresh() {
+  const rt = getRt();
+  if (!rt) throw new Error('no_refresh_token');
+  const d = await postToken({
+    client_id: CLIENT_ID, grant_type: 'refresh_token',
+    refresh_token: rt, scope: SCOPES.join(' ') + ' openid profile offline_access'
+  });
+  saveTk(d); return d.access_token;
+}
+
+async function popupAuth() {
+  const kce   = await makePkce();
+  const state = rnd(), nonce = rnd();
+  const redir = window.location.origin +
+    window.location.pathname.split('/').slice(0, -1).join('/') + '/';
+
+  const qs = new URLSearchParams({
+    client_id: CLIENT_ID, response_type: 'code', redirect_uri: redir,
+    scope: SCOPES.join(' ') + ' openid profile offline_access',
+    state, nonce, code_challenge: kce.c, code_challenge_method: 'S256',
+    response_mode: 'query', prompt: 'select_account',
+  });
+
+  const popup = window.open(AUTHORITY + '/oauth2/v2.0/authorize?' + qs,
+    'tj_auth', 'width=520,height=640,menubar=no,toolbar=no,resizable=yes,scrollbars=yes,left=200,top=80');
+  if (!popup) throw new Error('Popup blocked — please allow popups from this site, then try again.');
+
+  const code = await new Promise((resolve, reject) => {
+    const timer = setInterval(() => {
+      if (popup.closed) { clearInterval(timer); reject(new Error('Sign-in popup was closed.')); return; }
+      try {
+        const href = popup.location.href;
+        if (href && href.startsWith(window.location.origin)) {
+          clearInterval(timer);
+          const u = new URL(href);
+          popup.close();
+          if (u.searchParams.get('error')) { reject(new Error(u.searchParams.get('error_description') || u.searchParams.get('error'))); return; }
+          if (u.searchParams.get('state') !== state) { reject(new Error('Auth state mismatch.')); return; }
+          resolve(u.searchParams.get('code'));
+        }
+      } catch(e) { /* still cross-origin */ }
+    }, 200);
+    setTimeout(() => { clearInterval(timer); if (!popup.closed) popup.close(); reject(new Error('Sign-in timed out.')); }, 300000);
+  });
+
+  const d = await postToken({
+    client_id: CLIENT_ID, grant_type: 'authorization_code',
+    code, redirect_uri: redir, code_verifier: kce.v,
+    scope: SCOPES.join(' ') + ' openid profile offline_access',
+  });
+  saveTk(d); _token = d.access_token;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRAPH HELPERS
+═══════════════════════════════════════════════════════ */
+async function gGet(path) {
+  const r = await fetch(GRAPH + path, {
+    headers: { 'Authorization': 'Bearer ' + _token, 'Accept': 'application/json' }
+  });
+  if (!r.ok) throw new Error('Graph ' + r.status + ' on ' + path);
+  return r.json();
+}
+async function gBlob(path) {
+  const r = await fetch(GRAPH + path, { headers: { 'Authorization': 'Bearer ' + _token } });
+  if (!r.ok) throw new Error('Graph blob ' + r.status);
+  return r.blob();
+}
+const blobToDataUrl = blob => new Promise(res => {
+  const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(blob);
+});
+
+async function resolveExcel() {
+  if (_driveId && _itemId) return;
+  const enc  = btoa(SHARE_URL).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const item = await gGet('/shares/u!' + enc + '/driveItem?$select=id,parentReference');
+  _driveId = item.parentReference.driveId;
+  _itemId  = item.id;
+}
+
+/* Navigate: Excel → data folder → A_EKX root → list, then find Solo Pics & Logos */
+async function loadAssets() {
+  setLoading('Connecting to OneDrive\u2026');
+  await resolveExcel();
+
+  setLoading('Navigating to project folder\u2026');
+  const exMeta  = await gGet('/drives/' + _driveId + '/items/' + _itemId  + '?$select=parentReference');
+  const dfMeta  = await gGet('/drives/' + _driveId + '/items/' + exMeta.parentReference.id + '?$select=parentReference');
+  const rootId  = dfMeta.parentReference.id;
+  const rootR   = await gGet('/drives/' + _driveId + '/items/' + rootId + '/children?$select=id,name');
+  const root    = rootR.value || [];
+
+  /* ── Load Team Josh logo ── */
+  setLoading('Loading Team Josh logo\u2026');
+  _logoUrl = localStorage.getItem('tj_cached_logo') || null;
+  const logosF = root.find(f => f.name === 'Logos');
+  if (logosF) {
+    try {
+      const lr = await gGet('/drives/' + _driveId + '/items/' + logosF.id + '/children?$select=id,name');
+      const li = (lr.value || []).find(f => f.name === 'Team Josh Aqua Logo.png');
+      if (li) {
+        const blob = await gBlob('/drives/' + _driveId + '/items/' + li.id + '/content');
+        _logoUrl = await blobToDataUrl(blob);
+        try { localStorage.setItem('tj_cached_logo', _logoUrl); } catch(e) {}
+      }
+    } catch(e) { console.warn('[Logo]', e.message); }
+  }
+
+  /* ── Load Solo Pics ── */
+  const spF = root.find(f => f.name === 'Solo Pics');
+  if (!spF) { console.warn('[SoloPics] Folder not found.'); return; }
+
+  const spR   = await gGet('/drives/' + _driveId + '/items/' + spF.id + '/children?$select=id,name');
+  const items = (spR.value || []).filter(f => /\.(png|jpg|jpeg)$/i.test(f.name));
+
+  if (items.length === 0) { console.warn('[SoloPics] No image files found.'); return; }
+
+  setLoading('Loading team photos\u2026');
+  let n = 0;
+  await Promise.all(items.map(async f => {
+    const name = f.name.replace(/\.(png|jpg|jpeg)$/i, '');
+    try {
+      const blob = await gBlob('/drives/' + _driveId + '/items/' + f.id + '/content');
+      _photos[name] = await blobToDataUrl(blob);
+      n++;
+      setLoading('Loading team photos (' + n + '\u202F/\u202F' + items.length + ')\u2026');
+    } catch(e) { console.warn('[SoloPics] Failed:', f.name, e.message); }
+  }));
+  console.log('[SoloPics]', n, 'photo(s) loaded from', items.length, 'files.');
+}
+
+/* ═══════════════════════════════════════════════════════
+   AUDIO HELPERS
+═══════════════════════════════════════════════════════ */
+let _actx = null;
+function actx() {
+  if (!_actx || _actx.state === 'closed')
+    _actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_actx.state === 'suspended') _actx.resume();
+  return _actx;
+}
+function mkOsc(c, f) { const o = c.createOscillator(); o.type='sine'; o.frequency.value=f; return o; }
+function mkEnv(c, now, delay, peak, atk, hold, dec) {
+  const g = c.createGain(), t = now + (delay||0);
+  g.gain.setValueAtTime(0.001, now);
+  if ((delay||0)>0) g.gain.setValueAtTime(0.001, t);
+  g.gain.linearRampToValueAtTime(peak, t+atk);
+  if ((hold||0)>0) g.gain.setValueAtTime(peak, t+atk+hold);
+  g.gain.exponentialRampToValueAtTime(0.001, t+atk+(hold||0)+dec);
+  return g;
+}
+function mkChain(src, stopAt, nodes, dest) {
+  let p = src;
+  nodes.forEach(n => { p.connect(n); p = n; });
+  p.connect(dest); src.start(); src.stop(stopAt);
+}
+function mkPulses(g, t0, count, interval, peak, atk, dec) {
+  g.gain.setValueAtTime(0.001, t0 - 0.001);
+  for (let i=0; i<count; i++) {
+    const t = t0 + i * interval;
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.linearRampToValueAtTime(peak, t+atk);
+    g.gain.exponentialRampToValueAtTime(0.001, t+atk+dec);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   WELCOME SOUND — VARIANT A: JARVIS WAKE-UP
+   Six rapid amplitude pulses (440 Hz diagnostic phase)
+   → smooth 3-part chord blooms (330/440/660 Hz).
+   Duration: ~2.25 s
+═══════════════════════════════════════════════════════ */
+function playWelcomeSound() {
+  const c = actx(), n = c.currentTime, end = n + 2.30;
+
+  /* Phase 1 — rapid diagnostic pulses on 440 Hz */
+  const pOsc  = mkOsc(c, 440);
+  const pGain = c.createGain();
+  pOsc.connect(pGain); pGain.connect(c.destination);
+  pOsc.start(n); pOsc.stop(n + 1.15);
+  mkPulses(pGain, n, 6, 0.175, 0.18, 0.035, 0.105);
+
+  /* Phase 2 — smooth resolution chord at t = 1.15 s */
+  [{f:330,pk:0.15},{f:440,pk:0.16},{f:660,pk:0.12}].forEach(ch => {
+    const o = mkOsc(c, ch.f);
+    const g = mkEnv(c, n, 1.15, ch.pk, 0.20, 0.30, 0.48);
+    mkChain(o, end, [g], c.destination);
+  });
+}
+const SOUND_DURATION_MS = 2250;  /* approximate; used for status display only */
+
+/* ═══════════════════════════════════════════════════════
+   CLICK SOUND (soft tap for button feedback)
+═══════════════════════════════════════════════════════ */
+function playClick() {
+  const c = actx(), n = c.currentTime;
+  const ns = (function() {
+    const b   = c.createBuffer(1, Math.ceil(c.sampleRate * 0.035), c.sampleRate);
+    const d   = b.getChannelData(0);
+    for (let i=0; i<d.length; i++) d[i] = Math.random()*2-1;
+    const s = c.createBufferSource(); s.buffer = b; return s;
+  })();
+  const bp = c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=450; bp.Q.value=1.2;
+  const g  = c.createGain();
+  g.gain.setValueAtTime(0.001, n);
+  g.gain.linearRampToValueAtTime(0.07, n+0.0008);
+  g.gain.exponentialRampToValueAtTime(0.001, n+0.022);
+  ns.connect(bp); bp.connect(g); g.connect(c.destination);
+  ns.start(n); ns.stop(n+0.035);
+}
+
+/* ═══════════════════════════════════════════════════════
+   VOICE SYNTHESIS (Web Speech API)
+═══════════════════════════════════════════════════════ */
+async function preloadVoices() {
+  if (!window.speechSynthesis) return;
+  _voices = speechSynthesis.getVoices();
+  if (_voices.length === 0) {
+    await new Promise(res => {
+      const t = setTimeout(() => { _voices = speechSynthesis.getVoices(); res(); }, 1800);
+      speechSynthesis.onvoiceschanged = () => { clearTimeout(t); _voices = speechSynthesis.getVoices(); res(); };
+    });
+  }
+}
+
+function pickVoice(voices) {
+  /* Priority: UK male voices first, then US male, then any en */
+  const want = [
+    'Google UK English Male',
+    'Daniel',                                /* Apple en-GB */
+    'Microsoft George Online (Natural) - English (United Kingdom)',
+    'Microsoft George - English (United Kingdom)',
+    'Microsoft Mark Online (Natural) - English (United States)',
+    'Microsoft David Online (Natural) - English (United States)',
+    'Microsoft David Desktop - English (United States)',
+    'Microsoft David - English (United States)',
+    'Alex',                                  /* macOS */
+    'Fred',
+  ];
+  for (const name of want) {
+    const v = voices.find(v => v.name === name);
+    if (v) return v;
+  }
+  /* Fallback: prefer en-GB, then en-US */
+  return voices.find(v => v.lang === 'en-GB')
+      || voices.find(v => v.lang === 'en-US')
+      || voices.find(v => v.lang.startsWith('en'))
+      || null;
+}
+
+function speakWelcome() {
+  return new Promise(resolve => {
+    if (!window.speechSynthesis) { resolve(); return; }
+    speechSynthesis.cancel();
+    const voices  = _voices && _voices.length ? _voices : speechSynthesis.getVoices();
+    const utt     = new SpeechSynthesisUtterance('Welcome to Team Josh Executive Dashboard.');
+    const voice   = pickVoice(voices || []);
+    if (voice) utt.voice = voice;
+    utt.rate   = 0.87;   /* deliberate, measured pace */
+    utt.pitch  = 0.80;   /* slightly deeper            */
+    utt.volume = 0.82;
+    utt.onend  = resolve;
+    utt.onerror= resolve;
+    speechSynthesis.speak(utt);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════════════════════ */
+function showScreen(id) {
+  ['screen-auth','screen-loading','screen-sequence','screen-logo','screen-complete']
+    .forEach(s => {
+      const el = document.getElementById(s);
+      if (s === id) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    });
+}
+const setLoading  = t => { const el=document.getElementById('loading-text'); if(el) el.textContent=t; };
+const setSeqStat  = t => { const el=document.getElementById('seq-status');   if(el) el.textContent=t; };
+const setMemberNm = t => { const el=document.getElementById('member-name'); if(el) el.textContent=t; };
+
+function buildDots() {
+  const wrap = document.getElementById('prog-dots');
+  if (!wrap) return;
+  wrap.innerHTML = MEMBERS.map((_,i) =>
+    '<div class="dot" id="dot-' + i + '"></div>'
+  ).join('');
+}
+function setDot(idx) {
+  MEMBERS.forEach((_,i) => {
+    const d = document.getElementById('dot-' + i);
+    if (!d) return;
+    d.className = 'dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   MEMBER DISPLAY
+═══════════════════════════════════════════════════════ */
+function setMemberContent(name, photoUrl) {
+  const ph  = document.getElementById('photo-ph');
+  const img = document.getElementById('photo-img');
+  if (photoUrl) {
+    img.src     = photoUrl;
+    img.style.opacity = '1';
+    ph.style.display  = 'none';
+  } else {
+    img.style.opacity = '0';
+    ph.style.display  = 'flex';
+    ph.textContent    = name.charAt(0).toUpperCase();
+  }
+  setMemberNm(name);
+}
+
+async function triggerScan() {
+  const sl = document.getElementById('scan-line');
+  if (!sl) return;
+  sl.classList.remove('active');
+  void sl.offsetWidth;   /* reflow to restart animation */
+  sl.classList.add('active');
+}
+
+async function showMember(idx) {
+  const name     = MEMBERS[idx];
+  const photoUrl = _photos[name] || null;
+  const stage    = document.getElementById('stage');
+
+  /* --- Fade in --- */
+  stage.style.transition = 'none';
+  stage.style.opacity    = '0';
+  stage.style.transform  = 'scale(0.88)';
+  setMemberContent(name, photoUrl);
+  setDot(idx);
+  await wait(12);   /* allow browser to apply opacity:0 */
+
+  stage.style.transition = 'opacity ' + T_FADE_IN + 'ms ease, transform ' + (T_FADE_IN + 60) + 'ms cubic-bezier(0.16,1,0.3,1)';
+  stage.style.opacity    = '1';
+  stage.style.transform  = 'scale(1)';
+  triggerScan();
+  await wait(T_FADE_IN);
+
+  /* --- Hold --- */
+  await wait(T_HOLD);
+
+  /* --- Fade out --- */
+  stage.style.transition = 'opacity ' + T_FADE_OUT + 'ms ease-in, transform ' + T_FADE_OUT + 'ms ease-in';
+  stage.style.opacity    = '0';
+  stage.style.transform  = 'scale(1.05)';
+  await wait(T_FADE_OUT);
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOGO REVEAL
+═══════════════════════════════════════════════════════ */
+function applyLogo() {
+  const img = document.getElementById('logo-img');
+  const txt = document.getElementById('logo-text-fb');
+  if (_logoUrl) {
+    img.src = _logoUrl; img.style.display = 'block';
+    txt.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    txt.style.display = 'block';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FULL SEQUENCE
+═══════════════════════════════════════════════════════ */
+async function runSequence() {
+  if (_running) return;
+  _running = true;
+
+  /* ── Reset stage ── */
+  const stage = document.getElementById('stage');
+  stage.style.opacity   = '0';
+  stage.style.transform = 'scale(1)';
+  stage.style.transition= 'none';
+  buildDots();
+  showScreen('sequence');
+
+  /* ── Play welcome sound immediately ── */
+  setSeqStat('System initializing\u2026');
+  playWelcomeSound();
+  await wait(60);   /* tiny gap so audio context is warm */
+
+  /* ── Stagger members with overlap timing ── */
+  for (let i = 0; i < MEMBERS.length; i++) {
+    setSeqStat('Loading module ' + (i+1) + ' of ' + MEMBERS.length);
+    /* Start showing this member; next iteration starts after T_STAGGER,
+       which overlaps with this member's fade-out intentionally */
+    const memberPromise = showMember(i);
+    if (i < MEMBERS.length - 1) {
+      /* Wait T_STAGGER then start next member (cross-fade overlap) */
+      await wait(T_STAGGER);
+    } else {
+      /* Last member — wait for it to fully finish */
+      await memberPromise;
+    }
+  }
+
+  /* ── After final member ── */
+  setSeqStat('System ready');
+  await wait(T_LOGO_DELAY);
+
+  /* ── Logo screen ── */
+  applyLogo();
+  document.getElementById('voice-status').textContent = '';
+  document.getElementById('wave-wrap').classList.add('hidden');
+  showScreen('logo');
+  await wait(T_LOGO_HOLD);
+
+  /* ── Voice ── */
+  await wait(T_VOICE_GAP);
+  document.getElementById('voice-status').textContent = 'AI voice online';
+  document.getElementById('wave-wrap').classList.remove('hidden');
+  await speakWelcome();
+
+  document.getElementById('wave-wrap').classList.add('hidden');
+  document.getElementById('voice-status').textContent = 'Dashboard ready.';
+  await wait(T_AFTER_VOICE);
+
+  /* ── Complete ── */
+  showScreen('complete');
+  document.getElementById('btn-replay-top').style.display = 'block';
+  _running = false;
+}
+
+/* ═══════════════════════════════════════════════════════
+   REPLAY
+═══════════════════════════════════════════════════════ */
+function replay() {
+  playClick();
+  if (_running) return;
+  document.getElementById('btn-replay-top').style.display = 'none';
+  runSequence();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIGN-IN HANDLER
+═══════════════════════════════════════════════════════ */
+async function doSignIn() {
+  playClick();
+  const btn = document.getElementById('btn-signin');
+  const err = document.getElementById('auth-err');
+  btn.disabled = true; btn.textContent = 'Signing in\u2026'; err.textContent = '';
+  try {
+    await popupAuth();
+    showScreen('loading');
+    await loadAssets();
+    await runSequence();
+  } catch(e) {
+    console.error('[Auth/Load]', e);
+    err.textContent = e.message || 'An unexpected error occurred.';
+    showScreen('auth');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign in with Microsoft 365';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  /* Pre-warm voice list so it is ready by the time we need it */
+  preloadVoices();
+
+  /* Restore cached logo for the auth screen */
+  const cached = localStorage.getItem('tj_cached_logo');
+  if (cached) {
+    const img  = document.getElementById('auth-logo');
+    const span = document.getElementById('auth-logo-text');
+    img.src            = cached;
+    img.style.display  = 'block';
+    span.style.display = 'none';
+    _logoUrl = cached;
+  }
+
+  /* If a valid token exists in this session, skip sign-in */
+  if (isValid()) {
+    _token = getAt();
+    showScreen('loading');
+    try {
+      await loadAssets();
+      await runSequence();
+    } catch(e) {
+      console.warn('[Init] Silent start failed:', e.message);
+      showScreen('auth');
+    }
+  } else {
+    showScreen('auth');
+  }
+});
+</script>
+</body>
+</html>
