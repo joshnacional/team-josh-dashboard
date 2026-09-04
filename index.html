@@ -225,6 +225,19 @@ body{
 html.is-capturing :focus,
 html.is-capturing :focus-visible{outline:none !important}
 
+/* During capture: suppress the SAP 3D background watermark (::before pseudo-
+   element) — it bleeds through at 20% opacity and creates a visible blurry
+   background artifact in the exported PNG.                                   */
+html.is-capturing .tab-section::before,
+html.is-capturing .caf-dlg::before{opacity:0 !important}
+
+/* During capture: hide emoji / Unicode icon characters inside header buttons.
+   html2canvas cannot render complex emoji (📷 🌙 ⛶) and draws them as
+   solid black boxes.  Hiding the spans removes the boxes; the button text
+   labels (Dark, Refresh Data, Screenshot, Full Screen) remain fully visible. */
+html.is-capturing .btn-icon,
+html.is-capturing #theme-icon{visibility:hidden}
+
 /* ════════════════════════════════════════════════════════════════════════════
    SAP 3D BACKGROUND WATERMARK
    Loaded dynamically from SharePoint (Logos/SAP 3D.jpg) and cached in
@@ -618,6 +631,91 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 .irt-tc-bar-fill{height:2px;border-radius:2px}
 
 /* ════════════════════════════════════════════════════════════════════════════
+   VIOLATION CASE REVIEW (VCR) SECTION
+════════════════════════════════════════════════════════════════════════════ */
+.vcr-section{padding:0 10px 10px}
+
+/* ── Summary cards ─── */
+.vcr-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+.vcr-sum-card{background:var(--ch);border-radius:8px;padding:8px 6px 7px;text-align:center;border-top:2px solid var(--cd);transition:background .25s,border-color .25s}
+.vcr-sum-lbl{font-size:7.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--cm);transition:color .25s}
+.vcr-sum-val{font-size:20px;font-weight:700;color:var(--ct);line-height:1.15;margin-top:2px;transition:color .25s}
+.vcr-sum-card[data-type="total"]{border-top-color:#5D36FF}
+.vcr-sum-card[data-type="pending"]{border-top-color:#E89700}
+.vcr-sum-card[data-type="valid"]{border-top-color:#D20A0A}
+.vcr-sum-card[data-type="disputed"]{border-top-color:#0070F2}
+.vcr-sum-card[data-type="invalid"]{border-top-color:#107E3E}
+
+/* ── Filters row ─── */
+.vcr-filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.vcr-filters select,.vcr-filters input{font-family:"72","72full",sans-serif;font-size:9.5px;padding:4px 8px;border:1px solid var(--cd);border-radius:6px;background:var(--cb);color:var(--ct);outline:none;transition:border-color .2s,background .25s,color .25s}
+.vcr-filters select:focus,.vcr-filters input:focus{border-color:#5D36FF}
+.vcr-filters input[type="text"]{width:160px}
+.vcr-filter-lbl{font-size:8px;font-weight:700;color:var(--cm);text-transform:uppercase;letter-spacing:.3px;margin-right:-2px}
+
+/* ── Table ─── */
+.vcr-table{width:100%;border-collapse:collapse;font-size:9.5px;table-layout:fixed}
+.vcr-table th{font-size:8px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--cm);padding:4px 5px;border-bottom:1.5px solid var(--cd);text-align:left;white-space:nowrap;transition:color .25s,border-color .25s}
+.vcr-table td{padding:4px 5px;border-bottom:1px solid var(--cg);vertical-align:middle;transition:border-color .25s;color:var(--ct);word-break:break-word}
+.vcr-table tr:hover td{background:var(--rh);transition:background .12s}
+.vcr-table tr:last-child td{border-bottom:none}
+.vcr-table .vcr-col-css{width:9%}
+.vcr-table .vcr-col-case{width:10%}
+.vcr-table .vcr-col-src{width:10%}
+.vcr-table .vcr-col-acct{width:18%}
+.vcr-table .vcr-col-subj{width:20%}
+.vcr-table .vcr-col-irt{width:5%;text-align:center}
+.vcr-table .vcr-col-ort{width:5%;text-align:center}
+.vcr-table .vcr-col-status{width:12%;text-align:center}
+.vcr-table .vcr-col-action{width:11%;text-align:center}
+
+/* ── Copy button ─── */
+.vcr-copy-btn{display:inline-flex;align-items:center;gap:2px;background:none;border:1px solid var(--cd);border-radius:4px;padding:1px 5px;font-family:"72","72full",sans-serif;font-size:9px;color:var(--ct);cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.vcr-copy-btn:hover{background:var(--ch);border-color:#5D36FF;color:#5D36FF}
+.vcr-copy-btn.copied{background:#107E3E;border-color:#107E3E;color:#fff}
+
+/* ── Review button ─── */
+.vcr-review-btn{display:inline-flex;align-items:center;gap:3px;background:#5D36FF;border:none;border-radius:5px;padding:3px 10px;font-family:"72","72full",sans-serif;font-size:8.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s}
+.vcr-review-btn:hover{background:#7858FF}
+.vcr-review-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── Status badges ─── */
+.vcr-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.vcr-badge-pending{background:#FFF3CD;color:#856404}
+.vcr-badge-valid{background:#FDDEDE;color:#BB0000}
+.vcr-badge-disputed{background:#E1F4FF;color:#0070F2}
+.vcr-badge-invalid{background:#D4EDDA;color:#107E3E}
+
+/* ── Pagination ─── */
+.vcr-pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;font-size:9px}
+.vcr-pg-btn{background:var(--ch);border:1px solid var(--cd);border-radius:5px;padding:3px 9px;font-family:"72","72full",sans-serif;font-size:9px;color:var(--ct);cursor:pointer;transition:background .15s,border-color .15s}
+.vcr-pg-btn:hover:not(:disabled){background:#5D36FF;color:#fff;border-color:#5D36FF}
+.vcr-pg-btn:disabled{opacity:.4;cursor:not-allowed}
+.vcr-pg-info{color:var(--cm);font-weight:600}
+
+/* ── Review Modal ─── */
+.vcr-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.vcr-modal-overlay.active{opacity:1;pointer-events:auto}
+.vcr-modal{background:var(--cb);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.22);padding:20px 24px;width:420px;max-width:92vw;max-height:88vh;overflow-y:auto;transform:translateY(20px);transition:transform .25s,background .25s}
+.vcr-modal-overlay.active .vcr-modal{transform:translateY(0)}
+.vcr-modal-title{font-size:13px;font-weight:700;color:var(--ct);margin-bottom:14px;transition:color .25s}
+.vcr-modal-field{margin-bottom:10px}
+.vcr-modal-field label{display:block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--cm);margin-bottom:2px;transition:color .25s}
+.vcr-modal-field .vcr-field-val{font-size:10px;color:var(--ct);padding:4px 0;transition:color .25s}
+.vcr-modal-radios{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.vcr-modal-radios label{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--ct);cursor:pointer;transition:color .25s}
+.vcr-modal-radios input[type="radio"]{accent-color:#5D36FF}
+.vcr-modal-reason{width:100%;min-height:60px;border:1px solid var(--cd);border-radius:6px;padding:6px 8px;font-family:"72","72full",sans-serif;font-size:9.5px;color:var(--ct);background:var(--cb);resize:vertical;transition:border-color .2s,background .25s,color .25s}
+.vcr-modal-reason:focus{border-color:#5D36FF;outline:none}
+.vcr-modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.vcr-modal-cancel{background:var(--ch);border:1px solid var(--cd);border-radius:6px;padding:5px 14px;font-family:"72","72full",sans-serif;font-size:9.5px;font-weight:600;color:var(--ct);cursor:pointer;transition:background .15s}
+.vcr-modal-cancel:hover{background:var(--cg)}
+.vcr-modal-submit{background:#5D36FF;border:none;border-radius:6px;padding:5px 14px;font-family:"72","72full",sans-serif;font-size:9.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s}
+.vcr-modal-submit:hover{background:#7858FF}
+.vcr-modal-submit:disabled{opacity:.5;cursor:not-allowed}
+.vcr-empty{text-align:center;color:var(--cm);padding:20px 0;font-size:10px;font-style:italic}
+
+/* ════════════════════════════════════════════════════════════════════════════
    FOOTER  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
 .footer{text-align:center;color:var(--cf);font-size:9.5px;padding:8px 0 4px;transition:color .25s}
@@ -815,6 +913,64 @@ html[data-theme="dark"] .tab-btn.active{
 .lp-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--cx);transition:color .25s}
 .lp-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .lp-leg-abbr{font-weight:700;font-size:10px;margin-right:1px}
+
+/* ── Monthly Summary ──────────────────────────────────────────────────────── */
+#lp-month-summary{margin-bottom:10px}
+.lp-sum-hdr{
+  font-size:9.5px;font-weight:700;color:var(--ct);letter-spacing:.4px;
+  text-transform:uppercase;margin-bottom:7px;transition:color .25s;
+}
+/* Side-by-side row: main tiles LEFT, member tiles RIGHT */
+.lp-sum-row{
+  display:flex;align-items:flex-start;gap:12px;
+}
+.lp-sum-main{
+  display:flex;flex-wrap:wrap;gap:7px;flex-shrink:0;
+}
+/* Change 3 – iOS-style hover, matching .caf-sum-card / .el-sum-card */
+.lp-sum-tile{
+  background:var(--ch);border:1px solid var(--cd);border-radius:8px;
+  padding:8px 13px 8px 12px;min-width:120px;flex:0 0 auto;
+  border-top:3px solid var(--accent,#0070F2);
+  box-shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03);
+  transition:background .25s,border-color .25s,box-shadow .25s,transform .15s ease;
+  will-change:transform;cursor:default;
+}
+.lp-sum-tile:hover{
+  transform:scale(1.025) translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.11),0 2px 6px rgba(0,0,0,.07);
+}
+.lp-sum-tile-val{
+  font-size:22px;font-weight:700;color:var(--ct);line-height:1;
+  margin-bottom:2px;transition:color .25s;
+}
+.lp-sum-tile-lbl{
+  font-size:9px;font-weight:600;color:var(--cm);letter-spacing:.35px;
+  text-transform:uppercase;transition:color .25s;
+}
+/* Member tiles — flex-wrap fills the right column */
+.lp-sum-members{
+  flex:1;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;
+}
+.lp-sum-member{
+  background:var(--ch);border:1px solid var(--cd);border-radius:7px;
+  padding:6px 10px;font-size:11px;
+  box-shadow:0 2px 8px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.03);
+  transition:background .25s,border-color .25s,box-shadow .25s,transform .15s ease;
+  will-change:transform;cursor:default;
+}
+.lp-sum-member:hover{
+  transform:scale(1.025) translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.11),0 2px 6px rgba(0,0,0,.07);
+}
+.lp-sum-member-name{
+  font-weight:700;color:var(--ct);margin-bottom:1px;transition:color .25s;
+}
+/* Change 2 – training days text matches leave days color (var(--cm)) */
+.lp-sum-member-detail,
+.lp-sum-member-training{
+  color:var(--cm);font-size:10px;transition:color .25s;
+}
 
 /* ── Calendar wrapper ─────────────────────────────────────────────────────── */
 .lp-calendar-wrap{
@@ -1950,6 +2106,96 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
     </div><!-- /card -->
   </div><!-- /irt-section -->
 
+  <!-- ═══ VIOLATION CASE REVIEW ═══════════════════════════════════════════ -->
+  <div class="vcr-section" id="vcr-section" style="display:none">
+    <div class="card">
+      <div class="card-accent" style="background:#5D36FF"></div>
+      <div class="card-head">Violation Case Review</div>
+      <div class="card-body">
+
+        <!-- Summary cards -->
+        <div class="vcr-summary" id="vcr-summary"></div>
+
+        <!-- Filters -->
+        <div class="vcr-filters">
+          <span class="vcr-filter-lbl">Member</span>
+          <select id="vcr-f-member"><option value="all">All</option></select>
+          <span class="vcr-filter-lbl">Source</span>
+          <select id="vcr-f-source">
+            <option value="all">All</option>
+            <option value="CSS Created">CSS Created</option>
+            <option value="Client Created">Client Created</option>
+          </select>
+          <span class="vcr-filter-lbl">Status</span>
+          <select id="vcr-f-status">
+            <option value="all">All</option>
+            <option value="Pending Review">Pending</option>
+            <option value="Valid Violation">Valid</option>
+            <option value="Dispute Violation">Disputed</option>
+            <option value="Invalid Violation">Invalid</option>
+          </select>
+          <span class="vcr-filter-lbl">Search</span>
+          <input type="text" id="vcr-f-search" placeholder="Case #, account, subject...">
+        </div>
+
+        <!-- Table -->
+        <div style="overflow-x:auto">
+          <table class="vcr-table">
+            <thead>
+              <tr>
+                <th class="vcr-col-css">CSS</th>
+                <th class="vcr-col-case">Case Number</th>
+                <th class="vcr-col-src">Source</th>
+                <th class="vcr-col-acct">Account Name</th>
+                <th class="vcr-col-subj">Subject</th>
+                <th class="vcr-col-irt">IRT</th>
+                <th class="vcr-col-ort">ORT</th>
+                <th class="vcr-col-status">Review Status</th>
+                <th class="vcr-col-action">Review</th>
+              </tr>
+            </thead>
+            <tbody id="vcr-tbody"></tbody>
+          </table>
+        </div>
+        <div class="vcr-empty" id="vcr-empty" style="display:none">No violation cases found for this period.</div>
+
+        <!-- Pagination -->
+        <div class="vcr-pagination" id="vcr-pagination">
+          <button class="vcr-pg-btn" id="vcr-pg-prev" onclick="vcrPage(-1)">&laquo; Prev</button>
+          <span class="vcr-pg-info" id="vcr-pg-info"></span>
+          <button class="vcr-pg-btn" id="vcr-pg-next" onclick="vcrPage(1)">Next &raquo;</button>
+        </div>
+
+      </div><!-- /card-body -->
+    </div><!-- /card -->
+  </div><!-- /vcr-section -->
+
+  <!-- VCR Review Modal -->
+  <div class="vcr-modal-overlay" id="vcr-modal-overlay">
+    <div class="vcr-modal">
+      <div class="vcr-modal-title">Review Violation Case</div>
+      <div class="vcr-modal-field"><label>CSS</label><div class="vcr-field-val" id="vcr-m-css"></div></div>
+      <div class="vcr-modal-field"><label>Case Number</label><div class="vcr-field-val" id="vcr-m-case"></div></div>
+      <div class="vcr-modal-field"><label>Source</label><div class="vcr-field-val" id="vcr-m-source"></div></div>
+      <div class="vcr-modal-field"><label>Account Name</label><div class="vcr-field-val" id="vcr-m-acct"></div></div>
+      <div class="vcr-modal-field"><label>Subject</label><div class="vcr-field-val" id="vcr-m-subj"></div></div>
+      <div class="vcr-modal-field"><label>IRT Violations</label><div class="vcr-field-val" id="vcr-m-irt"></div></div>
+      <div class="vcr-modal-field"><label>ORT Violations</label><div class="vcr-field-val" id="vcr-m-ort"></div></div>
+      <div class="vcr-modal-radios">
+        <label><input type="radio" name="vcr-decision" value="Valid Violation"> Valid Violation</label>
+        <label><input type="radio" name="vcr-decision" value="Dispute Violation"> Dispute Violation</label>
+      </div>
+      <div id="vcr-reason-wrap" style="display:none">
+        <label style="display:block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--cm);margin-bottom:3px">Reason for Dispute (required)</label>
+        <textarea class="vcr-modal-reason" id="vcr-m-reason" placeholder="Explain why this violation should be disputed..."></textarea>
+      </div>
+      <div class="vcr-modal-actions">
+        <button class="vcr-modal-cancel" onclick="vcrCloseModal()">Cancel</button>
+        <button class="vcr-modal-submit" id="vcr-m-submit" onclick="vcrSubmitReview()" disabled>Submit Review</button>
+      </div>
+    </div>
+  </div>
+
   <div class="footer"><span id="footer-info"></span></div>
 
   </div><!-- /section-performance -->
@@ -1979,6 +2225,9 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
       <!-- Legend -->
       <div class="lp-legend" id="lp-legend"></div>
+
+      <!-- Monthly Summary -->
+      <div id="lp-month-summary"></div>
 
       <!-- Calendar -->
       <div class="lp-calendar-wrap">
@@ -2145,6 +2394,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
             <option>Holiday Leave</option>
             <option>Half-day VL</option>
             <option>Other</option>
+            <option>Training</option>
           </select>
         </div>
         <div class="lp-field" id="lp-f-custom-wrap" style="display:none">
@@ -3008,6 +3258,8 @@ function updateAuthUI(signedIn, displayName) {
       userEl.textContent = '• ' + (displayName.split(' ')[0] || displayName);
       userEl.classList.add('visible');
     }
+    /* VCR: store signed-in user for review attribution */
+    if (displayName) _vcrSignedInUser = displayName;
   } else {
     if (btnSignIn)  btnSignIn.style.display  = '';
     if (btnRefresh) btnRefresh.disabled       = true;
@@ -3056,6 +3308,50 @@ async function graphGetBinary(path, token) {
   });
   if (!resp.ok) throw new Error('Graph binary ' + resp.status);
   return resp.blob();
+}
+
+/* ── Graph API POST (JSON) — for appending rows to Excel worksheets ────── */
+async function graphPost(path, token, body) {
+  const resp = await fetch('https://graph.microsoft.com/v1.0' + path, {
+    method:  'POST',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (resp.status === 423) throw new Error(
+    'The Excel workbook is currently locked. Close it in Excel Online / desktop and try again.'
+  );
+  if (!resp.ok) {
+    let detail = '';
+    try { const j = await resp.json(); detail = (j.error && j.error.message) ? j.error.message : JSON.stringify(j); }
+    catch(e2) { detail = await resp.text().catch(() => ''); }
+    throw new Error('Graph POST ' + resp.status + ': ' + detail.substring(0, 300));
+  }
+  return resp.json();
+}
+
+/* ── Graph API PATCH (JSON) — for updating existing cells ──────────────── */
+async function graphPatch(path, token, body) {
+  const resp = await fetch('https://graph.microsoft.com/v1.0' + path, {
+    method:  'PATCH',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (resp.status === 423) throw new Error(
+    'The Excel workbook is currently locked. Close it in Excel Online / desktop and try again.'
+  );
+  if (!resp.ok) {
+    let detail = '';
+    try { const j = await resp.json(); detail = (j.error && j.error.message) ? j.error.message : JSON.stringify(j); }
+    catch(e2) { detail = await resp.text().catch(() => ''); }
+    throw new Error('Graph PATCH ' + resp.status + ': ' + detail.substring(0, 300));
+  }
+  return resp.json();
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -3173,12 +3469,33 @@ function parseConfig(values) {
   const version       = String(kv['Dashboard Version'] || 'V9');
   const theme         = String(kv['Dashboard Theme']   || 'SAP Horizon Light');
 
+  /* ── Salesforce Name → Dashboard Name mapping ───────────────────────────
+     The Config tab contains a section with headers "Salesforce Name" and
+     "Dashboard Name". This builds a lookup { 'john macaraig': 'Oliver' }.
+     Keys are lowercased for case-insensitive matching.                    */
+  const sfMap = {};
+  let sfMapActive = false;
+  for (let i = 0; i < values.length; i++) {
+    const a = values[i][0] != null ? String(values[i][0]).trim() : '';
+    const b = values[i][1] != null ? String(values[i][1]).trim() : '';
+    if (!sfMapActive) {
+      if (a.toLowerCase() === 'salesforce name' && b.toLowerCase() === 'dashboard name') {
+        sfMapActive = true;
+      }
+      continue;
+    }
+    /* Stop at next blank row or next section header */
+    if (!a) break;
+    sfMap[a.toLowerCase()] = b;
+  }
+
   return {
     year, month, month_name: monthName, report_date: reportDate,
     data_as_of: dataAsOfStr, version, theme,
     prev_month_name: prevMonthName,
     prev_month_str:  prevMonthStr,
-    curr_month_str:  currMonthStr
+    curr_month_str:  currMonthStr,
+    sf_name_map:     sfMap
   };
 }
 function _defaultConfig() {
@@ -3191,69 +3508,99 @@ function _defaultConfig() {
     data_as_of: formatDayMonthYear(now), version: 'V9', theme: 'SAP Horizon Light',
     prev_month_name: getMonthName(pm),
     prev_month_str:  py + '-' + String(pm).padStart(2,'0'),
-    curr_month_str:  y  + '-' + String(m).padStart(2,'0')
+    curr_month_str:  y  + '-' + String(m).padStart(2,'0'),
+    sf_name_map:     {}
   };
 }
 
-/* ─── Case Productivity ──────────────────────────────────────────────────── */
-function parseCaseProductivity(values) {
-  if (!values || values.length < 2) return [];
+/* ─── Case Productivity (simplified — v71) ───────────────────────────────
+   The CP tab now only holds: Month | CSS Name | Leave Days (and optionally
+   Effective Workdays / Cases per Effective Workday — both calculated).
+   All case-count and compliance data flows from Salesforce Exports.
+   This parser extracts the leave-days map: { 'Oliver': 2, 'Hannah': 0 }.
+   If the old multi-column CP tab is still present, it falls back to the
+   legacy parser so older Excel files continue to work.                    */
+function parseCaseProductivity(values, config) {
+  if (!values || values.length < 2) return { leave_map: {}, legacy: [] };
   const hi      = findHeaderRow(values);
   const headers = values[hi].map(h => h != null ? String(h).trim() : '');
 
-  /* Detect columns by header name — same logic as the Python extractor */
-  const nameIdx   = findCol(headers, ['CSS Name', 'Name', 'Member']) ?? 0;
-  const csIdx     = findCol(headers, ['CS Created Cases', 'CS Created']) ?? 1;
-  const cliIdx    = findCol(headers, ['Client Created Cases', 'Client Created']) ?? 2;
-  const avgIdx    = findCol(headers, ['MTD Average (per weekday)', 'MTD Average', 'Average']) ?? 5;
-  const statusIdx = findCol(headers, ['Status']) ?? 6;
-  /* IRT / ORT columns (optional — null if not present in sheet) */
-  const irtCsIdx    = findCol(headers, ['IRT Violation (CS Created)',     'IRT Violation CS']);
-  const ortCsIdx    = findCol(headers, ['ORT Violation (CS Created)',     'ORT Violation CS']);
-  const compCsIdx   = findCol(headers, ['IRT/ORT Compliance % (CS Created)',     'Compliance % (CS Created)']);
-  const irtCliIdx   = findCol(headers, ['IRT Violation (Client Created)', 'IRT Violation Client']);
-  const ortCliIdx   = findCol(headers, ['ORT Violation (Client Created)', 'ORT Violation Client']);
-  const compCliIdx  = findCol(headers, ['IRT/ORT Compliance % (Client Created)', 'Compliance % (Client Created)']);
-  const totViolIdx  = findCol(headers, ['Total Combined Violations',      'Total Violations']);
-  const compCombIdx = findCol(headers, ['IRT/ORT Compliance % (Combined)','Compliance % (Combined)']);
+  /* ── Detect tab format ─────────────────────────────────────────────── */
+  const nameIdx  = findCol(headers, ['CSS Name', 'Name', 'Member']) ?? 0;
+  const leaveIdx = findCol(headers, ['Leave Days', 'Leave']);
+  const csIdx    = findCol(headers, ['CS Created Cases', 'CS Created']);
 
-  /* Helper: read compliance % — Excel may store as decimal (0.985) or % (98.5).
-     Clamped to [0, 100] — negative values (more violations than cases) become 0. */
-  function toCompPct(v) {
-    if (v === null || v === undefined || v === '') return null;
-    const n = Number(v);
-    if (isNaN(n)) return null;
-    const pct = n <= 1 ? Math.round(n * 1000) / 10 : Math.round(n * 10) / 10;
-    return Math.min(100, Math.max(0, pct));
+  /* Build leave-days map (all formats) */
+  const leave_map = {};
+  if (leaveIdx !== null) {
+    /* Optional: filter by month if a Month column exists */
+    const monthIdx = findCol(headers, ['Month']);
+    const targetMonth = config ? (config.month_name || '') : '';
+    for (let i = hi + 1; i < values.length; i++) {
+      const row  = values[i];
+      const name = row[nameIdx];
+      if (!name) continue;
+      /* If Month column exists, only include rows matching the current month */
+      if (monthIdx !== null && targetMonth) {
+        const rowMonth = row[monthIdx] != null ? String(row[monthIdx]).trim() : '';
+        if (rowMonth.toLowerCase() !== targetMonth.toLowerCase()) continue;
+      }
+      leave_map[String(name).trim()] = Math.round(parseNum(row[leaveIdx]));
+    }
   }
 
-  const result = [];
-  for (let i = hi + 1; i < values.length; i++) {
-    const row = values[i];
-    const name = row[nameIdx];
-    if (!name) continue;
-    const cs  = Math.round(parseNum(row[csIdx]));
-    const cli = Math.round(parseNum(row[cliIdx]));
-    const avg = Math.round(parseNum(row[avgIdx]) * 100) / 100;
-    const status = row[statusIdx] ? String(row[statusIdx]).trim() : 'Progressing';
-    /* IRT / ORT */
-    const irt_cs   = irtCsIdx   !== null ? Math.round(parseNum(row[irtCsIdx]))   : 0;
-    const ort_cs   = ortCsIdx   !== null ? Math.round(parseNum(row[ortCsIdx]))   : 0;
-    const comp_cs  = compCsIdx  !== null ? toCompPct(row[compCsIdx])             : null;
-    const irt_cli  = irtCliIdx  !== null ? Math.round(parseNum(row[irtCliIdx]))  : 0;
-    const ort_cli  = ortCliIdx  !== null ? Math.round(parseNum(row[ortCliIdx]))  : 0;
-    const comp_cli = compCliIdx !== null ? toCompPct(row[compCliIdx])            : null;
-    const tot_viol = totViolIdx !== null
-      ? Math.round(parseNum(row[totViolIdx]))
-      : irt_cs + ort_cs + irt_cli + ort_cli;
-    const comp_comb = compCombIdx !== null ? toCompPct(row[compCombIdx]) : null;
-    result.push({
-      name: String(name), cs_created: cs, client_created: cli,
-      total: cs + cli, avg, status,
-      irt_cs, ort_cs, comp_cs, irt_cli, ort_cli, comp_cli, tot_viol, comp_comb
-    });
+  /* ── Legacy fallback: old multi-column CP format ───────────────────── */
+  if (csIdx !== null) {
+    const avgIdx    = findCol(headers, ['MTD Average (per weekday)', 'MTD Average', 'Average']) ?? 5;
+    const statusIdx = findCol(headers, ['Status']) ?? 6;
+    const irtCsIdx    = findCol(headers, ['IRT Violation (CS Created)',     'IRT Violation CS']);
+    const ortCsIdx    = findCol(headers, ['ORT Violation (CS Created)',     'ORT Violation CS']);
+    const compCsIdx   = findCol(headers, ['IRT/ORT Compliance % (CS Created)',     'Compliance % (CS Created)']);
+    const irtCliIdx   = findCol(headers, ['IRT Violation (Client Created)', 'IRT Violation Client']);
+    const ortCliIdx   = findCol(headers, ['ORT Violation (Client Created)', 'ORT Violation Client']);
+    const compCliIdx  = findCol(headers, ['IRT/ORT Compliance % (Client Created)', 'Compliance % (Client Created)']);
+    const totViolIdx  = findCol(headers, ['Total Combined Violations',      'Total Violations']);
+    const compCombIdx = findCol(headers, ['IRT/ORT Compliance % (Combined)','Compliance % (Combined)']);
+    const cliIdx      = findCol(headers, ['Client Created Cases', 'Client Created']) ?? 2;
+
+    function toCompPct(v) {
+      if (v === null || v === undefined || v === '') return null;
+      const n = Number(v);
+      if (isNaN(n)) return null;
+      const pct = n <= 1 ? Math.round(n * 1000) / 10 : Math.round(n * 10) / 10;
+      return Math.min(100, Math.max(0, pct));
+    }
+
+    const legacy = [];
+    for (let i = hi + 1; i < values.length; i++) {
+      const row = values[i];
+      const name = row[nameIdx];
+      if (!name) continue;
+      const cs  = Math.round(parseNum(row[csIdx]));
+      const cli = Math.round(parseNum(row[cliIdx]));
+      const avg = Math.round(parseNum(row[avgIdx]) * 100) / 100;
+      const status = row[statusIdx] ? String(row[statusIdx]).trim() : 'Progressing';
+      const irt_cs   = irtCsIdx   !== null ? Math.round(parseNum(row[irtCsIdx]))   : 0;
+      const ort_cs   = ortCsIdx   !== null ? Math.round(parseNum(row[ortCsIdx]))   : 0;
+      const comp_cs  = compCsIdx  !== null ? toCompPct(row[compCsIdx])             : null;
+      const irt_cli  = irtCliIdx  !== null ? Math.round(parseNum(row[irtCliIdx]))  : 0;
+      const ort_cli  = ortCliIdx  !== null ? Math.round(parseNum(row[ortCliIdx]))  : 0;
+      const comp_cli = compCliIdx !== null ? toCompPct(row[compCliIdx])            : null;
+      const tot_viol = totViolIdx !== null
+        ? Math.round(parseNum(row[totViolIdx]))
+        : irt_cs + ort_cs + irt_cli + ort_cli;
+      const comp_comb = compCombIdx !== null ? toCompPct(row[compCombIdx]) : null;
+      legacy.push({
+        name: String(name), cs_created: cs, client_created: cli,
+        total: cs + cli, avg, status,
+        irt_cs, ort_cs, comp_cs, irt_cli, ort_cli, comp_cli, tot_viol, comp_comb
+      });
+    }
+    return { leave_map, legacy };
   }
-  return result;
+
+  /* New simplified format — no legacy case-count data */
+  return { leave_map, legacy: [] };
 }
 
 /* ─── Touch Base ─────────────────────────────────────────────────────────── */
@@ -3410,8 +3757,10 @@ function computeAxisLimits(data) {
   const qlMax   = (ql.sorted || []).reduce((m, r) => Math.max(m, r.pct), 0);
   const pfMax   = pf.reduce((m, r) => Math.max(m, r.total), 0);
   const allNull = ql.all_null || false;
-  /* IRT/ORT: max stacked violations (irt_cs + ort_cs + irt_cli + ort_cli) per member */
-  const irtMax  = cp.reduce((m, r) => Math.max(m, (r.irt_cs||0) + (r.ort_cs||0) + (r.irt_cli||0) + (r.ort_cli||0)), 0);
+  /* IRT/ORT: max stacked violations — use irt_ort data if available (v77),
+     fall back to cp fields for backward compatibility with legacy format */
+  const irtSrc = (data.irt_ort && data.irt_ort.length > 0) ? data.irt_ort : cp;
+  const irtMax  = irtSrc.reduce((m, r) => Math.max(m, (r.irt_cs||0) + (r.ort_cs||0) + (r.irt_cli||0) + (r.ort_cli||0)), 0);
 
   return {
     cc_max:  Math.max(Math.ceil(ccMax  * 1.20) + 1, 12),
@@ -3756,6 +4105,858 @@ async function loadBgImage(token) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
+   SALESFORCE DATA PIPELINE  (v71)
+   Scans "Salesforce Exports" folder on OneDrive, reads Block 1 from each
+   raw Salesforce report export, and computes Case Productivity + IRT/ORT
+   metrics per CSS per month.  All case-count and compliance data now flows
+   from here rather than from manually maintained Excel columns.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Filename parser ─────────────────────────────────────────────────────
+   "NEW Closed Cases [CSS Created]-2026-09-03-12-14-22.xlsx"
+   → { type:'css', dateStr:'2026-09-03', monthKey:'2026-09', ts:Date }
+   "NEW Closed Cases [Client Created]-2026-09-03-12-14-22.xlsx"
+   → { type:'client', ... }                                               */
+function sfParseFilename(name) {
+  const m = name.match(
+    /^NEW Closed Cases \[(CSS Created|Client Created)\]-(\d{4})-(\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})\.xlsx$/i
+  );
+  if (!m) return null;
+  const type     = m[1].toLowerCase().includes('css') ? 'css' : 'client';
+  const y = +m[2], mo = +m[3], d = +m[4], hh = +m[5], mm = +m[6], ss = +m[7];
+  const ts       = new Date(y, mo - 1, d, hh, mm, ss);
+  const dateStr  = y + '-' + String(mo).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+  const monthKey = y + '-' + String(mo).padStart(2,'0');
+  return { type, dateStr, monthKey, ts, year: y, month: mo, day: d };
+}
+
+/* ── List Salesforce Exports folder ──────────────────────────────────────
+   Returns { files: [{name, id, parsed}], months: Set, warnings: [] }.
+   The folder must be a direct child of the same directory that holds the
+   main Excel workbook (Team Josh Dashboard Data.xlsx).                    */
+async function sfListExports(token) {
+  const result = { files: [], months: new Set(), warnings: [] };
+
+  /* Locate the data folder (parent of main Excel) */
+  const exMeta = await graphGet(
+    '/drives/' + excelDriveId + '/items/' + excelItemId + '?$select=parentReference', token
+  );
+  const rootId = exMeta.parentReference.id;
+
+  /* Find "Salesforce Exports" subfolder */
+  const rootChildren = await graphGet(
+    '/drives/' + excelDriveId + '/items/' + rootId + '/children?$select=id,name', token
+  );
+  const sfFolder = (rootChildren.value || []).find(
+    f => f.name.toLowerCase() === 'salesforce exports'
+  );
+  if (!sfFolder) {
+    result.warnings.push('Salesforce Exports folder not found in the data directory.');
+    return result;
+  }
+
+  /* List all files in the Salesforce Exports folder */
+  const sfChildren = await graphGet(
+    '/drives/' + excelDriveId + '/items/' + sfFolder.id + '/children?$select=id,name', token
+  );
+  (sfChildren.value || []).forEach(f => {
+    const parsed = sfParseFilename(f.name);
+    if (!parsed) return; /* skip non-matching files */
+    result.files.push({ name: f.name, id: f.id, parsed });
+    result.months.add(parsed.monthKey);
+  });
+
+  if (result.files.length === 0) {
+    result.warnings.push('No SF export files matched expected naming pattern.');
+    console.warn('[SF] 0 files matched. Folder contents: ' +
+      (sfChildren.value || []).map(function(f) { return f.name; }).join(', '));
+  } else {
+    console.log('[SF] Found ' + result.files.length + ' export files across ' +
+                result.months.size + ' month(s): ' + [...result.months].join(', '));
+  }
+  return result;
+}
+
+/* ── Pick the latest file per type for a given month ─────────────────── */
+function sfPickFilesForMonth(allFiles, monthKey) {
+  const css    = allFiles.filter(f => f.parsed.type === 'css'    && f.parsed.monthKey === monthKey);
+  const client = allFiles.filter(f => f.parsed.type === 'client' && f.parsed.monthKey === monthKey);
+  /* Sort descending by timestamp to pick the latest */
+  css.sort((a, b)    => b.parsed.ts - a.parsed.ts);
+  client.sort((a, b) => b.parsed.ts - a.parsed.ts);
+  return { cssFile: css[0] || null, clientFile: client[0] || null };
+}
+
+/* ── Read Block 1 from a Salesforce export Excel file ────────────────────
+   Block 1 is the first contiguous section of data rows after the header.
+   Stops when it encounters a fully blank row or another section header.
+   Returns a raw 2-D values array (headers + data rows).                  */
+async function sfReadBlock1(itemId, token) {
+  /* Try common sheet names, then fall back to listing worksheets */
+  var commonNames = ['Sheet1', 'Sheet 1', 'Report', 'Data'];
+  var data = null;
+  for (var ci = 0; ci < commonNames.length; ci++) {
+    try {
+      var p = '/drives/' + excelDriveId + '/items/' + itemId +
+              '/workbook/worksheets/' + encodeURIComponent(commonNames[ci]) + '/usedRange(valuesOnly=true)';
+      data = await graphGet(p, token);
+      console.log('[SF] Read worksheet "' + commonNames[ci] + '" from item ' + itemId);
+      break;
+    } catch (ignore) { /* try next */ }
+  }
+  if (!data) {
+    /* List worksheets and use the first one */
+    var wsPath = '/drives/' + excelDriveId + '/items/' + itemId + '/workbook/worksheets';
+    var sheets = await graphGet(wsPath, token);
+    if (!sheets.value || !sheets.value.length) throw new Error('No worksheets in SF export');
+    var firstSheet = sheets.value[0].name;
+    console.log('[SF] Using first worksheet: "' + firstSheet + '"');
+    var altPath = '/drives/' + excelDriveId + '/items/' + itemId +
+                  '/workbook/worksheets/' + encodeURIComponent(firstSheet) + '/usedRange(valuesOnly=true)';
+    data = await graphGet(altPath, token);
+  }
+  var allRows = Array.isArray(data.values) ? data.values : [];
+  console.log('[SF] usedRange returned ' + allRows.length + ' rows, ' +
+              (allRows.length > 0 ? allRows[0].length : 0) + ' cols');
+  if (allRows.length < 2) return allRows;
+
+  /* ── Find the header row containing "Case Number" ──────────────────
+     Salesforce report exports typically have:
+       Row 0: Report title (e.g. "New Closed Cases [CSS Created]")
+       Rows 1-N: Metadata, subtotals, blank rows
+       Row N+1: Column headers (Case Number, Created By, ...)
+       Row N+2+: Data rows
+     Scan the ENTIRE range — the header could be anywhere.            */
+  var headerIdx = -1;
+  for (var i = 0; i < allRows.length; i++) {
+    var cells = (allRows[i] || []).map(function(c) {
+      return c != null ? String(c).trim().toLowerCase() : '';
+    });
+    if (cells.includes('case number')) { headerIdx = i; break; }
+  }
+
+  if (headerIdx < 0) {
+    /* Header not found — log the first non-empty rows for debugging */
+    console.warn('[SF] "Case Number" header NOT found in ' + allRows.length + ' rows.');
+    var shown = 0;
+    for (var d = 0; d < allRows.length && shown < 8; d++) {
+      var row = allRows[d] || [];
+      var hasContent = row.some(function(c) { return c !== null && c !== undefined && c !== ''; });
+      if (hasContent) {
+        console.warn('[SF]   Row ' + d + ':', row.slice(0, 10).map(function(c) {
+          return c != null ? String(c).substring(0, 40) : '';
+        }).join(' | '));
+        shown++;
+      }
+    }
+    return allRows; /* return raw — sfParseBlock will fail gracefully */
+  }
+
+  console.log('[SF] Found "Case Number" header at row ' + headerIdx +
+              ' (of ' + allRows.length + ' total rows)');
+
+  /* ── Extract Block 1: rows from header to the first fully-blank row ─ */
+  var block = [allRows[headerIdx]];
+  for (var j = headerIdx + 1; j < allRows.length; j++) {
+    var brow = allRows[j];
+    var allEmpty = !brow || brow.every(function(c) {
+      return c === null || c === undefined || c === '';
+    });
+    if (allEmpty) break;
+    block.push(brow);
+  }
+
+  console.log('[SF] Block 1: ' + (block.length - 1) + ' data rows (header at row ' +
+              headerIdx + ', ends at row ' + (headerIdx + block.length - 1) + ')');
+  return block;
+}
+
+/* ── Parse Block 1 into case records ─────────────────────────────────────
+   type = 'css' | 'client'
+   For CSS Created: the CSS identifier column is "Created By"
+   For Client Created: the CSS identifier column is "Case Owner"
+   Returns array of { caseNumber, sfName, irtViol, ortViol }.             */
+function sfParseBlock(block1, type) {
+  if (!block1 || block1.length < 2) return [];
+  var headers = block1[0].map(function(h) {
+    return h != null ? String(h).trim().toLowerCase() : '';
+  });
+  console.log('[SF] ' + type + ' report headers (' + headers.length + '):', headers.filter(function(h){return h;}).join(' | '));
+
+  /* ── Flexible column matching ──────────────────────────────────────── */
+  function findHdr(exact, partials) {
+    for (var c = 0; c < exact.length; c++) {
+      var i = headers.indexOf(exact[c]);
+      if (i >= 0) return i;
+    }
+    if (partials) {
+      for (var p = 0; p < partials.length; p++) {
+        var j = headers.findIndex(function(h) { return h.includes(partials[p]); });
+        if (j >= 0) return j;
+      }
+    }
+    return -1;
+  }
+
+  var caseIdx = findHdr(['case number'], ['case number', 'casenumber', 'case #']);
+  var nameIdx = type === 'css'
+    ? findHdr(['created by'], ['created by'])
+    : findHdr(['case owner'], ['case owner']);
+
+  /* Account Name / Subject — for Violation Case Review table */
+  var acctIdx = findHdr(['account name'], ['account name', 'account']);
+  var subjIdx = findHdr(['subject'], ['subject']);
+
+  /* IRT / ORT violation columns — try several patterns */
+  var irtIdx = headers.findIndex(function(h) {
+    return h.includes('irt') && (h.includes('violat') || h.includes('breach'));
+  });
+  var ortIdx = headers.findIndex(function(h) {
+    return h.includes('ort') && !h.includes('irt') && !h.includes('report') &&
+           !h.includes('support') && (h.includes('violat') || h.includes('breach'));
+  });
+  if (irtIdx < 0) irtIdx = headers.findIndex(function(h) { return h.includes('sla') && h.includes('irt'); });
+  if (ortIdx < 0) ortIdx = headers.findIndex(function(h) {
+    return h.includes('sla') && h.includes('ort') && !h.includes('irt');
+  });
+
+  console.log('[SF] ' + type + ' column indices: case=' + caseIdx + ' name=' + nameIdx +
+              ' acct=' + acctIdx + ' subj=' + subjIdx +
+              ' IRT=' + irtIdx + ' ORT=' + ortIdx);
+
+  if (caseIdx < 0) {
+    console.warn('[SF] "Case Number" column not found in ' + type + ' report. Headers: ' + headers.join(', '));
+    return [];
+  }
+  if (nameIdx < 0) {
+    console.warn('[SF] ' + (type === 'css' ? '"Created By"' : '"Case Owner"') +
+                 ' column not found in ' + type + ' report. Headers: ' + headers.join(', '));
+    return [];
+  }
+  if (irtIdx < 0) console.warn('[SF] IRT violation column not found — IRT defaults to 0');
+  if (ortIdx < 0) console.warn('[SF] ORT violation column not found — ORT defaults to 0');
+
+  /* ── Parse rows with grouped-report "carry forward" logic ──────────
+     Salesforce grouped report exports place the group-by field
+     (Created By / Case Owner) only in a group-header row.  Data rows
+     below that header leave the Name column blank.
+
+     Strategy:
+       - Track lastGroupName (the last non-empty Name value seen)
+       - Rows WITH Case Number → data row → use lastGroupName
+       - Rows WITHOUT Case Number but WITH Name → group header → update lastGroupName
+       - Rows with BOTH → flat report row → use the row name directly
+
+     This handles both grouped and flat report formats.               */
+
+  var records = [];
+  var lastGroupName = '';
+  var groupHeaderCount = 0;
+  var flatRowCount = 0;
+
+  for (var i = 1; i < block1.length; i++) {
+    var row = block1[i];
+    var rawCase = row[caseIdx] != null ? String(row[caseIdx]).trim() : '';
+    var rawName = row[nameIdx] != null ? String(row[nameIdx]).trim() : '';
+    var rawIrt  = irtIdx >= 0 ? row[irtIdx] : null;
+    var rawOrt  = ortIdx >= 0 ? row[ortIdx] : null;
+    var rawAcct = acctIdx >= 0 && row[acctIdx] != null ? String(row[acctIdx]).trim() : '';
+    var rawSubj = subjIdx >= 0 && row[subjIdx] != null ? String(row[subjIdx]).trim() : '';
+
+    /* ── Group header row: Name present but no Case Number ─────────── */
+    if (!rawCase && rawName) {
+      lastGroupName = rawName;
+      groupHeaderCount++;
+      continue;
+    }
+
+    /* ── Data row: Case Number present ─────────────────────────────── */
+    if (!rawCase) continue;  /* skip blank rows */
+
+    /* Determine the CSS name: use row value if present, else carried-forward */
+    var effectiveName = rawName || lastGroupName;
+    if (rawName) {
+      lastGroupName = rawName;  /* update carry-forward for flat reports */
+      flatRowCount++;
+    }
+
+    var irtVal = parseNum(rawIrt);
+    var ortVal = parseNum(rawOrt);
+
+    records.push({
+      caseNumber:  rawCase,
+      sfName:      effectiveName,
+      irtViol:     irtVal,
+      ortViol:     ortVal,
+      accountName: rawAcct,
+      subject:     rawSubj
+    });
+
+    /* Diagnostic: log rows with violations or first 3 rows */
+    if (irtVal > 0 || ortVal > 0 || records.length <= 3) {
+      console.log('[SF] ' + type + ' row ' + i + ': Case=' + rawCase +
+        ' Name=' + (rawName ? '"' + rawName + '"' : '(group:"' + lastGroupName + '")') +
+        ' IRT_raw=' + String(rawIrt) + ' ORT_raw=' + String(rawOrt) +
+        ' IRT=' + irtVal + ' ORT=' + ortVal +
+        (irtVal > 0 || ortVal > 0 ? ' ** VIOLATED **' : ''));
+    }
+  }
+
+  var reportType = groupHeaderCount > 0 ? 'GROUPED' : 'FLAT';
+  console.log('[SF] ' + type + ' report format: ' + reportType +
+    ' (' + groupHeaderCount + ' group headers, ' + flatRowCount + ' flat-name rows)');
+  console.log('[SF] ' + type + ' report: parsed ' + records.length + ' case records');
+
+  /* Summary of unique names found */
+  var nameSet = {};
+  records.forEach(function(r) {
+    if (!nameSet[r.sfName]) nameSet[r.sfName] = 0;
+    nameSet[r.sfName]++;
+  });
+  console.log('[SF] ' + type + ' names found: ' +
+    Object.keys(nameSet).map(function(n) { return '"' + n + '" (' + nameSet[n] + ')'; }).join(', '));
+
+  return records;
+}
+
+/* ── Count weekdays (Mon-Fri) between two dates inclusive ────────────────
+   Used for effective workdays calculation.                                */
+function sfCountWeekdays(startDate, endDate) {
+  let count = 0;
+  const d = new Date(startDate);
+  const end = new Date(endDate);
+  while (d <= end) {
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+    d.setDate(d.getDate() + 1);
+  }
+  return count;
+}
+
+/* ── Compute per-CSS metrics from parsed Salesforce records ──────────────
+   nameMap:  { 'john macaraig': 'Oliver', ... } (lowercase SF → dashboard)
+   leaveMap: { 'Oliver': 3, 'Hannah': 0, ... } (leave days from CP tab)
+   reportDate: { year, month, day } from the Salesforce filename          */
+function sfComputeMetrics(cssRecords, clientRecords, nameMap, leaveMap, reportDate) {
+  const result  = {};  /* dashName → { cs, cli, irtCsCases, ortCsCases, irtCliCases, ortCliCases, violatedCases } */
+  const ignored = new Set();  /* SF names not in the mapping */
+
+  /* Initialise all mapped dashboard members */
+  Object.values(nameMap).forEach(dn => {
+    result[dn] = {
+      cs_created: 0, client_created: 0, total: 0,
+      /* sets for unique case dedup */
+      _csNums: new Set(), _cliNums: new Set(),
+      /* violation tracking: per-case binary flags */
+      _csViolCases: new Set(), _cliViolCases: new Set(),
+      irt_cs: 0, ort_cs: 0, irt_cli: 0, ort_cli: 0,
+      violated_cs: 0, violated_cli: 0, tot_viol: 0
+    };
+  });
+
+  /* Process CSS Created records */
+  (cssRecords || []).forEach(r => {
+    const dn = nameMap[r.sfName.toLowerCase()];
+    if (!dn) { if (r.sfName) ignored.add(r.sfName); return; }
+    const m = result[dn];
+    if (m._csNums.has(r.caseNumber)) return; /* dedup */
+    m._csNums.add(r.caseNumber);
+    m.cs_created++;
+    if (r.irtViol > 0) m.irt_cs++;
+    if (r.ortViol > 0) m.ort_cs++;
+    if (r.irtViol > 0 || r.ortViol > 0) m._csViolCases.add(r.caseNumber);
+  });
+
+  /* Process Client Created records */
+  (clientRecords || []).forEach(r => {
+    const dn = nameMap[r.sfName.toLowerCase()];
+    if (!dn) { if (r.sfName) ignored.add(r.sfName); return; }
+    const m = result[dn];
+    if (m._cliNums.has(r.caseNumber)) return; /* dedup */
+    m._cliNums.add(r.caseNumber);
+    m.client_created++;
+    if (r.irtViol > 0) m.irt_cli++;
+    if (r.ortViol > 0) m.ort_cli++;
+    if (r.irtViol > 0 || r.ortViol > 0) m._cliViolCases.add(r.caseNumber);
+  });
+
+  /* Effective workdays calculation */
+  const repYear  = reportDate.year;
+  const repMonth = reportDate.month; /* 1-indexed */
+  const repDay   = reportDate.day;
+  const periodStart = new Date(repYear, repMonth - 1, 1);
+  const periodEnd   = new Date(repYear, repMonth - 1, repDay);
+  const totalWeekdays = sfCountWeekdays(periodStart, periodEnd);
+
+  /* Derive status thresholds from MTD average */
+  function avgStatus(avg) {
+    if (avg >= 3.5) return 'Extraordinary';
+    if (avg >= 2.5) return 'Outstanding';
+    if (avg >= 1.5) return 'Successful';
+    return 'Progressing';
+  }
+
+  /* Build final per-member array matching the existing case_productivity shape */
+  const members = [];
+  Object.entries(result).forEach(([dn, m]) => {
+    m.total        = m.cs_created + m.client_created;
+    m.violated_cs  = m._csViolCases.size;
+    m.violated_cli = m._cliViolCases.size;
+    /* Combined violated cases: union across both sources */
+    const allViol  = new Set([...m._csViolCases, ...m._cliViolCases]);
+    m.tot_viol     = allViol.size;
+
+    /* Compliance % — per source and combined */
+    const comp_cs  = m.cs_created  > 0 ? Math.round(((m.cs_created  - m.violated_cs)  / m.cs_created)  * 1000) / 10 : 100;
+    const comp_cli = m.client_created > 0 ? Math.round(((m.client_created - m.violated_cli) / m.client_created) * 1000) / 10 : 100;
+    const comp_comb = m.total > 0 ? Math.round(((m.total - m.tot_viol) / m.total) * 1000) / 10 : 100;
+
+    const leaveDays     = leaveMap[dn] || 0;
+    const effectiveWd   = Math.max(0, totalWeekdays - leaveDays);
+    const avg           = effectiveWd > 0 ? Math.round((m.total / effectiveWd) * 100) / 100 : 0;
+
+    members.push({
+      name: dn,
+      cs_created:     m.cs_created,
+      client_created: m.client_created,
+      total:          m.total,
+      avg:            avg,
+      status:         avgStatus(avg),
+      irt_cs:         m.irt_cs,        /* # CS cases with IRT violation */
+      ort_cs:         m.ort_cs,        /* # CS cases with ORT violation */
+      comp_cs:        comp_cs,
+      irt_cli:        m.irt_cli,       /* # Client cases with IRT violation */
+      ort_cli:        m.ort_cli,       /* # Client cases with ORT violation */
+      comp_cli:       comp_cli,
+      tot_viol:       m.tot_viol,      /* unique violated cases (union) */
+      comp_comb:      comp_comb,
+      leave_days:     leaveDays,
+      effective_wd:   effectiveWd
+    });
+  });
+
+  console.log('[SF] Metrics: ' + members.length + ' members, weekdays=' + totalWeekdays + ', ignored=' + ignored.size);
+  members.forEach(function(m) {
+    console.log('[SF]   ' + m.name + ': CS=' + m.cs_created + ' Cli=' + m.client_created +
+      ' Tot=' + m.total + ' Avg=' + m.avg + ' (' + m.status + ')' +
+      ' Leave=' + m.leave_days + ' EffWD=' + m.effective_wd +
+      ' IRT_CS=' + m.irt_cs + ' ORT_CS=' + m.ort_cs +
+      ' IRT_Cli=' + m.irt_cli + ' ORT_Cli=' + m.ort_cli +
+      ' Viol=' + m.tot_viol + ' Comp=' + m.comp_comb + '%');
+  });
+  return { members, ignored: [...ignored], totalWeekdays };
+}
+
+/* ── IRT/ORT-only computation (v73) ─────────────────────────────────────
+   Decoupled from Case Productivity.  Reads the same parsed Salesforce
+   records but produces ONLY violation / compliance metrics.
+   Returns { members:[...], ignored:[...], violationDetails:[...] }     */
+function sfComputeIrtOrt(cssRecords, clientRecords, nameMap) {
+  var result  = {};   /* dashName → accum */
+  var ignored = {};   /* sfName → count */
+  var violationDetails = [];  /* per-case detail for diagnostics */
+
+  /* Initialise every mapped dashboard member */
+  Object.keys(nameMap).forEach(function(sfLow) {
+    var dn = nameMap[sfLow];
+    if (result[dn]) return;  /* dedup if same dashName mapped twice */
+    result[dn] = {
+      sfName: sfLow,
+      _csNums: new Set(), _cliNums: new Set(),
+      _csViolCases: new Set(), _cliViolCases: new Set(),
+      cs_total: 0, cli_total: 0,
+      irt_cs: 0, ort_cs: 0, irt_cli: 0, ort_cli: 0
+    };
+  });
+
+  /* ── Process CSS Created records ─────────────────────────────────── */
+  (cssRecords || []).forEach(function(r) {
+    var dn = nameMap[r.sfName.toLowerCase()];
+    if (!dn) { if (r.sfName) ignored[r.sfName] = (ignored[r.sfName]||0) + 1; return; }
+    var m = result[dn];
+    if (m._csNums.has(r.caseNumber)) return;  /* dedup */
+    m._csNums.add(r.caseNumber);
+    m.cs_total++;
+    if (r.irtViol > 0) m.irt_cs++;
+    if (r.ortViol > 0) m.ort_cs++;
+    if (r.irtViol > 0 || r.ortViol > 0) {
+      m._csViolCases.add(r.caseNumber);
+      violationDetails.push({ caseNumber: r.caseNumber, source: 'CSS Created',
+        dashName: dn, sfName: r.sfName, irt: r.irtViol, ort: r.ortViol,
+        accountName: r.accountName || '', subject: r.subject || '' });
+    }
+  });
+
+  /* ── Process Client Created records ──────────────────────────────── */
+  (clientRecords || []).forEach(function(r) {
+    var dn = nameMap[r.sfName.toLowerCase()];
+    if (!dn) { if (r.sfName) ignored[r.sfName] = (ignored[r.sfName]||0) + 1; return; }
+    var m = result[dn];
+    if (m._cliNums.has(r.caseNumber)) return;  /* dedup */
+    m._cliNums.add(r.caseNumber);
+    m.cli_total++;
+    if (r.irtViol > 0) m.irt_cli++;
+    if (r.ortViol > 0) m.ort_cli++;
+    if (r.irtViol > 0 || r.ortViol > 0) {
+      m._cliViolCases.add(r.caseNumber);
+      violationDetails.push({ caseNumber: r.caseNumber, source: 'Client Created',
+        dashName: dn, sfName: r.sfName, irt: r.irtViol, ort: r.ortViol,
+        accountName: r.accountName || '', subject: r.subject || '' });
+    }
+  });
+
+  /* ── Build per-member output ─────────────────────────────────────── */
+  var members = [];
+  Object.keys(result).forEach(function(dn) {
+    var m = result[dn];
+    var violated_cs  = m._csViolCases.size;
+    var violated_cli = m._cliViolCases.size;
+    /* Combined: union of case numbers across both sources */
+    var allViol = new Set();
+    m._csViolCases.forEach(function(cn) { allViol.add(cn); });
+    m._cliViolCases.forEach(function(cn) { allViol.add(cn); });
+    var tot_viol = allViol.size;
+
+    var total = m.cs_total + m.cli_total;
+    var comp_cs   = m.cs_total  > 0 ? Math.round(((m.cs_total  - violated_cs)  / m.cs_total)  * 1000) / 10 : 100;
+    var comp_cli  = m.cli_total > 0 ? Math.round(((m.cli_total - violated_cli) / m.cli_total) * 1000) / 10 : 100;
+    var comp_comb = total       > 0 ? Math.round(((total       - tot_viol)     / total)       * 1000) / 10 : 100;
+
+    members.push({
+      name: dn,
+      cs_created:     m.cs_total,        /* total CS cases  (chart/team denominator) */
+      client_created: m.cli_total,       /* total Client cases */
+      irt_cs:         m.irt_cs,          /* CS cases with IRT > 0 */
+      ort_cs:         m.ort_cs,          /* CS cases with ORT > 0 */
+      irt_cli:        m.irt_cli,         /* Client cases with IRT > 0 */
+      ort_cli:        m.ort_cli,         /* Client cases with ORT > 0 */
+      violated_cs:    violated_cs,       /* unique violated CS cases */
+      violated_cli:   violated_cli,      /* unique violated Client cases */
+      tot_viol:       tot_viol,          /* unique violated combined */
+      comp_cs:        comp_cs,
+      comp_cli:       comp_cli,
+      comp_comb:      comp_comb
+    });
+  });
+
+  return {
+    members:          members,
+    ignored:          ignored,
+    violationDetails: violationDetails
+  };
+}
+
+/* ── Case Productivity computation (v77) ──────────────────────────────────
+   Completely independent of IRT/ORT.  Counts unique cases from Salesforce
+   exports, computes effective workdays, MTD average, and status.
+   Does NOT use IRT/ORT violation values for anything.
+
+   Params:
+     cssRecords    — parsed Block 1 records from CSS Created export
+     clientRecords — parsed Block 1 records from Client Created export
+     nameMap       — { 'john macaraig':'Oliver', … } (lowercase SF → dashboard)
+     leaveMap      — { 'Oliver':3, 'Hannah':0, … } from Case Productivity tab
+     reportDate    — { year, month, day } from SF filename timestamp
+     monthKey      — '2026-09' etc.
+     filesUsed     — [ { name, type, cases } ]
+
+   Returns { members: [...], ignored: [...], totalWeekdays }                */
+function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap, reportDate, monthKey, filesUsed) {
+  var result  = {};   /* dashName → accum */
+  var ignored = {};   /* sfName → count (for diagnostics) */
+
+  /* Initialise every mapped dashboard member */
+  Object.keys(nameMap).forEach(function(sfLow) {
+    var dn = nameMap[sfLow];
+    if (result[dn]) return;
+    result[dn] = {
+      _csNums: new Set(),
+      _cliNums: new Set(),
+      cs_created: 0,
+      client_created: 0
+    };
+  });
+
+  /* ── Count CSS Created cases (unique by Case Number) ───────────────── */
+  (cssRecords || []).forEach(function(r) {
+    var dn = nameMap[r.sfName.toLowerCase()];
+    if (!dn) { if (r.sfName) ignored[r.sfName] = (ignored[r.sfName]||0) + 1; return; }
+    var m = result[dn];
+    if (m._csNums.has(r.caseNumber)) return;  /* dedup */
+    m._csNums.add(r.caseNumber);
+    m.cs_created++;
+  });
+
+  /* ── Count Client Created cases (unique by Case Number) ────────────── */
+  (clientRecords || []).forEach(function(r) {
+    var dn = nameMap[r.sfName.toLowerCase()];
+    if (!dn) { if (r.sfName) ignored[r.sfName] = (ignored[r.sfName]||0) + 1; return; }
+    var m = result[dn];
+    if (m._cliNums.has(r.caseNumber)) return;  /* dedup */
+    m._cliNums.add(r.caseNumber);
+    m.client_created++;
+  });
+
+  /* ── Effective workdays ────────────────────────────────────────────── */
+  var repYear  = reportDate.year;
+  var repMonth = reportDate.month;
+  var repDay   = reportDate.day;
+  var periodStart = new Date(repYear, repMonth - 1, 1);
+  var periodEnd   = new Date(repYear, repMonth - 1, repDay);
+  var totalWeekdays = sfCountWeekdays(periodStart, periodEnd);
+
+  /* Status thresholds (same as existing) */
+  function avgStatus(avg) {
+    if (avg >= 3.5) return 'Extraordinary';
+    if (avg >= 2.5) return 'Outstanding';
+    if (avg >= 1.5) return 'Successful';
+    return 'Progressing';
+  }
+
+  /* ── Build per-member output ─────────────────────────────────────── */
+  var members = [];
+  Object.keys(result).forEach(function(dn) {
+    var m = result[dn];
+    var total       = m.cs_created + m.client_created;
+    var leaveDays   = leaveMap[dn] || 0;
+    var effectiveWd = Math.max(0, totalWeekdays - leaveDays);
+    var avg         = effectiveWd > 0 ? Math.round((total / effectiveWd) * 100) / 100 : 0;
+
+    members.push({
+      name:           dn,
+      cs_created:     m.cs_created,
+      client_created: m.client_created,
+      total:          total,
+      avg:            avg,
+      status:         avgStatus(avg),
+      leave_days:     leaveDays,
+      effective_wd:   effectiveWd
+    });
+  });
+
+  /* ── Diagnostic console output ─────────────────────────────────── */
+  console.log('[CP-SF] ════ CASE PRODUCTIVITY DIAGNOSTIC REPORT ════');
+  console.log('[CP-SF] Month: ' + monthKey + '  |  Period: ' +
+    periodStart.toISOString().slice(0,10) + ' to ' + periodEnd.toISOString().slice(0,10) +
+    '  |  Applicable Weekdays: ' + totalWeekdays);
+  console.log('[CP-SF] Files: ' + filesUsed.map(function(f) { return f.name + ' (' + f.type + ', ' + f.cases + ' raw records)'; }).join(', '));
+
+  /* Per-CSS table */
+  var cpDiagRows = members.map(function(m) {
+    var sfn = '';
+    Object.keys(nameMap).forEach(function(k) { if (nameMap[k] === m.name) sfn = k; });
+    return {
+      'CSS':            m.name,
+      'SF Name':        sfn,
+      'CS Created':     m.cs_created,
+      'Client Created': m.client_created,
+      'Combined':       m.total,
+      'Leave Days':     m.leave_days,
+      'Eff. Workdays':  m.effective_wd,
+      'MTD Average':    m.avg.toFixed(2),
+      'Status':         m.status
+    };
+  });
+  console.table(cpDiagRows);
+
+  /* Team totals */
+  var teamCs = 0, teamCli = 0, teamTot = 0;
+  members.forEach(function(m) {
+    teamCs  += m.cs_created;
+    teamCli += m.client_created;
+    teamTot += m.total;
+  });
+  console.log('[CP-SF] Team Totals: CS Created=' + teamCs + ', Client Created=' + teamCli + ', Combined=' + teamTot);
+
+  /* Unique case numbers per source (cross-check for dedup) */
+  var allCsNums = new Set(), allCliNums = new Set();
+  Object.keys(result).forEach(function(dn) {
+    result[dn]._csNums.forEach(function(cn) { allCsNums.add(cn); });
+    result[dn]._cliNums.forEach(function(cn) { allCliNums.add(cn); });
+  });
+  console.log('[CP-SF] Unique CSS Created case numbers across team: ' + allCsNums.size);
+  console.log('[CP-SF] Unique Client Created case numbers across team: ' + allCliNums.size);
+
+  /* Ignored SF names */
+  var ignoredNames = Object.keys(ignored);
+  if (ignoredNames.length > 0) {
+    console.log('[CP-SF] Ignored SF names (not in Config mapping):');
+    ignoredNames.forEach(function(n) {
+      console.log('  - "' + n + '" (' + ignored[n] + ' records)');
+    });
+  }
+  console.log('[CP-SF] ════ END CASE PRODUCTIVITY DIAGNOSTIC ════');
+
+  return { members: members, ignored: ignoredNames, totalWeekdays: totalWeekdays };
+}
+
+/* ── Main orchestrator: fetch + compute Salesforce data ──────────────────
+   Returns { irt_ort_members, violationDetails, cp_members,
+             sf_month, sf_report_date, sf_warnings, sf_ignored, sf_files_used }
+   or partial data if some pipelines fail.                                 */
+async function sfFetchData(token, config, leaveMap) {
+  const warnings = [];
+  console.log('[SF] \u2550\u2550\u2550\u2550 Salesforce Pipeline starting \u2550\u2550\u2550\u2550');
+
+  /* 1. Ensure name mapping exists */
+  const nameMap = config.sf_name_map || {};
+  const mapSize = Object.keys(nameMap).length;
+  if (mapSize === 0) {
+    console.warn('[SF] No Salesforce Name mapping in Config tab.\n' +
+      '     To fix: add a section to your Config sheet with:\n' +
+      '     Row: "Salesforce Name" (col A) | "Dashboard Name" (col B)\n' +
+      '     Then list each SF display name \u2192 dashboard name below it.');
+    warnings.push('No SF Name mapping in Config \u2014 add "Salesforce Name"/"Dashboard Name" section.');
+    return { case_productivity: null, sf_warnings: warnings };
+  }
+  console.log('[SF] Name mapping loaded (' + mapSize + ' entries):', Object.entries(nameMap).map(function(e) { return e[0] + ' \u2192 ' + e[1]; }).join(', '));
+
+  /* 2. List all Salesforce exports */
+  let listing;
+  try {
+    listing = await sfListExports(token);
+  } catch (e) {
+    warnings.push('Failed to list Salesforce Exports folder: ' + (e.message || e));
+    return { case_productivity: null, sf_warnings: warnings };
+  }
+  warnings.push(...listing.warnings);
+  if (listing.files.length === 0) {
+    warnings.push('No Salesforce export files found.');
+    return { case_productivity: null, sf_warnings: warnings };
+  }
+
+  /* 3. Determine target month (from Config year/month) */
+  const targetMonth = config.year + '-' + String(config.month).padStart(2, '0');
+  let monthKey = targetMonth;
+
+  /* If target month has no files, fall back to the latest available */
+  if (!listing.months.has(targetMonth)) {
+    const sorted = [...listing.months].sort();
+    monthKey = sorted[sorted.length - 1];
+    warnings.push('No Salesforce files for ' + targetMonth + '; using latest available: ' + monthKey);
+  }
+
+  /* 4. Pick the latest file per type for the chosen month */
+  const { cssFile, clientFile } = sfPickFilesForMonth(listing.files, monthKey);
+  const filesUsed = [];
+
+  if (!cssFile && !clientFile) {
+    warnings.push('No matching Salesforce files for ' + monthKey);
+    return { case_productivity: null, sf_warnings: warnings };
+  }
+  if (!cssFile)    warnings.push('CSS Created file missing for ' + monthKey + ' — CS counts will be 0.');
+  if (!clientFile) warnings.push('Client Created file missing for ' + monthKey + ' — Client counts will be 0.');
+
+  /* 5. Read Block 1 from each file */
+  let cssRecords = [], clientRecords = [];
+  if (cssFile) {
+    try {
+      const block = await sfReadBlock1(cssFile.id, token);
+      cssRecords  = sfParseBlock(block, 'css');
+      filesUsed.push({ name: cssFile.name, type: 'CSS Created', cases: cssRecords.length });
+      console.log('[SF] CSS Created — parsed', cssRecords.length, 'records from', cssFile.name);
+    } catch (e) {
+      warnings.push('Failed to read CSS Created file: ' + (e.message || e));
+    }
+  }
+  if (clientFile) {
+    try {
+      const block    = await sfReadBlock1(clientFile.id, token);
+      clientRecords  = sfParseBlock(block, 'client');
+      filesUsed.push({ name: clientFile.name, type: 'Client Created', cases: clientRecords.length });
+      console.log('[SF] Client Created — parsed', clientRecords.length, 'records from', clientFile.name);
+    } catch (e) {
+      warnings.push('Failed to read Client Created file: ' + (e.message || e));
+    }
+  }
+
+  /* 6. Determine report date from the latest file's filename */
+  const repFile = cssFile || clientFile;
+  const reportDate = repFile.parsed;
+
+  /* 7. Compute IRT/ORT metrics (v73 — decoupled from Case Productivity) */
+  var irtOrt = sfComputeIrtOrt(cssRecords, clientRecords, nameMap);
+  var ignoredNames = Object.keys(irtOrt.ignored);
+  if (ignoredNames.length > 0) {
+    warnings.push('Ignored Salesforce names (not in roster): ' + ignoredNames.join(', '));
+  }
+
+  /* ── Diagnostic console output ─────────────────────────────────── */
+  console.log('[IRT/ORT] \u2550\u2550\u2550\u2550 DIAGNOSTIC REPORT \u2550\u2550\u2550\u2550');
+  console.log('[IRT/ORT] Month: ' + monthKey + '  |  Files: ' + filesUsed.map(function(f){ return f.name; }).join(', '));
+
+  /* Per-CSS table */
+  var diagRows = irtOrt.members.map(function(m) {
+    /* find this member's SF name from nameMap (reverse lookup) */
+    var sfn = '';
+    Object.keys(nameMap).forEach(function(k) { if (nameMap[k] === m.name) sfn = k; });
+    return {
+      'CSS':             m.name,
+      'SF Name':         sfn,
+      'CS Total':        m.cs_created,
+      'CS Violated':     m.violated_cs,
+      'CLI Total':       m.client_created,
+      'CLI Violated':    m.violated_cli,
+      'Comb Violated':   m.tot_viol,
+      'CS Comp%':        m.comp_cs,
+      'CLI Comp%':       m.comp_cli,
+      'Comb Comp%':      m.comp_comb
+    };
+  });
+  console.table(diagRows);
+
+  /* Violated case details */
+  if (irtOrt.violationDetails.length > 0) {
+    console.log('[IRT/ORT] Violated case details (' + irtOrt.violationDetails.length + ' cases):');
+    console.table(irtOrt.violationDetails.map(function(v) {
+      return {
+        'Case#':    v.caseNumber,
+        'Source':   v.source,
+        'CSS':      v.dashName,
+        'SF Name':  v.sfName,
+        'IRT':      v.irt,
+        'ORT':      v.ort,
+        'Why':      'IRT=' + v.irt + (v.irt>0?' (>0)':'') + ', ORT=' + v.ort + (v.ort>0?' (>0)':'') + ' \u2192 1 violated case'
+      };
+    }));
+  } else {
+    console.log('[IRT/ORT] No violated cases found.');
+  }
+
+  /* Ignored names */
+  if (ignoredNames.length > 0) {
+    console.log('[IRT/ORT] Ignored SF names (not in Config mapping):');
+    ignoredNames.forEach(function(n) {
+      console.log('  \u2022 "' + n + '" (' + irtOrt.ignored[n] + ' records)');
+    });
+  }
+
+  /* Warnings */
+  if (warnings.length > 0) {
+    console.log('[IRT/ORT] Warnings:');
+    warnings.forEach(function(w) { console.log('  \u26A0 ' + w); });
+  }
+  console.log('[IRT/ORT] \u2550\u2550\u2550\u2550 END DIAGNOSTIC \u2550\u2550\u2550\u2550');
+
+  /* 8. Compute Case Productivity from same SF records (v77 — separate pipeline) */
+  var cpResult = sfComputeCaseProductivity(
+    cssRecords, clientRecords, nameMap, leaveMap || {}, reportDate, monthKey, filesUsed
+  );
+
+  return {
+    irt_ort_members:    irtOrt.members,
+    violationDetails:   irtOrt.violationDetails,
+    cp_members:         cpResult.members,
+    cp_totalWeekdays:   cpResult.totalWeekdays,
+    sf_month:           monthKey,
+    sf_report_date:     reportDate,
+    sf_warnings:        warnings,
+    sf_ignored:         ignoredNames,
+    sf_files_used:      filesUsed
+  };
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
    SIGN-IN PAGE BACKGROUND LOADER
    NOTE (v43+): Loading is now handled in loadLogo Step 4.2, which reuses
    the already-resolved assetItems list — no extra folder-navigation API calls.
@@ -3775,8 +4976,23 @@ async function loadSignInBg(token) {
 async function fetchDashboardData(token) {
   await resolveExcelFile(token);
 
+  /* ── Step 1: Read all sheets in parallel ─────────────────────────────── */
   const sheets = ['Config', 'Case Productivity', 'Touch Base', 'Case Surveys', 'Quality', 'PFTC'];
-  const settled = await Promise.allSettled(sheets.map(s => readSheetValues(s, token)));
+  const sheetPromises = sheets.map(s => readSheetValues(s, token));
+
+  /* We need Config AND Case Productivity (for leave days) before the SF pipeline */
+  const configResult = await sheetPromises[0];
+  const config = parseConfig(Array.isArray(configResult) ? configResult : []);
+
+  /* Parse Case Productivity early — we need the leave_map for the SF pipeline */
+  const cpResult = await sheetPromises[1].catch(e => { console.error('[Graph] CP sheet failed:', e); return []; });
+  const cpParsed = parseCaseProductivity(Array.isArray(cpResult) ? cpResult : [], config);
+
+  /* Start SF pipeline with config + leaveMap (v77) */
+  const sfPromise = sfFetchData(token, config, cpParsed.leave_map);
+
+  /* Wait for remaining sheets */
+  const settled = await Promise.allSettled(sheetPromises);
 
   function getValues(result, sheetName) {
     if (result.status === 'rejected') {
@@ -3786,27 +5002,77 @@ async function fetchDashboardData(token) {
     return result.value;
   }
 
-  const configVals = getValues(settled[0], 'Config');
-  const cpVals     = getValues(settled[1], 'Case Productivity');
   const tbVals     = getValues(settled[2], 'Touch Base');
   const svVals     = getValues(settled[3], 'Case Surveys');
   const qlVals     = getValues(settled[4], 'Quality');
   const pfVals     = getValues(settled[5], 'PFTC');
 
-  const config           = parseConfig(configVals);
-  const case_productivity = parseCaseProductivity(cpVals);
-  const touch_base       = parseTouchBase(tbVals);
-  const surveys          = parseSurveys(svVals, config);
-  const quality          = parseQuality(qlVals);
-  const pftc             = parsePFTC(pfVals);
+  /* ── Step 2: Parse remaining sheets ──────────────────────────────────── */
+  const touch_base        = parseTouchBase(tbVals);
+  const surveys           = parseSurveys(svVals, config);
+  const quality           = parseQuality(qlVals);
+  const pftc              = parsePFTC(pfVals);
 
-  const axis_limits = computeAxisLimits({ case_productivity, touch_base, surveys, quality, pftc });
+  /* ── Step 3: Wait for Salesforce pipeline ─────────────────────────── */
+  let sfResult;
+  try {
+    sfResult = await sfPromise;
+  } catch (e) {
+    console.warn('[SF] Salesforce pipeline error:', e);
+    sfResult = { irt_ort_members: null, cp_members: null, sf_warnings: ['SF pipeline error: ' + (e.message || e)] };
+  }
 
-  console.log('[Dashboard] Data assembled — period:', config.report_date,
+  /* ── Step 3b: Read existing VCR reviews (non-blocking, best-effort) ── */
+  let vcrReviews = [];
+  try {
+    vcrReviews = await vcrReadExistingReviews(token);
+  } catch (e) {
+    console.warn('[VCR] Could not load existing reviews:', e.message || e);
+  }
+
+  /* ── Step 4: Case Productivity — prefer SF-derived, fall back to legacy ─ */
+  const sfCpMembers = (sfResult.cp_members && sfResult.cp_members.length > 0)
+    ? sfResult.cp_members : null;
+  const legacyCp = (cpParsed.legacy && cpParsed.legacy.length > 0)
+    ? cpParsed.legacy : [];
+  const case_productivity = sfCpMembers || legacyCp;
+
+  if (sfCpMembers) {
+    console.log('[CP-SF] Case Productivity loaded from Salesforce (' + sfCpMembers.length + ' members)');
+  } else if (legacyCp.length > 0) {
+    console.warn('[CP-SF] No SF-derived Case Productivity — using legacy CP tab (' + legacyCp.length + ' members)');
+  } else {
+    console.warn('[CP-SF] No Case Productivity data from any source.');
+  }
+
+  /* ── Step 5: IRT/ORT data from Salesforce (decoupled from CP) ─────── */
+  const irt_ort = (sfResult.irt_ort_members && sfResult.irt_ort_members.length > 0)
+    ? sfResult.irt_ort_members : null;
+  const sf_warnings = sfResult.sf_warnings || [];
+
+  if (irt_ort) {
+    console.log('[IRT/ORT] Loaded from Salesforce (' + irt_ort.length + ' members)');
+  } else {
+    console.warn('[IRT/ORT] No Salesforce IRT/ORT data \u2014 compliance uses legacy if available.');
+  }
+
+  const axis_limits = computeAxisLimits({ case_productivity, touch_base, surveys, quality, pftc, irt_ort });
+
+  console.log('[Dashboard] Data assembled \u2014 period:', config.report_date,
               '| CP members:', case_productivity.length,
+              '| CP source:', sfCpMembers ? 'Salesforce' : (legacyCp.length > 0 ? 'Legacy Excel' : 'None'),
+              '| IRT/ORT members:', irt_ort ? irt_ort.length : 0,
               '| as of:', config.data_as_of);
 
-  return { config, case_productivity, touch_base, surveys, quality, pftc, axis_limits };
+  return {
+    config, case_productivity, touch_base, surveys, quality, pftc, axis_limits,
+    irt_ort,
+    sf_warnings,
+    sf_files_used:        sfResult.sf_files_used || [],
+    sf_ignored:           sfResult.sf_ignored || [],
+    sf_violation_details: sfResult.violationDetails || [],
+    vcr_reviews:          vcrReviews
+  };
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -3993,8 +5259,18 @@ async function takeScreenshot() {
     document.activeElement.blur();
   }
 
-  /* Add capture class → CSS strips all :focus / :focus-visible outlines */
+  /* Add capture class → CSS strips all :focus / :focus-visible outlines
+     and suppresses the SAP 3D watermark pseudo-element.                  */
   document.documentElement.classList.add('is-capturing');
+
+  /* ── Pre-capture: get dashboard bg + clear emoji icon spans ────────────
+     Computed here so it is available for both backgroundColor option and
+     the onclone body fix.  Icon innerHTML is cleared in the real DOM AND
+     in onclone — belt-and-suspenders against canvas.fillText() boxes.    */
+  const _dashBg    = getComputedStyle(el).backgroundColor;
+  const _iconEls   = Array.from(document.querySelectorAll('.btn-icon, #theme-icon'));
+  const _iconSaved = _iconEls.map(ic => ic.innerHTML);
+  _iconEls.forEach(ic => { ic.innerHTML = ''; });
 
   /* Lock the visible tab section at full opacity before capture.
      The tabIn CSS animation (opacity 0→1, 220 ms) can be mid-progress
@@ -4018,15 +5294,36 @@ async function takeScreenshot() {
 
     const canvas = await html2canvas(el, {
       scale,
-      useCORS     : true,
-      allowTaint  : false,
-      logging     : false,
-      scrollX     : 0,
-      scrollY     : 0,
-      width       : el.offsetWidth,
-      height      : el.scrollHeight,
-      windowWidth : el.offsetWidth,     /* match element, not viewport    */
-      windowHeight: el.scrollHeight,    /* expose full scroll height      */
+      useCORS         : true,
+      allowTaint      : false,
+      logging         : false,
+      scrollX         : 0,
+      scrollY         : 0,
+      backgroundColor : _dashBg,           /* canvas fill = dashboard bg    */
+      width           : el.offsetWidth,
+      height          : el.scrollHeight,
+      windowWidth     : el.offsetWidth,    /* match element, not viewport   */
+      windowHeight    : el.scrollHeight,   /* expose full scroll height     */
+      onclone         : function(clonedDoc) {
+        /* ── Body: zero padding in clone only — real DOM untouched ────────
+           Prevents body-bg bleeding around the card edge. Modifying only
+           the clone means Chart.js canvases never experience a layout
+           reflow and their rendered content is preserved correctly.       */
+        clonedDoc.body.style.cssText =
+          'padding:0!important;margin:0!important;background:' +
+          _dashBg + '!important;';
+        /* ── Emoji spans: clear in clone (belt-and-suspenders) ────────── */
+        clonedDoc.querySelectorAll('.btn-icon, #theme-icon').forEach(
+          function(ic) { ic.innerHTML = ''; }
+        );
+        /* ── Tab icons: hide <img> elements ────────────────────────────
+           CORS-blocked images from SharePoint render as broken-image
+           boxes in the canvas output. Setting display:none removes them
+           without affecting tab button layout (text labels remain).    */
+        clonedDoc.querySelectorAll('.tab-icon').forEach(
+          function(img) { img.style.display = 'none'; }
+        );
+      },
     });
 
     /* Filename from the dashboard's displayed month/year */
@@ -4058,6 +5355,8 @@ async function takeScreenshot() {
     el.style.borderRadius = origBR;
     window.scrollTo(0, origScrollY);
     btn.innerHTML         = origHTML;
+    /* Restore icon spans */
+    _iconEls.forEach((ic, i) => { ic.innerHTML = _iconSaved[i]; });
     /* Restore inline opacity (removes the lock; animation is already
        complete so the element stays at opacity:1 without restarting) */
     if (_visSection) _visSection.style.opacity = '';
@@ -4441,25 +5740,34 @@ function processData(D) {
   const pfLb = pf.map(r => r.name);
   _lastPftcSorted = pf; /* used by pftcBadgePlugin afterDraw */
 
-  /* ── IRT / ORT ─────────────────────────────────────────────────────────── */
-  const irtAlpha = [...D.case_productivity].sort((a, b) => a.name.localeCompare(b.name));
-  const irtCpMap = {};
+  /* ── IRT / ORT  (v73 — uses D.irt_ort from Salesforce if available) ── */
+  /* Data source: prefer D.irt_ort (Salesforce); fall back to case_productivity */
+  const irtSource = (D.irt_ort && D.irt_ort.length > 0) ? D.irt_ort : D.case_productivity;
+  const irtAlpha  = [...irtSource].sort((a, b) => a.name.localeCompare(b.name));
+  const irtCpMap  = {};
   let totCsCases = 0, totCliCases = 0;
-  let totIrtCs = 0, totOrtCs = 0, totIrtCli = 0, totOrtCli = 0, totViol = 0;
+  let totIrtCs = 0, totOrtCs = 0, totIrtCli = 0, totOrtCli = 0;
+  let totViolCs = 0, totViolCli = 0, totViol = 0;
   irtAlpha.forEach(r => {
     irtCpMap[r.name] = { comp_cs: r.comp_cs, comp_cli: r.comp_cli, comp_comb: r.comp_comb };
-    totCsCases  += r.cs_created;
-    totCliCases += r.client_created;
-    totIrtCs    += r.irt_cs  || 0;
-    totOrtCs    += r.ort_cs  || 0;
-    totIrtCli   += r.irt_cli || 0;
-    totOrtCli   += r.ort_cli || 0;
-    totViol     += r.tot_viol || 0;
+    totCsCases  += r.cs_created     || 0;
+    totCliCases += r.client_created || 0;
+    totIrtCs    += r.irt_cs   || 0;
+    totOrtCs    += r.ort_cs   || 0;
+    totIrtCli   += r.irt_cli  || 0;
+    totOrtCli   += r.ort_cli  || 0;
+    /* Use unique violated-case counts (NOT irt+ort sum which double-counts) */
+    totViolCs   += r.violated_cs  || 0;
+    totViolCli  += r.violated_cli || 0;
+    totViol     += r.tot_viol     || 0;
   });
+  /* Team compliance: (Total - UniqueViolated) / Total
+     FIXED v73: was incorrectly using totIrtCs+totOrtCs which double-counts
+     cases with both IRT and ORT violations. Now uses violated_cs/violated_cli. */
   const teamCsComp   = totCsCases  > 0
-    ? Math.round(((totCsCases  - totIrtCs  - totOrtCs)  / totCsCases)  * 1000) / 10 : 100;
+    ? Math.round(((totCsCases  - totViolCs)  / totCsCases)  * 1000) / 10 : 100;
   const teamCliComp  = totCliCases > 0
-    ? Math.round(((totCliCases - totIrtCli - totOrtCli) / totCliCases) * 1000) / 10 : 100;
+    ? Math.round(((totCliCases - totViolCli) / totCliCases) * 1000) / 10 : 100;
   const totAllCases  = totCsCases + totCliCases;
   const teamCombComp = totAllCases > 0
     ? Math.round(((totAllCases - totViol) / totAllCases) * 1000) / 10 : 100;
@@ -4754,6 +6062,422 @@ function buildCharts(p) {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
+   SECTION 17A — VIOLATION CASE REVIEW (VCR)
+   Displays violated cases from Salesforce exports in a filterable/paginated
+   table.  Reviewers can mark each case as Valid / Dispute.  Reviews persist
+   to the "Violation Disputes" worksheet in the main Excel workbook.
+════════════════════════════════════════════════════════════════════════════ */
+
+/* ── VCR state ─── */
+var _vcrData          = [];   /* violation detail rows (from SF pipeline) */
+var _vcrReviews       = [];   /* existing reviews from "Violation Disputes" sheet */
+var _vcrFiltered      = [];   /* after applying filters */
+var _vcrPage          = 0;    /* current page (0-based) */
+var _vcrPerPage       = 10;
+var _vcrCurrentCase   = null; /* case object open in the modal */
+var _vcrSignedInUser  = '';   /* displayName of signed-in user */
+
+/* Column order for the "Violation Disputes" sheet:
+   A: Date  B: CSS Name  C: Case Number  D: Account Name  E: Source
+   F: IRT   G: ORT       H: Reason for Dispute  I: Review Status
+   J: Reviewed By  K: Reviewed Date  L: Notes                      */
+
+/* ── Read existing reviews from "Violation Disputes" worksheet ───────── */
+async function vcrReadExistingReviews(token) {
+  try {
+    const vals = await readSheetValues('Violation Disputes', token);
+    if (!vals || vals.length < 2) return [];
+    /* Parse header row to be flexible */
+    var headers = vals[0].map(function(h) { return h != null ? String(h).trim().toLowerCase() : ''; });
+    var ciCase  = headers.indexOf('case number');
+    var ciCSS   = headers.indexOf('css name');
+    var ciSrc   = headers.indexOf('source');
+    var ciStat  = headers.indexOf('review status');
+    var ciBy    = headers.indexOf('reviewed by');
+    var ciDate  = headers.indexOf('reviewed date');
+    var ciReason= headers.indexOf('reason for dispute');
+    var ciNotes = headers.indexOf('notes');
+
+    if (ciCase < 0) { console.warn('[VCR] "Case Number" header not found in Violation Disputes sheet'); return []; }
+
+    var reviews = [];
+    for (var i = 1; i < vals.length; i++) {
+      var row = vals[i];
+      var cn  = row[ciCase] != null ? String(row[ciCase]).trim() : '';
+      if (!cn) continue;
+      reviews.push({
+        _row:         i + 1,  /* 1-based Excel row number for updates */
+        caseNumber:   cn,
+        cssName:      ciCSS   >= 0 && row[ciCSS]   != null ? String(row[ciCSS]).trim()   : '',
+        source:       ciSrc   >= 0 && row[ciSrc]   != null ? String(row[ciSrc]).trim()   : '',
+        status:       ciStat  >= 0 && row[ciStat]  != null ? String(row[ciStat]).trim()  : '',
+        reviewedBy:   ciBy    >= 0 && row[ciBy]    != null ? String(row[ciBy]).trim()    : '',
+        reviewedDate: ciDate  >= 0 && row[ciDate]  != null ? String(row[ciDate]).trim()  : '',
+        reason:       ciReason>= 0 && row[ciReason]!= null ? String(row[ciReason]).trim(): '',
+        notes:        ciNotes >= 0 && row[ciNotes] != null ? String(row[ciNotes]).trim() : ''
+      });
+    }
+    console.log('[VCR] Read ' + reviews.length + ' existing reviews from "Violation Disputes" sheet');
+    return reviews;
+  } catch (e) {
+    console.warn('[VCR] Could not read "Violation Disputes" sheet — may not exist yet:', e.message || e);
+    return [];
+  }
+}
+
+/* ── Find existing review for a given case ──────────────────────────────── */
+function vcrFindReview(caseNumber, source, cssName) {
+  for (var i = 0; i < _vcrReviews.length; i++) {
+    var r = _vcrReviews[i];
+    if (r.caseNumber === caseNumber && r.source === source && r.cssName === cssName) return r;
+  }
+  return null;
+}
+
+/* ── Get review status label for a violation detail ─────────────────────── */
+function vcrGetStatus(v) {
+  var rev = vcrFindReview(v.caseNumber, v.source, v.dashName);
+  return rev && rev.status ? rev.status : 'Pending Review';
+}
+
+/* ── Write a NEW review row (append) to "Violation Disputes" sheet ──── */
+async function vcrAppendReview(token, reviewData) {
+  /* Build the row in column order: Date, CSS Name, Case Number, Account Name, Source, IRT, ORT, Reason, Status, Reviewed By, Reviewed Date, Notes */
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+  var rowValues = [
+    [dateStr, reviewData.cssName, reviewData.caseNumber, reviewData.accountName || '',
+     reviewData.source, reviewData.irt, reviewData.ort,
+     reviewData.reason || '', reviewData.status,
+     reviewData.reviewedBy, dateStr, reviewData.notes || '']
+  ];
+  var enc  = encodeURIComponent('Violation Disputes');
+  /* First: find the last used row so we know where to append */
+  var rangePath = '/drives/' + excelDriveId + '/items/' + excelItemId +
+    '/workbook/worksheets/' + enc + '/usedRange(valuesOnly=true)';
+  var rangeData = await graphGet(rangePath, token);
+  var lastRow   = rangeData.values ? rangeData.values.length + 1 : 2; /* +1 because usedRange is 1-based in address */
+
+  /* Write to the next row */
+  var cellRange = 'A' + lastRow + ':L' + lastRow;
+  var writePath = '/drives/' + excelDriveId + '/items/' + excelItemId +
+    '/workbook/worksheets/' + enc + '/range(address=\'' + cellRange + '\')';
+  await graphPatch(writePath, token, { values: rowValues });
+  console.log('[VCR] Appended review row at row ' + lastRow);
+}
+
+/* ── Update an EXISTING review row in "Violation Disputes" sheet ─────── */
+async function vcrUpdateReview(token, excelRow, reviewData) {
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+  /* Update columns H (Reason), I (Status), J (Reviewed By), K (Reviewed Date) */
+  var rowValues = [[reviewData.reason || '', reviewData.status, reviewData.reviewedBy, dateStr]];
+  var enc  = encodeURIComponent('Violation Disputes');
+  var cellRange = 'H' + excelRow + ':K' + excelRow;
+  var writePath = '/drives/' + excelDriveId + '/items/' + excelItemId +
+    '/workbook/worksheets/' + enc + '/range(address=\'' + cellRange + '\')';
+  await graphPatch(writePath, token, { values: rowValues });
+  console.log('[VCR] Updated review at row ' + excelRow);
+}
+
+/* ── Build summary cards ─────────────────────────────────────────────── */
+function vcrRenderSummary() {
+  var total = _vcrData.length;
+  var pending = 0, valid = 0, disputed = 0, invalid = 0;
+  _vcrData.forEach(function(v) {
+    var st = vcrGetStatus(v);
+    if (st === 'Valid Violation')   valid++;
+    else if (st === 'Dispute Violation') disputed++;
+    else if (st === 'Invalid Violation') invalid++;
+    else pending++;
+  });
+  var el = document.getElementById('vcr-summary');
+  if (!el) return;
+  el.innerHTML =
+    '<div class="vcr-sum-card" data-type="total"><div class="vcr-sum-lbl">Total Violations</div><div class="vcr-sum-val">' + total + '</div></div>' +
+    '<div class="vcr-sum-card" data-type="pending"><div class="vcr-sum-lbl">Pending Review</div><div class="vcr-sum-val">' + pending + '</div></div>' +
+    '<div class="vcr-sum-card" data-type="valid"><div class="vcr-sum-lbl">Valid</div><div class="vcr-sum-val">' + valid + '</div></div>' +
+    '<div class="vcr-sum-card" data-type="disputed"><div class="vcr-sum-lbl">Disputed</div><div class="vcr-sum-val">' + disputed + '</div></div>' +
+    '<div class="vcr-sum-card" data-type="invalid"><div class="vcr-sum-lbl">Invalid</div><div class="vcr-sum-val">' + invalid + '</div></div>';
+}
+
+/* ── Apply filters and reset to page 0 ──────────────────────────────── */
+function vcrFilter() {
+  var member = document.getElementById('vcr-f-member').value;
+  var source = document.getElementById('vcr-f-source').value;
+  var status = document.getElementById('vcr-f-status').value;
+  var search = (document.getElementById('vcr-f-search').value || '').toLowerCase().trim();
+
+  _vcrFiltered = _vcrData.filter(function(v) {
+    if (member !== 'all' && v.dashName !== member) return false;
+    if (source !== 'all' && v.source !== source) return false;
+    var st = vcrGetStatus(v);
+    if (status !== 'all' && st !== status) return false;
+    if (search) {
+      var hay = (v.caseNumber + ' ' + v.dashName + ' ' + v.accountName + ' ' + v.subject).toLowerCase();
+      if (hay.indexOf(search) < 0) return false;
+    }
+    return true;
+  });
+  _vcrPage = 0;
+  vcrRenderTable();
+}
+
+/* ── Status badge HTML ───────────────────────────────────────────────── */
+function vcrBadgeHtml(status) {
+  var cls = 'vcr-badge ';
+  if (status === 'Valid Violation')   cls += 'vcr-badge-valid';
+  else if (status === 'Dispute Violation') cls += 'vcr-badge-disputed';
+  else if (status === 'Invalid Violation') cls += 'vcr-badge-invalid';
+  else cls += 'vcr-badge-pending';
+  return '<span class="' + cls + '">' + status + '</span>';
+}
+
+/* ── Render table for current page ───────────────────────────────────── */
+function vcrRenderTable() {
+  var tbody  = document.getElementById('vcr-tbody');
+  var empty  = document.getElementById('vcr-empty');
+  var pgInfo = document.getElementById('vcr-pg-info');
+  var pgPrev = document.getElementById('vcr-pg-prev');
+  var pgNext = document.getElementById('vcr-pg-next');
+  var pgWrap = document.getElementById('vcr-pagination');
+
+  if (!_vcrFiltered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    pgWrap.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  pgWrap.style.display = 'flex';
+
+  var totalPages = Math.ceil(_vcrFiltered.length / _vcrPerPage);
+  if (_vcrPage >= totalPages) _vcrPage = totalPages - 1;
+  var start = _vcrPage * _vcrPerPage;
+  var page  = _vcrFiltered.slice(start, start + _vcrPerPage);
+
+  tbody.innerHTML = page.map(function(v, idx) {
+    var st = vcrGetStatus(v);
+    var globalIdx = start + idx;
+    return '<tr>' +
+      '<td>' + v.dashName + '</td>' +
+      '<td>' + v.caseNumber + ' <button class="vcr-copy-btn" onclick="vcrCopyCase(\'' + v.caseNumber + '\',this)" title="Copy case number">&#x2398;</button></td>' +
+      '<td>' + v.source + '</td>' +
+      '<td>' + (v.accountName || '<span style="color:var(--cm)">—</span>') + '</td>' +
+      '<td>' + (v.subject || '<span style="color:var(--cm)">—</span>') + '</td>' +
+      '<td style="text-align:center">' + v.irt + '</td>' +
+      '<td style="text-align:center">' + v.ort + '</td>' +
+      '<td style="text-align:center">' + vcrBadgeHtml(st) + '</td>' +
+      '<td style="text-align:center"><button class="vcr-review-btn" onclick="vcrOpenReview(' + globalIdx + ')">Review</button></td>' +
+      '</tr>';
+  }).join('');
+
+  pgInfo.textContent = 'Page ' + (_vcrPage + 1) + ' of ' + totalPages + ' (' + _vcrFiltered.length + ' cases)';
+  pgPrev.disabled = _vcrPage <= 0;
+  pgNext.disabled = _vcrPage >= totalPages - 1;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────── */
+function vcrPage(dir) {
+  _vcrPage += dir;
+  vcrRenderTable();
+}
+
+/* ── Copy case number to clipboard ───────────────────────────────────── */
+function vcrCopyCase(caseNum, btn) {
+  navigator.clipboard.writeText(caseNum).then(function() {
+    btn.classList.add('copied');
+    btn.innerHTML = '&#x2713;';
+    setTimeout(function() {
+      btn.classList.remove('copied');
+      btn.innerHTML = '&#x2398;';
+    }, 1500);
+  }).catch(function() {
+    showToast('Could not copy — clipboard access denied.');
+  });
+}
+
+/* ── Open review modal ───────────────────────────────────────────────── */
+function vcrOpenReview(filteredIdx) {
+  var v = _vcrFiltered[filteredIdx];
+  if (!v) return;
+  _vcrCurrentCase = v;
+
+  document.getElementById('vcr-m-css').textContent    = v.dashName;
+  document.getElementById('vcr-m-case').textContent   = v.caseNumber;
+  document.getElementById('vcr-m-source').textContent = v.source;
+  document.getElementById('vcr-m-acct').textContent   = v.accountName || '—';
+  document.getElementById('vcr-m-subj').textContent   = v.subject || '—';
+  document.getElementById('vcr-m-irt').textContent    = String(v.irt);
+  document.getElementById('vcr-m-ort').textContent    = String(v.ort);
+
+  /* Reset radio buttons */
+  document.querySelectorAll('input[name="vcr-decision"]').forEach(function(r) { r.checked = false; });
+  document.getElementById('vcr-m-reason').value = '';
+  document.getElementById('vcr-reason-wrap').style.display = 'none';
+  document.getElementById('vcr-m-submit').disabled = true;
+
+  /* Pre-fill if already reviewed */
+  var existing = vcrFindReview(v.caseNumber, v.source, v.dashName);
+  if (existing && existing.status) {
+    var radios = document.querySelectorAll('input[name="vcr-decision"]');
+    radios.forEach(function(r) {
+      if (r.value === existing.status) r.checked = true;
+    });
+    if (existing.status === 'Dispute Violation') {
+      document.getElementById('vcr-reason-wrap').style.display = 'block';
+      document.getElementById('vcr-m-reason').value = existing.reason || '';
+    }
+    document.getElementById('vcr-m-submit').disabled = false;
+  }
+
+  /* Show modal */
+  document.getElementById('vcr-modal-overlay').classList.add('active');
+}
+
+/* ── Close review modal ──────────────────────────────────────────────── */
+function vcrCloseModal() {
+  document.getElementById('vcr-modal-overlay').classList.remove('active');
+  _vcrCurrentCase = null;
+}
+
+/* ── Submit review ───────────────────────────────────────────────────── */
+async function vcrSubmitReview() {
+  if (!_vcrCurrentCase) return;
+  var v = _vcrCurrentCase;
+
+  /* Read decision */
+  var decision = '';
+  document.querySelectorAll('input[name="vcr-decision"]').forEach(function(r) {
+    if (r.checked) decision = r.value;
+  });
+  if (!decision) { showToast('Please select Valid or Dispute.'); return; }
+
+  var reason = '';
+  if (decision === 'Dispute Violation') {
+    reason = (document.getElementById('vcr-m-reason').value || '').trim();
+    if (!reason) { showToast('Please provide a reason for the dispute.'); return; }
+  }
+
+  var submitBtn = document.getElementById('vcr-m-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving...';
+
+  try {
+    var token = await getToken();
+    var reviewedBy = _vcrSignedInUser || 'Unknown';
+    var reviewData = {
+      caseNumber:  v.caseNumber,
+      cssName:     v.dashName,
+      accountName: v.accountName || '',
+      source:      v.source,
+      irt:         v.irt,
+      ort:         v.ort,
+      reason:      reason,
+      status:      decision,
+      reviewedBy:  reviewedBy,
+      notes:       ''
+    };
+
+    /* Check if review already exists */
+    var existing = vcrFindReview(v.caseNumber, v.source, v.dashName);
+    if (existing && existing._row) {
+      /* Update existing row */
+      await vcrUpdateReview(token, existing._row, reviewData);
+      existing.status       = decision;
+      existing.reason       = reason;
+      existing.reviewedBy   = reviewedBy;
+      existing.reviewedDate = new Date().toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' });
+    } else {
+      /* Append new row */
+      await vcrAppendReview(token, reviewData);
+      _vcrReviews.push({
+        _row:         0,  /* unknown until next reload */
+        caseNumber:   v.caseNumber,
+        cssName:      v.dashName,
+        source:       v.source,
+        status:       decision,
+        reviewedBy:   reviewedBy,
+        reviewedDate: new Date().toLocaleDateString('en-AU', { day:'2-digit', month:'short', year:'numeric' }),
+        reason:       reason,
+        notes:        ''
+      });
+    }
+
+    showToast('Review saved: ' + v.caseNumber + ' — ' + decision);
+    vcrCloseModal();
+    vcrRenderSummary();
+    vcrRenderTable();
+  } catch (e) {
+    console.error('[VCR] Submit error:', e);
+    showToast('Failed to save review: ' + (e.message || 'unknown error'));
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Review';
+  }
+}
+
+/* ── Radio button change handler — show/hide reason, enable submit ──── */
+function vcrInitModalListeners() {
+  document.querySelectorAll('input[name="vcr-decision"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      var val = this.value;
+      document.getElementById('vcr-reason-wrap').style.display =
+        val === 'Dispute Violation' ? 'block' : 'none';
+      document.getElementById('vcr-m-submit').disabled = false;
+    });
+  });
+
+  /* Close modal on overlay click */
+  var overlay = document.getElementById('vcr-modal-overlay');
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) vcrCloseModal();
+    });
+  }
+
+  /* Attach filter listeners */
+  ['vcr-f-member', 'vcr-f-source', 'vcr-f-status'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', vcrFilter);
+  });
+  var searchEl = document.getElementById('vcr-f-search');
+  if (searchEl) searchEl.addEventListener('input', vcrFilter);
+}
+
+/* ── Main render entry point ─────────────────────────────────────────── */
+function renderViolationReview(violationDetails, existingReviews, signedInUser) {
+  _vcrData    = violationDetails || [];
+  _vcrReviews = existingReviews  || [];
+  _vcrSignedInUser = signedInUser || '';
+
+  var section = document.getElementById('vcr-section');
+  if (!section) return;
+
+  /* Only show VCR section if there are violation cases */
+  if (_vcrData.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+
+  /* Populate member dropdown */
+  var memberSelect = document.getElementById('vcr-f-member');
+  if (memberSelect) {
+    var names = {};
+    _vcrData.forEach(function(v) { names[v.dashName] = true; });
+    var sorted = Object.keys(names).sort();
+    memberSelect.innerHTML = '<option value="all">All</option>' +
+      sorted.map(function(n) { return '<option value="' + n + '">' + n + '</option>'; }).join('');
+  }
+
+  vcrRenderSummary();
+  _vcrFiltered = _vcrData.slice();
+  _vcrPage = 0;
+  vcrRenderTable();
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
    SECTION 18 — DASHBOARD ORCHESTRATOR  (v4 — unchanged)
 ════════════════════════════════════════════════════════════════════════════ */
 function buildDashboard(D) {
@@ -4764,6 +6488,12 @@ function buildDashboard(D) {
   renderQualityNote(p.ql);
   renderFooter(p.cfg);
   renderIrtOrt(p);
+  /* VCR — Violation Case Review (v76) */
+  renderViolationReview(
+    D.sf_violation_details || [],
+    D.vcr_reviews || [],
+    _vcrSignedInUser
+  );
   buildCharts(p);
 }
 
@@ -4849,6 +6579,7 @@ async function refreshDashboard() {
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();           /* restore saved theme BEFORE building charts */
   cafInitListeners();    /* attach static CAF event listeners           */
+  vcrInitModalListeners();  /* attach VCR modal & filter listeners (v76) */
   await initAuth();      /* check Microsoft 365 session and auto-load   */
 
   /* Close leave-day popover when clicking outside it */
@@ -4880,7 +6611,8 @@ const LP_META = {
   'Bereavement Leave':         { bg:'#3D4F5D', fg:'#FFFFFF', abbr:'BL'    },
   'Holiday Leave':             { bg:'#107E3E', fg:'#FFFFFF', abbr:'HL'    },
   'Half-day VL':               { bg:'#71B9FF', fg:'#1C0C6E', abbr:'HDVL'  },
-  'Other':                     { bg:'#2CE0BF', fg:'#1D2329', abbr:null    }
+  'Other':                     { bg:'#2CE0BF', fg:'#1D2329', abbr:null    },
+  'Training':                  { bg:'#0070F2', fg:'#FFFFFF', abbr:'TR'    }
 };
 
 function lpGetMeta(leaveType, customType) {
@@ -5310,6 +7042,9 @@ function lpRenderCalendar() {
 
     grid.appendChild(cell);
   }
+
+  /* Update monthly summary above the calendar */
+  lpRenderMonthSummary();
 }
 
 function lpLeavesForDate(dateStr) {
@@ -5322,6 +7057,140 @@ function lpLeavesForDate(dateStr) {
     lv.startDate && lv.endDate &&
     lv.startDate <= dateStr && lv.endDate >= dateStr
   );
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MONTHLY SUMMARY
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Count Mon–Fri days in [startStr, endStr] that fall within year/month */
+function lpCountWeekdaysInMonth(startStr, endStr, year, month) {
+  /* Clamp to the month boundaries */
+  const mStart = new Date(year, month, 1);
+  const mEnd   = new Date(year, month + 1, 0); /* last day of month */
+
+  const entryStart = new Date(startStr + 'T00:00:00');
+  const entryEnd   = new Date(endStr   + 'T00:00:00');
+
+  const clampStart = entryStart > mStart ? entryStart : mStart;
+  const clampEnd   = entryEnd   < mEnd   ? entryEnd   : mEnd;
+
+  if (clampStart > clampEnd) return 0;
+
+  let count = 0;
+  const cur = new Date(clampStart);
+  while (cur <= clampEnd) {
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
+
+function lpRenderMonthSummary() {
+  const el = document.getElementById('lp-month-summary');
+  if (!el) return;
+
+  /* Filter to entries overlapping this month */
+  const mStart = new Date(lpYear, lpMonth, 1);
+  const mEnd   = new Date(lpYear, lpMonth + 1, 0);
+  const mStartStr = lpYear + '-' + String(lpMonth + 1).padStart(2,'0') + '-01';
+  const mEndStr   = lpYear + '-' + String(lpMonth + 1).padStart(2,'0') + '-' +
+                    String(mEnd.getDate()).padStart(2,'0');
+
+  const overlapping = lpLeaves.filter(lv =>
+    lv.startDate && lv.endDate &&
+    lv.startDate <= mEndStr && lv.endDate >= mStartStr
+  );
+
+  if (overlapping.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+
+  /* Separate training vs leave entries */
+  const leaveEntries    = overlapping.filter(lv => lv.leaveType !== 'Training');
+  const trainingEntries = overlapping.filter(lv => lv.leaveType === 'Training');
+
+  /* ── Team-level counts ── */
+  const leaveMembers    = new Set(leaveEntries.map(lv => lv.name));
+  const trainingMembers = new Set(trainingEntries.map(lv => lv.name));
+
+  let totalLeaveDays = 0;
+  leaveEntries.forEach(lv => {
+    totalLeaveDays += lpCountWeekdaysInMonth(lv.startDate, lv.endDate, lpYear, lpMonth);
+  });
+
+  /* ── Per-member counts ── */
+  const MEMBERS = ['Josh','Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor'];
+  const memberData = {};
+  MEMBERS.forEach(m => { memberData[m] = { leaveDays: 0, trainingDays: 0 }; });
+
+  leaveEntries.forEach(lv => {
+    if (!memberData[lv.name]) memberData[lv.name] = { leaveDays: 0, trainingDays: 0 };
+    memberData[lv.name].leaveDays +=
+      lpCountWeekdaysInMonth(lv.startDate, lv.endDate, lpYear, lpMonth);
+  });
+  trainingEntries.forEach(lv => {
+    if (!memberData[lv.name]) memberData[lv.name] = { leaveDays: 0, trainingDays: 0 };
+    memberData[lv.name].trainingDays +=
+      lpCountWeekdaysInMonth(lv.startDate, lv.endDate, lpYear, lpMonth);
+  });
+
+  /* Only show members that have at least one day in this month */
+  const activeMembers = Object.entries(memberData).filter(
+    ([, d]) => d.leaveDays > 0 || d.trainingDays > 0
+  );
+
+  /* ── Build HTML ── */
+  let html = '<div class="lp-sum-hdr">Monthly Summary</div>';
+  html += '<div class="lp-sum-row">';
+
+  /* LEFT: team metric tiles */
+  html += '<div class="lp-sum-main">';
+  html +=
+    '<div class="lp-sum-tile" style="--accent:#5D36FF">' +
+      '<div class="lp-sum-tile-val">' + leaveMembers.size + '</div>' +
+      '<div class="lp-sum-tile-lbl">On Leave</div>' +
+    '</div>';
+  html +=
+    '<div class="lp-sum-tile" style="--accent:#BB0000">' +
+      '<div class="lp-sum-tile-val">' + totalLeaveDays + '</div>' +
+      '<div class="lp-sum-tile-lbl">Total Leave Days</div>' +
+    '</div>';
+  if (trainingMembers.size > 0) {
+    html +=
+      '<div class="lp-sum-tile" style="--accent:#0070F2">' +
+        '<div class="lp-sum-tile-val">' + trainingMembers.size + '</div>' +
+        '<div class="lp-sum-tile-lbl">In Training</div>' +
+      '</div>';
+  }
+  html += '</div>'; /* /lp-sum-main */
+
+  /* RIGHT: per-member cards */
+  if (activeMembers.length > 0) {
+    html += '<div class="lp-sum-members">';
+    activeMembers.forEach(([name, d]) => {
+      html += '<div class="lp-sum-member">';
+      html += '<div class="lp-sum-member-name">' + name + '</div>';
+      if (d.leaveDays > 0) {
+        html += '<div class="lp-sum-member-detail">' +
+          d.leaveDays + ' Leave Day' + (d.leaveDays !== 1 ? 's' : '') +
+          '</div>';
+      }
+      if (d.trainingDays > 0) {
+        html += '<div class="lp-sum-member-training">' +
+          d.trainingDays + ' Training Day' + (d.trainingDays !== 1 ? 's' : '') +
+          '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>'; /* /lp-sum-members */
+  }
+
+  html += '</div>'; /* /lp-sum-row */
+
+  el.innerHTML = html;
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
