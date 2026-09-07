@@ -144,13 +144,15 @@ body{
 /* ════════════════════════════════════════════════════════════════════════════
    HEADER  (v4 — unchanged, plus new sub-elements)
 ════════════════════════════════════════════════════════════════════════════ */
+/* v85: premium purple gradient header */
 .hdr{
-  background:#5D36FF;
+  background:linear-gradient(135deg,#4A28E0 0%,#5D36FF 40%,#7858FF 100%);
   display:flex;
   align-items:center;
   padding:0 16px;
   height:58px;
   gap:12px;
+  box-shadow:0 2px 12px rgba(93,54,255,.18),inset 0 -1px 0 rgba(0,0,0,.08);
 }
 .hdr-logo{height:30px;flex-shrink:0}
 .hdr-divider{width:1px;height:26px;background:rgba(255,255,255,.35)}
@@ -230,6 +232,9 @@ html.is-capturing :focus-visible{outline:none !important}
    background artifact in the exported PNG.                                   */
 html.is-capturing .tab-section::before,
 html.is-capturing .caf-dlg::before{opacity:0 !important}
+/* v83: hide loading overlay and toast during screenshot capture */
+html.is-capturing .rpt-loading-overlay{display:none !important}
+html.is-capturing #toast{display:none !important}
 
 /* During capture: hide emoji / Unicode icon characters inside header buttons.
    html2canvas cannot render complex emoji (📷 🌙 ⛶) and draws them as
@@ -305,11 +310,13 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
    Appears when user changes the Reporting Month dropdown.
    Prevents interaction with stale data and shows an orbiting-dot animation.
 ════════════════════════════════════════════════════════════════════════════ */
+/* v84: position:fixed, slightly above center for better UX */
 .rpt-loading-overlay{
-  position:absolute;inset:0;
+  position:fixed;inset:0;
   background:rgba(20,18,40,.62);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:clamp(80px,15vh,180px);
   z-index:58;
   opacity:1;transition:opacity .35s ease;
   pointer-events:all;
@@ -396,7 +403,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 /* ── Overlay backdrop (semi-dark tint over blurred dashboard) ─────────── */
 .welcome-overlay{
   position:fixed;inset:0;
-  background:rgba(10,14,28,.50);
+  background:rgba(18,10,42,.55);
   display:flex;align-items:center;justify-content:center;
   z-index:65;
 }
@@ -410,9 +417,9 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
   .welcome-overlay.welcome-close{animation:none!important;opacity:0}
 }
 
-/* ── Dialog card (Grey 6 #5B738B) ────────────────────────────────────── */
+/* ── Dialog card (v84: premium purple gradient) ──────────────────────── */
 .wl-dialog{
-  background:#5B738B;
+  background:linear-gradient(145deg,#2D1B69 0%,#3A2280 40%,#5D36FF 100%);
   border-radius:24px;
   padding:36px 40px 28px;
   box-shadow:
@@ -445,7 +452,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
   overflow:hidden;
   border:2.5px solid rgba(255,255,255,.28);
   box-shadow:0 4px 18px rgba(0,0,0,.30),0 0 0 4px rgba(93,54,255,.18);
-  background:#3D4F5D;
+  background:#3A2280;
   opacity:0;
   transition:opacity 360ms ease;   /* pure fade-in only — no scale/translate */
 }
@@ -458,7 +465,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
   transform:translate(-50%,-50%) scale(.80);
   opacity:0;z-index:2;
   width:170px;height:170px;border-radius:50%;
-  background:rgba(68,90,110,.90);
+  background:rgba(45,27,105,.92);
   display:flex;align-items:center;justify-content:center;
   box-shadow:
     0 0 0 2.5px rgba(93,54,255,.45),
@@ -715,7 +722,33 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 /* ════════════════════════════════════════════════════════════════════════════
    VIOLATION CASE REVIEW (VCR) SECTION
 ════════════════════════════════════════════════════════════════════════════ */
-.vcr-section{padding:0 10px 10px}
+/* v85: extra top breathing room separates VCR from IRT/ORT Compliance above */
+.vcr-section{padding:14px 10px 10px}
+/* v85: Instruction note banner — dual purple accent, soft purple bg */
+.vcr-note-banner{
+  background:rgba(93,54,255,.06);
+  border:1px solid rgba(93,54,255,.18);
+  border-left:3px solid #5D36FF;
+  border-right:3px solid #5D36FF;
+  border-radius:8px;
+  padding:7px 14px;
+  max-width:100%;
+  margin:0 0 10px;
+  transition:background .25s,border-color .25s;
+}
+html[data-theme="dark"] .vcr-note-banner{
+  background:rgba(93,54,255,.10);
+  border-color:rgba(93,54,255,.28);
+  border-left-color:#5D36FF;
+  border-right-color:#5D36FF;
+}
+.vcr-note-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.vcr-note-ttl{font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:var(--ct);transition:color .25s}
+.vcr-note-sep{font-size:9px;font-weight:400;color:var(--cm);transition:color .25s}
+.vcr-note-sub{font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:#5D36FF}
+.vcr-note-body{font-size:10px;color:var(--cm);line-height:1.45;margin:0;transition:color .25s}
+.vcr-note-body strong{font-weight:700;color:var(--ct)}
+.vcr-note-action{font-size:10px;font-weight:700;color:#5D36FF;margin:3px 0 0;line-height:1.45}
 
 /* ── Summary cards ─── */
 .vcr-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
@@ -901,7 +934,8 @@ html[data-theme="dark"] .tab-btn.active{
   text-shadow:0 1px 3px rgba(0,0,0,.40), 0 0 8px rgba(255,255,255,.15);
   box-shadow:0 4px 16px rgba(93,54,255,.42),0 1px 4px rgba(93,54,255,.18),inset 0 1px 0 rgba(255,255,255,.18);
 }
-.tab-section{display:block;position:relative}
+/* v85: small breathing room between tab-nav and content across all tabs */
+.tab-section{display:block;position:relative;padding-top:4px}
 .tab-section.hidden{display:none}
 
 /* ── Tab-section enter / exit animation ──────────────────────────────────
@@ -1415,6 +1449,24 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   outline:none;width:210px;transition:border-color .15s,background .25s,color .25s;
   flex-shrink:0}
 .caf-search:focus{border-color:#5D36FF;box-shadow:0 0 0 3px rgba(93,54,255,.10)}
+/* v84: Internal reference note banner (LP-style card) */
+.caf-note-banner{
+  background:var(--ch);
+  border:1px solid var(--cd);
+  border-left:3px solid #5D36FF;
+  border-radius:8px;
+  padding:7px 13px 7px 10px;
+  max-width:600px;
+  margin:0 0 8px;
+  transition:background .25s,border-color .25s;
+}
+.caf-note-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.caf-note-ttl{font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:var(--ct);transition:color .25s}
+.caf-note-sep{font-size:9px;font-weight:400;color:var(--cm);transition:color .25s}
+.caf-note-sub{font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:#5D36FF}
+.caf-note-body{font-size:10px;color:var(--cm);line-height:1.45;margin:0;transition:color .25s}
+.caf-note-body strong{font-weight:700;color:var(--ct)}
+.caf-note-action{font-size:10px;font-weight:700;color:#5D36FF;margin:3px 0 0;line-height:1.45}
 .caf-search::placeholder{color:var(--cm)}
 
 /* ── CSS Member tiles ───────────────────────────────────────────────────── */
@@ -1484,12 +1536,12 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   transition:background .15s,border-color .15s,color .15s}
 .caf-clear-btn:hover{background:var(--cg);border-color:var(--cf)}
 .caf-tbl-wrap{overflow-x:auto;max-height:500px;overflow-y:auto}
-/* v82: Top horizontal scrollbar proxy */
-.caf-top-scroll{overflow-x:auto;overflow-y:hidden;height:10px;margin-bottom:-1px}
-.caf-top-scroll::-webkit-scrollbar{height:6px}
-.caf-top-scroll::-webkit-scrollbar-track{background:var(--cg,#F5F6F7);border-radius:3px}
-.caf-top-scroll::-webkit-scrollbar-thumb{background:var(--cd,#D1D6DC);border-radius:3px}
-.caf-top-scroll::-webkit-scrollbar-thumb:hover{background:#A9B4BE}
+/* v82: Top horizontal scrollbar proxy — v83: improved default visibility */
+.caf-top-scroll{overflow-x:auto;overflow-y:hidden;height:12px;margin-bottom:-1px;border-bottom:1px solid var(--cd,#D1D6DC)}
+.caf-top-scroll::-webkit-scrollbar{height:7px}
+.caf-top-scroll::-webkit-scrollbar-track{background:var(--ch,#E4E8ED);border-radius:4px}
+.caf-top-scroll::-webkit-scrollbar-thumb{background:#97A5B3;border-radius:4px}
+.caf-top-scroll::-webkit-scrollbar-thumb:hover{background:#7B8D9E}
 .caf-top-scroll-inner{height:1px}
 .caf-tbl{width:100%;border-collapse:collapse;font-size:10px;min-width:500px}
 .caf-tbl thead{position:sticky;top:0;z-index:2}
@@ -1931,9 +1983,10 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
   line-height:1.4;word-break:break-word;transition:color .25s}
 
 /* ═══ Reporting Month Bar (v80) ═════════════════════════════════════════ */
+/* v85: balanced spacing above and below Reporting Month bar */
 .rpt-month-bar{
   display:flex;align-items:center;gap:10px;
-  padding:8px 16px;margin-bottom:10px;
+  padding:8px 16px;margin:6px 0 10px;
   background:var(--cb);border-radius:10px;box-shadow:var(--cs);
   transition:background .25s,box-shadow .25s}
 .rpt-month-label{
@@ -1955,11 +2008,11 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
 /* ═══ eLearning Course Link compact display (v80) ══════════════════════ */
 .el-link-cell{display:flex;align-items:center;gap:6px}
+/* v83: LINK is now display-only text (no longer a clickable anchor) */
 .el-link-anchor{
   font-family:'72','72full',Arial,sans-serif;
   font-size:11px;font-weight:700;color:#0070F2;
-  text-decoration:none;letter-spacing:.3px}
-.el-link-anchor:hover{text-decoration:underline}
+  text-decoration:none;letter-spacing:.3px;cursor:default;user-select:none}
 .el-copy-btn{
   display:inline-flex;align-items:center;justify-content:center;
   min-width:22px;height:22px;border:none;border-radius:4px;
@@ -2259,11 +2312,18 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
   <div class="vcr-section" id="vcr-section" style="display:none">
     <div class="card">
       <div class="card-accent" style="background:#5D36FF"></div>
-      <div class="card-head">Violation Case Review</div>
+      <div class="card-head">IRT/ORT Violation Case Review</div>
       <div class="card-body">
 
         <!-- Summary cards -->
         <div class="vcr-summary" id="vcr-summary"></div>
+
+        <!-- v85: instructional note moved below summary cards -->
+        <div class="vcr-note-banner">
+          <div class="vcr-note-top"><span class="vcr-note-ttl">Violation Case Review</span><span class="vcr-note-sep">&mdash;</span><span class="vcr-note-sub">Action Required</span></div>
+          <p class="vcr-note-body">Please review your potential IRT/ORT violation and provide your feedback using the <strong>REVIEW</strong> button.</p>
+          <p class="vcr-note-action">Josh will file these cases for dispute.</p>
+        </div>
 
         <!-- Filters -->
         <div class="vcr-filters">
@@ -2402,7 +2462,13 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
           <span class="caf-month-pill" id="caf-month-pill" style="display:none"></span>
         </div>
         <input class="caf-search" id="caf-search" type="search"
-               placeholder="Search all columns…" autocomplete="off">
+               placeholder="Search all columns&#x2026;" autocomplete="off">
+      </div>
+
+      <!-- v84: Internal reference note banner (LP-style card) -->
+      <div class="caf-note-banner">
+        <div class="caf-note-top"><span class="caf-note-ttl">Client Assignment File</span><span class="caf-note-sep">&mdash;</span><span class="caf-note-sub">Internal Reference</span></div>
+        <p class="caf-note-body">For any changes to our <strong>INTERNAL</strong> Client Assignment File reference, please click <strong>Request Update</strong> and complete the necessary actions.</p>
       </div>
 
       <!-- ── CSS Member filter tiles ────────────────────────────────────── -->
@@ -2652,23 +2718,6 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
     <div class="lp-pop-list" id="lp-pop-list"></div>
   </div>
 
-  <!-- ══ Reporting Month loading overlay (v82) ═══════════════════════════ -->
-  <div id="rpt-loading-overlay" class="rpt-loading-overlay hidden">
-    <div class="rpt-loading-card">
-      <div class="rpt-orbit-wrap">
-        <div class="rpt-orbit-ring">
-          <div class="rpt-orbit-dot"></div>
-          <div class="rpt-orbit-dot"></div>
-          <div class="rpt-orbit-dot"></div>
-          <div class="rpt-orbit-dot"></div>
-        </div>
-        <div class="rpt-orbit-center"></div>
-      </div>
-      <div class="rpt-loading-title">Crunching the numbers\u2026</div>
-      <div class="rpt-loading-sub" id="rpt-loading-sub">Preparing your dashboard</div>
-    </div>
-  </div>
-
   <!-- ══ Sign-in overlay (shown when not authenticated — new in v5) ══ -->
   <div id="signin-overlay" class="signin-overlay">
     <div class="signin-card">
@@ -2689,10 +2738,27 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
 </div><!-- /dashboard -->
 
+<!-- ══ Reporting Month loading overlay (v82, v83: position:fixed, outside .dashboard) ══ -->
+<div id="rpt-loading-overlay" class="rpt-loading-overlay hidden">
+  <div class="rpt-loading-card">
+    <div class="rpt-orbit-wrap">
+      <div class="rpt-orbit-ring">
+        <div class="rpt-orbit-dot"></div>
+        <div class="rpt-orbit-dot"></div>
+        <div class="rpt-orbit-dot"></div>
+        <div class="rpt-orbit-dot"></div>
+      </div>
+      <div class="rpt-orbit-center"></div>
+    </div>
+    <div class="rpt-loading-title">Crunching the numbers...</div>
+    <div class="rpt-loading-sub" id="rpt-loading-sub">Preparing your dashboard</div>
+  </div>
+</div>
+
 <!-- ══ Post-login welcome overlay — frosted dialog with bubble formation (v58) ══ -->
 <div id="welcome-overlay" class="welcome-overlay hidden" aria-live="polite" role="status">
 
-  <!-- Grey 6 (#5B738B) centered dialog card -->
+  <!-- v84: Premium purple gradient dialog card -->
   <div class="wl-dialog" id="wl-dialog">
 
     <!-- Formation ring: 8 circular photo slots (positioned by JS) + center logo -->
@@ -5827,20 +5893,21 @@ function initTheme() {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   SCREENSHOT  (v12)
+   SCREENSHOT  (v83 — comprehensive capture-safe approach)
    Captures the full .dashboard element to PNG via html2canvas.
    • Temporarily removes overflow:hidden so the full scroll-height is visible.
    • Resets to top-of-page scroll, waits one frame, then restores everything.
+   • onclone strips backdrop-filter, ::before watermarks, overlays, and any
+     CSS artifacts that html2canvas cannot render faithfully.
    • Filename: "Team Josh Dashboard - <Month Year>.png"
 ════════════════════════════════════════════════════════════════════════════ */
 async function takeScreenshot() {
   if (typeof html2canvas === 'undefined') {
-    showToast('Screenshot library still loading — please try again in a moment.');
+    showToast('Screenshot library still loading \u2014 please try again in a moment.');
     return;
   }
 
-  /* Re-entry guard — use a flag rather than btn.disabled so the button's
-     visual state stays normal and won't appear changed in the capture.    */
+  /* Re-entry guard */
   if (takeScreenshot._busy) return;
   takeScreenshot._busy = true;
 
@@ -5859,112 +5926,134 @@ async function takeScreenshot() {
   const origScrollY = window.scrollY;
   window.scrollTo(0, 0);
 
-  /* Remove browser focus from any element so focus rings don't appear
-     in the captured image (clicked button, active tab, etc.)           */
+  /* Remove browser focus rings */
   if (document.activeElement && document.activeElement !== document.body) {
     document.activeElement.blur();
   }
 
-  /* Add capture class → CSS strips all :focus / :focus-visible outlines
-     and suppresses the SAP 3D watermark pseudo-element.                  */
+  /* Add capture class on <html> */
   document.documentElement.classList.add('is-capturing');
 
-  /* ── Pre-capture: get dashboard bg + clear emoji icon spans ────────────
-     Computed here so it is available for both backgroundColor option and
-     the onclone body fix.  Icon innerHTML is cleared in the real DOM AND
-     in onclone — belt-and-suspenders against canvas.fillText() boxes.    */
+  /* ── Pre-capture: get dashboard bg + clear emoji icon spans ───────── */
   const _dashBg    = getComputedStyle(el).backgroundColor;
   const _iconEls   = Array.from(document.querySelectorAll('.btn-icon, #theme-icon'));
-  const _iconSaved = _iconEls.map(ic => ic.innerHTML);
-  _iconEls.forEach(ic => { ic.innerHTML = ''; });
+  const _iconSaved = _iconEls.map(function(ic) { return ic.innerHTML; });
+  _iconEls.forEach(function(ic) { ic.innerHTML = ''; });
 
-  /* Lock the visible tab section at full opacity before capture.
-     The tabIn CSS animation (opacity 0→1, 220 ms) can be mid-progress
-     if the user recently switched tabs; html2canvas reads computed
-     opacity for HTML elements but reads <canvas> via toDataURL()
-     (bypassing CSS opacity), causing HTML text to appear washed-out
-     while Chart.js bars look correct.  Setting an inline opacity:1
-     freezes the element at full opacity without touching CSS classes
-     (no animation restart when the inline style is removed later).   */
+  /* Lock visible tab section at full opacity (prevent mid-animation capture) */
   const _visSection = document.querySelector('.tab-section:not(.hidden)');
   if (_visSection) _visSection.style.opacity = '1';
 
-  /* Wait for the tabIn animation (220 ms) to complete, focus rings
-     to clear, and any blur/class-change transitions to settle.       */
-  await new Promise(r => setTimeout(r, 300));
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  /* Wait for transitions / animations to settle */
+  await new Promise(function(r) { setTimeout(r, 350); });
+  await new Promise(function(r) { requestAnimationFrame(function() { requestAnimationFrame(r); }); });
 
   try {
-    /* Match the device's actual pixel density; minimum 2× for sharpness  */
-    const scale = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
+    var scale = Math.min(Math.max(window.devicePixelRatio || 1, 2), 3);
 
-    const canvas = await html2canvas(el, {
-      scale,
-      useCORS         : true,
-      allowTaint      : false,
-      logging         : false,
-      scrollX         : 0,
-      scrollY         : 0,
-      backgroundColor : _dashBg,           /* canvas fill = dashboard bg    */
-      width           : el.offsetWidth,
-      height          : el.scrollHeight,
-      windowWidth     : el.offsetWidth,    /* match element, not viewport   */
-      windowHeight    : el.scrollHeight,   /* expose full scroll height     */
-      onclone         : function(clonedDoc) {
-        /* ── Body: zero padding in clone only — real DOM untouched ────────
-           Prevents body-bg bleeding around the card edge. Modifying only
-           the clone means Chart.js canvases never experience a layout
-           reflow and their rendered content is preserved correctly.       */
+    var canvas = await html2canvas(el, {
+      scale:           scale,
+      useCORS:         true,
+      allowTaint:      false,
+      logging:         false,
+      scrollX:         0,
+      scrollY:         0,
+      backgroundColor: _dashBg,
+      width:           el.offsetWidth,
+      height:          el.scrollHeight,
+      windowWidth:     el.offsetWidth,
+      windowHeight:    el.scrollHeight,
+      /* ── v83+v84: comprehensive clone cleanup ──────────────────── */
+      onclone: function(clonedDoc) {
+        /* Body: zero padding, match dashboard bg */
         clonedDoc.body.style.cssText =
           'padding:0!important;margin:0!important;background:' +
           _dashBg + '!important;';
-        /* ── Emoji spans: clear in clone (belt-and-suspenders) ────────── */
+
+        /* Emoji spans: clear in clone */
         clonedDoc.querySelectorAll('.btn-icon, #theme-icon').forEach(
           function(ic) { ic.innerHTML = ''; }
         );
-        /* ── Tab icons: hide <img> elements ────────────────────────────
-           CORS-blocked images from SharePoint render as broken-image
-           boxes in the canvas output. Setting display:none removes them
-           without affecting tab button layout (text labels remain).    */
+
+        /* Tab icons: hide CORS-blocked images */
         clonedDoc.querySelectorAll('.tab-icon').forEach(
           function(img) { img.style.display = 'none'; }
         );
-      },
+
+        /* ── CRITICAL: Remove ALL backdrop-filter / filter on every element.
+           html2canvas cannot render backdrop-filter and produces a white/grey
+           translucent overlay artifact instead. Walking the entire clone is
+           acceptable since it happens once on a detached DOM.             */
+        clonedDoc.querySelectorAll('*').forEach(function(node) {
+          if (node.nodeType !== 1) return;
+          var cs = node.style;
+          if (cs) {
+            cs.setProperty('backdrop-filter', 'none', 'important');
+            cs.setProperty('-webkit-backdrop-filter', 'none', 'important');
+          }
+        });
+
+        /* Remove .wl-blurred class if still present (prevents blur filter) */
+        var clonedDash = clonedDoc.querySelector('.dashboard');
+        if (clonedDash) {
+          clonedDash.classList.remove('wl-blurred');
+          clonedDash.style.filter = 'none';
+        }
+
+        /* Kill ::before pseudo-elements (SAP 3D watermark) by injecting a
+           <style> block into the cloned document.  This is more reliable than
+           the CSS-class approach because html2canvas may not parse
+           html.is-capturing selectors in the clone.                      */
+        var killStyle = clonedDoc.createElement('style');
+        killStyle.textContent =
+          '.tab-section::before,.caf-dlg::before{display:none!important}' +
+          '.signin-overlay{display:none!important}' +
+          '.rpt-loading-overlay{display:none!important}' +
+          '.welcome-overlay{display:none!important}' +
+          '.vcr-modal-overlay{display:none!important}' +
+          '#toast{display:none!important}' +
+          '#chart-tt{display:none!important}' +
+          '.lp-pop{display:none!important}' +
+          /* v84: minor fidelity — force scrollbar areas invisible, ensure
+             tab nav buttons + toolbar render with solid opaque backgrounds,
+             and collapse the top-scroll mirror div to avoid blank bars */
+          '.caf-top-scroll{display:none!important}' +
+          '::-webkit-scrollbar{display:none!important}' +
+          '.tab-nav{box-shadow:none!important}' +
+          '.toolbar{box-shadow:none!important}' +
+          '*{animation:none!important;transition:none!important}';
+        clonedDoc.head.appendChild(killStyle);
+      }
     });
 
     /* Filename from the dashboard's displayed month/year */
-    const monthEl = document.getElementById('hdr-month');
-    const month   = monthEl && monthEl.textContent.trim()
-                    ? monthEl.textContent.trim() : 'Dashboard';
-    const fname   = 'Team Josh Dashboard - ' + month + '.png';
+    var monthEl = document.getElementById('hdr-month');
+    var month   = monthEl && monthEl.textContent.trim()
+                  ? monthEl.textContent.trim() : 'Dashboard';
+    var fname   = 'Team Josh Dashboard - ' + month + '.png';
 
-    const link    = document.createElement('a');
+    var link    = document.createElement('a');
     link.download = fname;
     link.href     = canvas.toDataURL('image/png');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    /* Show "Saved!" feedback only AFTER the image is captured so the
-       temporary label never appears in the screenshot itself.          */
+    /* "Saved!" feedback AFTER capture (never appears in screenshot) */
     btn.innerHTML = '<span class="btn-icon">&#x2713;</span> Saved!';
     showToast('Saved: ' + fname);
-    await new Promise(r => setTimeout(r, 1800));
+    await new Promise(function(r) { setTimeout(r, 1800); });
 
   } catch(err) {
     console.error('[Screenshot]', err);
-    showToast('Screenshot failed — please try again.');
+    showToast('Screenshot failed \u2014 please try again.');
   } finally {
-    /* Always restore every temporary change */
     document.documentElement.classList.remove('is-capturing');
     el.style.overflow     = origOverflow;
     el.style.borderRadius = origBR;
     window.scrollTo(0, origScrollY);
     btn.innerHTML         = origHTML;
-    /* Restore icon spans */
-    _iconEls.forEach((ic, i) => { ic.innerHTML = _iconSaved[i]; });
-    /* Restore inline opacity (removes the lock; animation is already
-       complete so the element stays at opacity:1 without restarting) */
+    _iconEls.forEach(function(ic, i) { ic.innerHTML = _iconSaved[i]; });
     if (_visSection) _visSection.style.opacity = '';
     takeScreenshot._busy  = false;
   }
@@ -9712,7 +9801,7 @@ function elRenderTable() {
     const escaped = cafEsc(url);
     const copyIcon = '<svg viewBox="0 0 16 16"><rect x="5" y="1" width="9" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="4" width="9" height="11" rx="1.5" fill="var(--cb,#fff)" stroke="currentColor" stroke-width="1.3"/></svg>';
     return '<td class="el-td-link"><div class="el-link-cell">' +
-      '<a class="el-link-anchor" href="' + escaped + '" target="_blank" rel="noopener">LINK</a>' +
+      '<span class="el-link-anchor">LINK</span>' +
       '<button class="el-copy-btn" title="Copy course URL" onclick="elCopyLink(this,\'' + escaped.replace(/'/g, "\\'") + '\')">' + copyIcon + '<span class="el-copy-label">\u2713 Copied</span></button>' +
       '</div></td>';
   };
