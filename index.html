@@ -301,6 +301,88 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 .signin-overlay.hidden{display:none}
 
 /* ════════════════════════════════════════════════════════════════════════════
+   REPORTING MONTH LOADING OVERLAY  (v82)
+   Appears when user changes the Reporting Month dropdown.
+   Prevents interaction with stale data and shows an orbiting-dot animation.
+════════════════════════════════════════════════════════════════════════════ */
+.rpt-loading-overlay{
+  position:absolute;inset:0;
+  background:rgba(20,18,40,.62);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:58;
+  opacity:1;transition:opacity .35s ease;
+  pointer-events:all;
+}
+.rpt-loading-overlay.rpt-hide{opacity:0;pointer-events:none}
+.rpt-loading-overlay.hidden{display:none}
+
+.rpt-loading-card{
+  background:linear-gradient(145deg,#1E1240 0%,#2D1B69 50%,#1E1240 100%);
+  border:1px solid rgba(93,54,255,.30);
+  border-radius:20px;
+  padding:44px 52px 36px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.45),0 0 80px rgba(93,54,255,.12);
+  min-width:280px;
+}
+.rpt-loading-title{
+  font-family:'72','72full',sans-serif;
+  font-size:18px;font-weight:700;
+  color:#FFFFFF;
+  margin-bottom:6px;
+  letter-spacing:.2px;
+}
+.rpt-loading-sub{
+  font-family:'72','72full',sans-serif;
+  font-size:12px;font-weight:400;
+  color:rgba(255,255,255,.55);
+  margin-bottom:30px;
+}
+
+/* ── Orbiting dots animation ─────────────────────────────────────────────── */
+.rpt-orbit-wrap{
+  position:relative;width:64px;height:64px;margin:0 auto 26px;
+}
+.rpt-orbit-ring{
+  position:absolute;inset:0;
+  animation:rptOrbitSpin 2.2s linear infinite;
+}
+.rpt-orbit-dot{
+  position:absolute;width:8px;height:8px;border-radius:50%;
+}
+.rpt-orbit-dot:nth-child(1){top:0;left:50%;transform:translateX(-50%);background:#5D36FF}
+.rpt-orbit-dot:nth-child(2){top:50%;right:0;transform:translateY(-50%);background:#B894FF}
+.rpt-orbit-dot:nth-child(3){bottom:0;left:50%;transform:translateX(-50%);background:#4CB1FF}
+.rpt-orbit-dot:nth-child(4){top:50%;left:0;transform:translateY(-50%);background:#2CE0BF}
+
+/* Stagger dot pulsing for extra motion */
+.rpt-orbit-dot{animation:rptDotPulse 2.2s ease-in-out infinite}
+.rpt-orbit-dot:nth-child(2){animation-delay:.55s}
+.rpt-orbit-dot:nth-child(3){animation-delay:1.1s}
+.rpt-orbit-dot:nth-child(4){animation-delay:1.65s}
+
+/* Center glow */
+.rpt-orbit-center{
+  position:absolute;top:50%;left:50%;
+  width:14px;height:14px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(93,54,255,.55),transparent 70%);
+  animation:rptCenterPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes rptOrbitSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes rptDotPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.85}50%{transform:translate(-50%,-50%) scale(1.5);opacity:1}}
+/* fix non-centered dots */
+.rpt-orbit-dot:nth-child(1){animation:rptDotPulseY 2.2s ease-in-out infinite}
+.rpt-orbit-dot:nth-child(3){animation:rptDotPulseY 2.2s ease-in-out infinite;animation-delay:1.1s}
+.rpt-orbit-dot:nth-child(2){animation:rptDotPulseX 2.2s ease-in-out infinite;animation-delay:.55s}
+.rpt-orbit-dot:nth-child(4){animation:rptDotPulseX 2.2s ease-in-out infinite;animation-delay:1.65s}
+@keyframes rptDotPulseY{0%,100%{transform:translateX(-50%) scale(1);opacity:.85}50%{transform:translateX(-50%) scale(1.5);opacity:1}}
+@keyframes rptDotPulseX{0%,100%{transform:translateY(-50%) scale(1);opacity:.85}50%{transform:translateY(-50%) scale(1.5);opacity:1}}
+@keyframes rptCenterPulse{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(1)}50%{opacity:.7;transform:translate(-50%,-50%) scale(1.3)}}
+
+/* ════════════════════════════════════════════════════════════════════════════
    WELCOME OVERLAY  (v58 — frosted dashboard with centered Grey 6 dialog)
    The actual dashboard is visible but blurred beneath a semi-transparent
    dark backdrop. A Grey 6 (#5B738B) dialog card holds the 8-member bubble
@@ -670,9 +752,14 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 .vcr-table .vcr-col-action{width:11%;text-align:center}
 
 /* ── Copy button ─── */
-.vcr-copy-btn{display:inline-flex;align-items:center;gap:2px;background:none;border:1px solid var(--cd);border-radius:4px;padding:1px 5px;font-family:"72","72full",sans-serif;font-size:9px;color:var(--ct);cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.vcr-copy-btn{display:inline-flex;align-items:center;gap:2px;background:none;border:1px solid var(--cd);border-radius:4px;padding:1px 5px;font-family:"72","72full",sans-serif;font-size:9px;color:var(--ct);cursor:pointer;transition:background .2s,border-color .2s,color .2s,min-width .2s}
 .vcr-copy-btn:hover{background:var(--ch);border-color:#5D36FF;color:#5D36FF}
-.vcr-copy-btn.copied{background:#107E3E;border-color:#107E3E;color:#fff}
+/* v82: "✓ Copied" feedback state — consistent with eLearning copy button */
+.vcr-copy-btn .vcr-copy-icon{transition:opacity .2s}
+.vcr-copy-btn .vcr-copy-label{display:none;font-size:9px;font-weight:700;color:#107E3E;letter-spacing:.3px;white-space:nowrap}
+.vcr-copy-btn.copied{background:#E8F5E9;border-color:#107E3E;color:#107E3E;min-width:52px}
+.vcr-copy-btn.copied .vcr-copy-icon{opacity:0;width:0;overflow:hidden;display:none}
+.vcr-copy-btn.copied .vcr-copy-label{display:inline}
 
 /* ── Review button ─── */
 .vcr-review-btn{display:inline-flex;align-items:center;gap:3px;background:#5D36FF;border:none;border-radius:5px;padding:3px 10px;font-family:"72","72full",sans-serif;font-size:8.5px;font-weight:600;color:#fff;cursor:pointer;transition:background .15s}
@@ -1397,6 +1484,13 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   transition:background .15s,border-color .15s,color .15s}
 .caf-clear-btn:hover{background:var(--cg);border-color:var(--cf)}
 .caf-tbl-wrap{overflow-x:auto;max-height:500px;overflow-y:auto}
+/* v82: Top horizontal scrollbar proxy */
+.caf-top-scroll{overflow-x:auto;overflow-y:hidden;height:10px;margin-bottom:-1px}
+.caf-top-scroll::-webkit-scrollbar{height:6px}
+.caf-top-scroll::-webkit-scrollbar-track{background:var(--cg,#F5F6F7);border-radius:3px}
+.caf-top-scroll::-webkit-scrollbar-thumb{background:var(--cd,#D1D6DC);border-radius:3px}
+.caf-top-scroll::-webkit-scrollbar-thumb:hover{background:#A9B4BE}
+.caf-top-scroll-inner{height:1px}
 .caf-tbl{width:100%;border-collapse:collapse;font-size:10px;min-width:500px}
 .caf-tbl thead{position:sticky;top:0;z-index:2}
 .caf-tbl th{background:var(--ch);color:var(--ct);font-weight:700;
@@ -1835,6 +1929,53 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 .caf-tmpl-subject-val{
   font-size:11.5px;font-weight:700;color:var(--ct);
   line-height:1.4;word-break:break-word;transition:color .25s}
+
+/* ═══ Reporting Month Bar (v80) ═════════════════════════════════════════ */
+.rpt-month-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 16px;margin-bottom:10px;
+  background:var(--cb);border-radius:10px;box-shadow:var(--cs);
+  transition:background .25s,box-shadow .25s}
+.rpt-month-label{
+  font-family:'72','72full',Arial,sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--ct);white-space:nowrap}
+.rpt-month-select{
+  font-family:'72','72full',Arial,sans-serif;
+  font-size:13px;font-weight:600;color:var(--ct);
+  background:var(--cg);border:1px solid var(--cd);
+  border-radius:6px;padding:5px 28px 5px 10px;
+  cursor:pointer;outline:none;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236D7990'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  transition:background .25s,border-color .25s,color .25s}
+.rpt-month-select:hover{border-color:#5D36FF}
+.rpt-month-select:focus{border-color:#5D36FF;box-shadow:0 0 0 2px rgba(93,54,255,.18)}
+
+/* ═══ eLearning Course Link compact display (v80) ══════════════════════ */
+.el-link-cell{display:flex;align-items:center;gap:6px}
+.el-link-anchor{
+  font-family:'72','72full',Arial,sans-serif;
+  font-size:11px;font-weight:700;color:#0070F2;
+  text-decoration:none;letter-spacing:.3px}
+.el-link-anchor:hover{text-decoration:underline}
+.el-copy-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;border:none;border-radius:4px;
+  background:var(--cg);cursor:pointer;transition:background .2s,min-width .2s;
+  padding:0 4px;line-height:1;gap:3px;
+  font-family:'72','72full',Arial,sans-serif;font-size:0;color:var(--cm)}
+.el-copy-btn:hover{background:var(--cd)}
+.el-copy-btn svg{width:13px;height:13px;fill:var(--cm);transition:opacity .2s}
+.el-copy-btn .el-copy-label{display:none}
+/* v81: Copied state — show checkmark + "Copied" text */
+.el-copy-btn.copied{
+  background:#E8F5E9;min-width:60px;gap:4px}
+.el-copy-btn.copied svg{opacity:0;width:0;overflow:hidden}
+.el-copy-btn.copied .el-copy-label{
+  display:inline;font-size:10px;font-weight:700;color:#107E3E;
+  letter-spacing:.3px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1911,6 +2052,14 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 
   <!-- ══ PERFORMANCE TAB ═══════════════════════════════════════════════ -->
   <div id="section-performance" class="tab-section">
+
+  <!-- ── Reporting Month Selector (v80) ──────────────────────────────── -->
+  <div class="rpt-month-bar">
+    <label class="rpt-month-label" for="rptMonthSelect">Reporting Month</label>
+    <select class="rpt-month-select" id="rptMonthSelect" onchange="onReportingMonthChange()">
+      <!-- populated dynamically -->
+    </select>
+  </div>
 
   <!-- ── Main grid  (identical to v4) ────────────────────────────────── -->
   <div class="grid">
@@ -2273,7 +2422,9 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
           <span class="caf-row-badge" id="caf-row-badge">—</span>
           <button class="caf-clear-btn" id="caf-clear-btn">&#x21BA; Clear Filters</button>
         </div>
-        <div class="caf-tbl-wrap">
+      <!-- v82: Top horizontal scrollbar proxy — synced with bottom scrollbar -->
+        <div class="caf-top-scroll" id="caf-top-scroll"><div class="caf-top-scroll-inner" id="caf-top-scroll-inner"></div></div>
+        <div class="caf-tbl-wrap" id="caf-tbl-wrap">
           <table class="caf-tbl" id="caf-tbl"></table>
         </div>
       </div>
@@ -2499,6 +2650,23 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
       <button class="lp-pop-close" onclick="lpClosePopover()" title="Close">&#x2715;</button>
     </div>
     <div class="lp-pop-list" id="lp-pop-list"></div>
+  </div>
+
+  <!-- ══ Reporting Month loading overlay (v82) ═══════════════════════════ -->
+  <div id="rpt-loading-overlay" class="rpt-loading-overlay hidden">
+    <div class="rpt-loading-card">
+      <div class="rpt-orbit-wrap">
+        <div class="rpt-orbit-ring">
+          <div class="rpt-orbit-dot"></div>
+          <div class="rpt-orbit-dot"></div>
+          <div class="rpt-orbit-dot"></div>
+          <div class="rpt-orbit-dot"></div>
+        </div>
+        <div class="rpt-orbit-center"></div>
+      </div>
+      <div class="rpt-loading-title">Crunching the numbers\u2026</div>
+      <div class="rpt-loading-sub" id="rpt-loading-sub">Preparing your dashboard</div>
+    </div>
   </div>
 
   <!-- ══ Sign-in overlay (shown when not authenticated — new in v5) ══ -->
@@ -3416,6 +3584,12 @@ const MONTH_NAMES = [
   'January','February','March','April','May','June',
   'July','August','September','October','November','December'
 ];
+
+/* ═══ Reporting Month state (v80) ═══════════════════════════════════════ */
+let _reportingMonth   = null;  /* e.g. '2026-09' — set after data load  */
+let _availableMonths  = [];    /* sorted array of YYYY-MM strings        */
+let _lastDashboardData = null; /* cached D object for re-rendering       */
+let _lastToken         = null; /* cached token for SF re-fetch           */
 function getMonthName(m) { return MONTH_NAMES[(m - 1)] || ''; }
 
 /* Excel serial date  → JavaScript Date
@@ -3604,8 +3778,9 @@ function parseCaseProductivity(values, config) {
 }
 
 /* ─── Touch Base ─────────────────────────────────────────────────────────── */
-function parseTouchBase(values) {
-  const empty = { raw: [], emails_sorted: [], calls_sorted: [] };
+/* v80: added optional monthFilter (YYYY-MM string) and returns availableMonths */
+function parseTouchBase(values, monthFilter) {
+  const empty = { raw: [], emails_sorted: [], calls_sorted: [], availableMonths: [] };
   if (!values || values.length < 2) return empty;
   const hi      = findHeaderRow(values);
   const headers = values[hi].map(h => h != null ? String(h).trim() : '');
@@ -3613,27 +3788,69 @@ function parseTouchBase(values) {
   const nameIdx  = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
   const emailIdx = findCol(headers, ['Touch Base Emails','Emails','Email']) ?? 1;
   const callsIdx = findCol(headers, ['Call Conversations','Calls','Call']) ?? 2;
+  const monthIdx = findCol(headers, ['Month']);
 
-  const raw = [];
+  /* Collect all available months and aggregate by member+month */
+  const monthSet = new Set();
+  const allRows  = [];
   for (let i = hi + 1; i < values.length; i++) {
     const row = values[i];
     if (!row[nameIdx]) continue;
-    raw.push({
+    let mStr = null;
+    if (monthIdx !== null && row[monthIdx] != null) {
+      const mRaw = row[monthIdx];
+      if (typeof mRaw === 'number') {
+        const d = excelSerialToDate(mRaw);
+        mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      } else {
+        const s = String(mRaw).trim();
+        if (s.length === 7 && s[4] === '-') {
+          mStr = s;
+        } else {
+          const d = new Date(s);
+          if (!isNaN(d)) mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        }
+      }
+    }
+    if (mStr) monthSet.add(mStr);
+    allRows.push({
       name:   String(row[nameIdx]),
       emails: Math.round(parseNum(row[emailIdx])),
-      calls:  Math.round(parseNum(row[callsIdx]))
+      calls:  Math.round(parseNum(row[callsIdx])),
+      month:  mStr
     });
   }
+
+  const availableMonths = [...monthSet].sort();
+
+  /* If a month filter is specified and month data exists, filter */
+  let raw;
+  if (monthFilter && monthIdx !== null && availableMonths.length > 0) {
+    raw = allRows.filter(r => r.month === monthFilter);
+  } else {
+    raw = allRows;
+  }
+
   const emails_sorted = [...raw].sort((a, b) => b.emails - a.emails);
   const calls_sorted  = [...raw].sort((a, b) => b.calls  - a.calls);
-  return { raw, emails_sorted, calls_sorted };
+  return { raw, emails_sorted, calls_sorted, availableMonths };
 }
 
 /* ─── Case Surveys ───────────────────────────────────────────────────────── */
-function parseSurveys(values, config) {
+/* v80: added optional overrideCurr/overridePrev for reporting-month control */
+function parseSurveys(values, config, overrideCurr, overridePrev) {
+  const useCurr = overrideCurr || config.curr_month_str;
+  const usePrev = overridePrev || config.prev_month_str;
+  /* Derive display names from the month strings */
+  const currMo = parseInt(useCurr.split('-')[1], 10);
+  const prevMo = parseInt(usePrev.split('-')[1], 10);
+  const currMonthName = MONTH_NAMES[currMo - 1] || config.month_name;
+  const prevMonthName = MONTH_NAMES[prevMo - 1] || config.prev_month_name;
+
   const defMeta = {
-    curr_month: config.curr_month_str, prev_month: config.prev_month_str,
-    prev_month_name: config.prev_month_name, curr_month_name: config.month_name
+    curr_month: useCurr, prev_month: usePrev,
+    prev_month_name: prevMonthName, curr_month_name: currMonthName,
+    availableMonths: []
   };
   if (!values || values.length < 2) return { raw: [], ranking: [], ...defMeta };
 
@@ -3664,8 +3881,10 @@ function parseSurveys(values, config) {
     byMonth[mStr][name] = count;
   }
 
-  const curr  = byMonth[config.curr_month_str] || {};
-  const prev  = byMonth[config.prev_month_str] || {};
+  defMeta.availableMonths = Object.keys(byMonth).sort();
+
+  const curr  = byMonth[useCurr] || {};
+  const prev  = byMonth[usePrev] || {};
   const names = Object.keys(curr).length ? Object.keys(curr) : Object.keys(prev);
 
   const raw = names.map(name => {
@@ -3673,9 +3892,9 @@ function parseSurveys(values, config) {
     const p = prev[name] ?? 0;
     const v = c - p;
     let trend, trend_dir;
-    if      (v > 0) { trend = '▲ +' + v; trend_dir = 'up';      }
-    else if (v < 0) { trend = '▼ ' + v;  trend_dir = 'down';    }
-    else            { trend = '— 0';       trend_dir = 'neutral'; }
+    if      (v > 0) { trend = '\u25B2 +' + v; trend_dir = 'up';      }
+    else if (v < 0) { trend = '\u25BC ' + v;  trend_dir = 'down';    }
+    else            { trend = '\u2014 0';       trend_dir = 'neutral'; }
     return { name, prev: p, curr: c, variance: v, trend, trend_dir };
   });
 
@@ -3684,37 +3903,73 @@ function parseSurveys(values, config) {
 }
 
 /* ─── Quality ────────────────────────────────────────────────────────────── */
-function parseQuality(values) {
-  const empty = { raw: [], sorted: [], all_null: true, partial_null: false };
+/* v81: added optional monthFilter (YYYY-MM) for reporting-month control.
+   If a Month column exists and monthFilter is provided, only rows matching
+   that month are included. If no Month column exists, all rows pass. */
+function parseQuality(values, monthFilter) {
+  const empty = { raw: [], sorted: [], all_null: true, partial_null: false, availableMonths: [] };
   if (!values || values.length < 2) return empty;
   const hi      = findHeaderRow(values);
   const headers = values[hi].map(h => h != null ? String(h).trim() : '');
 
   const nameIdx   = findCol(headers, ['CSS Name','Name','Member']) ?? 0;
   const rateIdx   = findCol(headers, ['Quality Rating','Rating','Quality','Score']) ?? 1;
-  const pseudoIdx = findCol(headers, ['CSS Pseudonames','Pseudonames','Pseudo']);  /* optional privacy column */
+  const pseudoIdx = findCol(headers, ['CSS Pseudonames','Pseudonames','Pseudo']);
+  const monthIdx  = findCol(headers, ['Month']);
 
-  const raw = [];
+  /* Collect available months if Month column exists */
+  const monthSet = new Set();
+  const allRows  = [];
   for (let i = hi + 1; i < values.length; i++) {
     const row = values[i];
     if (!row[nameIdx]) continue;
+
+    let mStr = null;
+    if (monthIdx !== null && row[monthIdx] != null) {
+      const mRaw = row[monthIdx];
+      if (typeof mRaw === 'number') {
+        const d = excelSerialToDate(mRaw);
+        mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      } else {
+        const s = String(mRaw).trim();
+        if (s.length === 7 && s[4] === '-') {
+          mStr = s;
+        } else {
+          const d = new Date(s);
+          if (!isNaN(d)) mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        }
+      }
+    }
+    if (mStr) monthSet.add(mStr);
+
     const rv = row[rateIdx];
     const isNull = (rv === null || rv === undefined || rv === '');
     const rating = isNull ? null : parseNum(rv);
     const pct    = isNull ? 0    : Math.round(rating * 100 * 10) / 10;
     const pseudo = (pseudoIdx != null && row[pseudoIdx]) ? String(row[pseudoIdx]).trim() : null;
-    raw.push({ name: String(row[nameIdx]), pseudo, rating, pct });
+    allRows.push({ name: String(row[nameIdx]), pseudo, rating, pct, month: mStr });
   }
 
-  const all_null     = raw.every(r => r.rating === null);
+  const availableMonths = [...monthSet].sort();
+
+  /* Filter by month if specified and month data exists */
+  let raw;
+  if (monthFilter && monthIdx !== null && availableMonths.length > 0) {
+    raw = allRows.filter(r => r.month === monthFilter);
+  } else {
+    raw = allRows;
+  }
+
+  const all_null     = raw.length === 0 || raw.every(r => r.rating === null);
   const partial_null = !all_null && raw.some(r => r.rating === null);
   const sorted       = [...raw].sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
-  return { raw, sorted, all_null, partial_null };
+  return { raw, sorted, all_null, partial_null, availableMonths };
 }
 
 /* ─── PFTC ───────────────────────────────────────────────────────────────── */
-function parsePFTC(values) {
-  if (!values || values.length < 2) return { raw: [], sorted: [] };
+/* v82: added optional monthFilter (YYYY-MM string) and returns availableMonths */
+function parsePFTC(values, monthFilter) {
+  if (!values || values.length < 2) return { raw: [], sorted: [], availableMonths: [] };
   const hi      = findHeaderRow(values);
   const headers = values[hi].map(h => h != null ? String(h).trim() : '');
 
@@ -3722,8 +3977,11 @@ function parsePFTC(values) {
   const appIdx  = findCol(headers, ['Appreciate','Appreciations']) ?? 1;
   const commIdx = findCol(headers, ['Commendation','Commendations']) ?? 2;
   const totIdx  = findCol(headers, ['Total','Total Points']) ?? 3;
+  const monthIdx = findCol(headers, ['Month']);
 
-  const raw = [];
+  /* Collect all available months and all rows */
+  const monthSet = new Set();
+  const allRows  = [];
   for (let i = hi + 1; i < values.length; i++) {
     const row = values[i];
     if (!row[nameIdx]) continue;
@@ -3735,10 +3993,40 @@ function parsePFTC(values) {
     const tot = (totRaw !== null && totRaw !== undefined && totRaw !== '')
       ? Math.round(parseNum(totRaw))
       : app + (comm * 10);
-    raw.push({ name: String(row[nameIdx]), appreciate: app, commendation: comm, total: tot });
+    /* Parse month if column exists */
+    let mStr = null;
+    if (monthIdx !== null && row[monthIdx] != null) {
+      const mRaw = row[monthIdx];
+      if (typeof mRaw === 'number') {
+        const d = excelSerialToDate(mRaw);
+        mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      } else {
+        const s = String(mRaw).trim();
+        if (s.length === 7 && s[4] === '-') {
+          mStr = s;
+        } else {
+          const d = new Date(s);
+          if (!isNaN(d)) mStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        }
+      }
+    }
+    if (mStr) monthSet.add(mStr);
+    allRows.push({ name: String(row[nameIdx]), appreciate: app, commendation: comm, total: tot, month: mStr });
   }
+
+  const availableMonths = [...monthSet].sort();
+
+  /* If a month filter is specified and month data exists, filter */
+  let raw;
+  if (monthFilter && monthIdx !== null && availableMonths.length > 0) {
+    raw = allRows.filter(r => r.month === monthFilter);
+    console.log('[PFTC] Month filter: ' + monthFilter + ' — ' + raw.length + ' of ' + allRows.length + ' records match');
+  } else {
+    raw = allRows;
+  }
+
   const sorted = [...raw].sort((a, b) => b.total - a.total);
-  return { raw, sorted };
+  return { raw, sorted, availableMonths };
 }
 
 /* ─── Axis Limits ────────────────────────────────────────────────────────── */
@@ -4188,9 +4476,9 @@ function sfPickFilesForMonth(allFiles, monthKey) {
 }
 
 /* ── Read Block 1 from a Salesforce export Excel file ────────────────────
-   Block 1 is the first contiguous section of data rows after the header.
-   Stops when it encounters a fully blank row or another section header.
-   Returns a raw 2-D values array (headers + data rows).                  */
+   v81: Returns { block, metadataRows } instead of just block.
+   block = 2-D array (headers + data rows) for sfParseBlock.
+   metadataRows = rows 0..(headerIdx-1) for sfExtractReportPeriod.          */
 async function sfReadBlock1(itemId, token) {
   /* Try common sheet names, then fall back to listing worksheets */
   var commonNames = ['Sheet1', 'Sheet 1', 'Report', 'Data'];
@@ -4200,12 +4488,10 @@ async function sfReadBlock1(itemId, token) {
       var p = '/drives/' + excelDriveId + '/items/' + itemId +
               '/workbook/worksheets/' + encodeURIComponent(commonNames[ci]) + '/usedRange(valuesOnly=true)';
       data = await graphGet(p, token);
-      console.log('[SF] Read worksheet "' + commonNames[ci] + '" from item ' + itemId);
       break;
     } catch (ignore) { /* try next */ }
   }
   if (!data) {
-    /* List worksheets and use the first one */
     var wsPath = '/drives/' + excelDriveId + '/items/' + itemId + '/workbook/worksheets';
     var sheets = await graphGet(wsPath, token);
     if (!sheets.value || !sheets.value.length) throw new Error('No worksheets in SF export');
@@ -4218,15 +4504,9 @@ async function sfReadBlock1(itemId, token) {
   var allRows = Array.isArray(data.values) ? data.values : [];
   console.log('[SF] usedRange returned ' + allRows.length + ' rows, ' +
               (allRows.length > 0 ? allRows[0].length : 0) + ' cols');
-  if (allRows.length < 2) return allRows;
+  if (allRows.length < 2) return { block: allRows, metadataRows: [] };
 
-  /* ── Find the header row containing "Case Number" ──────────────────
-     Salesforce report exports typically have:
-       Row 0: Report title (e.g. "New Closed Cases [CSS Created]")
-       Rows 1-N: Metadata, subtotals, blank rows
-       Row N+1: Column headers (Case Number, Created By, ...)
-       Row N+2+: Data rows
-     Scan the ENTIRE range — the header could be anywhere.            */
+  /* Find the header row containing "Case Number" */
   var headerIdx = -1;
   for (var i = 0; i < allRows.length; i++) {
     var cells = (allRows[i] || []).map(function(c) {
@@ -4236,7 +4516,6 @@ async function sfReadBlock1(itemId, token) {
   }
 
   if (headerIdx < 0) {
-    /* Header not found — log the first non-empty rows for debugging */
     console.warn('[SF] "Case Number" header NOT found in ' + allRows.length + ' rows.');
     var shown = 0;
     for (var d = 0; d < allRows.length && shown < 8; d++) {
@@ -4249,13 +4528,16 @@ async function sfReadBlock1(itemId, token) {
         shown++;
       }
     }
-    return allRows; /* return raw — sfParseBlock will fail gracefully */
+    return { block: allRows, metadataRows: [] };
   }
 
   console.log('[SF] Found "Case Number" header at row ' + headerIdx +
               ' (of ' + allRows.length + ' total rows)');
 
-  /* ── Extract Block 1: rows from header to the first fully-blank row ─ */
+  /* v81: Capture metadata rows (everything before the header) */
+  var metadataRows = allRows.slice(0, headerIdx);
+
+  /* Extract Block 1: rows from header to the first fully-blank row */
   var block = [allRows[headerIdx]];
   for (var j = headerIdx + 1; j < allRows.length; j++) {
     var brow = allRows[j];
@@ -4268,7 +4550,67 @@ async function sfReadBlock1(itemId, token) {
 
   console.log('[SF] Block 1: ' + (block.length - 1) + ' data rows (header at row ' +
               headerIdx + ', ends at row ' + (headerIdx + block.length - 1) + ')');
-  return block;
+  return { block: block, metadataRows: metadataRows };
+}
+
+/* ── Extract the report's Closed Date period from metadata rows ──────────
+   v81: Salesforce grouped-report exports contain metadata rows above the
+   column headers. These rows include the date filter, e.g.:
+     "Closed Date equals Last Month (8/1/2026 to 8/31/2026)"
+     "Closed Date equals THIS MONTH"
+     "Closed Date equals 9/1/2026 to 9/30/2026"
+   This function scans those rows and returns the reporting month as YYYY-MM.
+   Falls back to null if no date filter is found.                           */
+function sfExtractReportPeriod(metadataRows) {
+  if (!metadataRows || metadataRows.length === 0) return null;
+
+  /* Flatten all metadata cells into strings for scanning */
+  for (var r = 0; r < metadataRows.length; r++) {
+    var row = metadataRows[r];
+    if (!row) continue;
+    for (var c = 0; c < row.length; c++) {
+      var cell = row[c];
+      if (cell === null || cell === undefined) continue;
+      var text = String(cell).trim();
+      if (!text) continue;
+
+      /* Pattern 1: explicit date range "(M/D/YYYY to M/D/YYYY)" */
+      var rangeMatch = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+to\s+(\d{1,2})\/(\d{1,2})\/(\d{4})/i);
+      if (rangeMatch) {
+        /* Use the start date's month/year as the reporting month */
+        var startMonth = parseInt(rangeMatch[1], 10);
+        var startYear  = parseInt(rangeMatch[3], 10);
+        var reportMonth = startYear + '-' + String(startMonth).padStart(2, '0');
+        console.log('[SF] Detected report period from date range: ' + reportMonth +
+                    ' (from: "' + text.substring(0, 80) + '")');
+        return reportMonth;
+      }
+
+      /* Pattern 2: "LAST MONTH" — compute from today */
+      if (/closed\s*date/i.test(text) && /last\s*month/i.test(text)) {
+        var now = new Date();
+        var lm  = now.getMonth();  /* 0-indexed; getMonth() for current; last month = getMonth()-1 */
+        var ly  = now.getFullYear();
+        if (lm === 0) { lm = 12; ly--; } /* January → December of previous year */
+        var reportMonth2 = ly + '-' + String(lm).padStart(2, '0');
+        console.log('[SF] Detected report period from "Last Month": ' + reportMonth2 +
+                    ' (from: "' + text.substring(0, 80) + '")');
+        return reportMonth2;
+      }
+
+      /* Pattern 3: "THIS MONTH" — current month */
+      if (/closed\s*date/i.test(text) && /this\s*month/i.test(text)) {
+        var now3 = new Date();
+        var reportMonth3 = now3.getFullYear() + '-' + String(now3.getMonth() + 1).padStart(2, '0');
+        console.log('[SF] Detected report period from "This Month": ' + reportMonth3 +
+                    ' (from: "' + text.substring(0, 80) + '")');
+        return reportMonth3;
+      }
+    }
+  }
+
+  console.log('[SF] No date filter found in ' + metadataRows.length + ' metadata rows — will use filename month as fallback.');
+  return null;
 }
 
 /* ── Parse Block 1 into case records ─────────────────────────────────────
@@ -4372,6 +4714,30 @@ function sfParseBlock(block1, type) {
 
     /* ── Data row: Case Number present ─────────────────────────────── */
     if (!rawCase) continue;  /* skip blank rows */
+
+    /* ── Safeguard 1 (v79): Detect and skip Salesforce subtotal/count/
+       total artifact rows.  In grouped reports the record-count subtotal
+       appears at the end of each group with the count value in the Case
+       Number column and a blank Name column.  Also skip rows where the
+       Case Number cell contains label text like "Record Count", "Grand
+       Total", etc.                                                       */
+    var caseLower = rawCase.toLowerCase();
+    if (caseLower === 'record count' || caseLower === 'subtotal' ||
+        caseLower === 'total' || caseLower === 'grand total' ||
+        caseLower.indexOf('count') >= 0 && caseLower.indexOf('account') < 0) {
+      console.log('[SF] ' + type + ' row ' + i + ': SKIPPED subtotal/label row (Case="' + rawCase + '")');
+      continue;
+    }
+
+    /* ── Safeguard 2 (v79): Strict Case Number validation.
+       Salesforce Case Numbers are exactly 8 numeric digits.  Anything
+       else (e.g. group record counts "11", "5", "3") is not a valid
+       case number and must be rejected.                                  */
+    if (!/^\d{8}$/.test(rawCase)) {
+      console.log('[SF] ' + type + ' row ' + i + ': SKIPPED invalid case number "' + rawCase +
+        '" (not 8 digits) — likely a group subtotal/record count');
+      continue;
+    }
 
     /* Determine the CSS name: use row value if present, else carried-forward */
     var effectiveName = rawName || lastGroupName;
@@ -4697,13 +5063,47 @@ function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap,
     m.client_created++;
   });
 
-  /* ── Effective workdays ────────────────────────────────────────────── */
-  var repYear  = reportDate.year;
-  var repMonth = reportDate.month;
-  var repDay   = reportDate.day;
-  var periodStart = new Date(repYear, repMonth - 1, 1);
-  var periodEnd   = new Date(repYear, repMonth - 1, repDay);
-  var totalWeekdays = sfCountWeekdays(periodStart, periodEnd);
+  /* ── Effective workdays (v82: historical vs current month) ─────────── */
+  /* Parse the data month from monthKey (e.g. '2026-08') */
+  var mkParts  = monthKey.split('-');
+  var mkYear   = parseInt(mkParts[0], 10);
+  var mkMonth  = parseInt(mkParts[1], 10);
+
+  /* Determine if this is a completed historical month:
+     A month is "historical" if it's strictly before the current calendar month. */
+  var now      = new Date();
+  var nowYear  = now.getFullYear();
+  var nowMonth = now.getMonth() + 1;  /* 1-based */
+  var isHistorical = (mkYear < nowYear) || (mkYear === nowYear && mkMonth < nowMonth);
+
+  var periodStart, periodEnd, totalWeekdays;
+  if (isHistorical) {
+    /* Completed month → count ALL weekdays in the full month */
+    var lastDay = new Date(mkYear, mkMonth, 0).getDate();
+    periodStart   = new Date(mkYear, mkMonth - 1, 1);
+    periodEnd     = new Date(mkYear, mkMonth - 1, lastDay);
+    totalWeekdays = sfCountWeekdays(periodStart, periodEnd);
+    console.log('[CP-SF] Historical month detected (' + monthKey + '): using FULL month weekdays = ' + totalWeekdays);
+  } else {
+    /* Current / partial month → use the export date (as-of date) within the monthKey month */
+    var repYear  = reportDate.year;
+    var repMonth = reportDate.month;
+    var repDay   = reportDate.day;
+    /* Clamp to the monthKey's month in case reportDate is from a different month */
+    if (repYear === mkYear && repMonth === mkMonth) {
+      periodStart   = new Date(mkYear, mkMonth - 1, 1);
+      periodEnd     = new Date(mkYear, mkMonth - 1, repDay);
+    } else {
+      /* Export date is from a different month (e.g. file exported next month for "This Month" data).
+         Fall back to today's day within the monthKey month. */
+      var todayDay = (nowYear === mkYear && nowMonth === mkMonth) ? now.getDate() : new Date(mkYear, mkMonth, 0).getDate();
+      periodStart   = new Date(mkYear, mkMonth - 1, 1);
+      periodEnd     = new Date(mkYear, mkMonth - 1, todayDay);
+    }
+    totalWeekdays = sfCountWeekdays(periodStart, periodEnd);
+    console.log('[CP-SF] Current/partial month (' + monthKey + '): weekdays through ' +
+                periodEnd.toISOString().slice(0, 10) + ' = ' + totalWeekdays);
+  }
 
   /* Status thresholds (same as existing) */
   function avgStatus(avg) {
@@ -4734,14 +5134,26 @@ function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap,
     });
   });
 
-  /* ── Diagnostic console output ─────────────────────────────────── */
-  console.log('[CP-SF] ════ CASE PRODUCTIVITY DIAGNOSTIC REPORT ════');
-  console.log('[CP-SF] Month: ' + monthKey + '  |  Period: ' +
-    periodStart.toISOString().slice(0,10) + ' to ' + periodEnd.toISOString().slice(0,10) +
-    '  |  Applicable Weekdays: ' + totalWeekdays);
-  console.log('[CP-SF] Files: ' + filesUsed.map(function(f) { return f.name + ' (' + f.type + ', ' + f.cases + ' raw records)'; }).join(', '));
+  /* ── Diagnostic console output (v82 — enhanced case-level detail) ── */
+  console.log('[CP-SF] ════════════════════════════════════════════════════════');
+  console.log('[CP-SF]  CASE PRODUCTIVITY DIAGNOSTIC REPORT  (v82 enhanced)');
+  console.log('[CP-SF] ════════════════════════════════════════════════════════');
+  console.log('[CP-SF] Month: ' + monthKey + (isHistorical ? ' (HISTORICAL — full month)' : ' (CURRENT — partial)'));
+  console.log('[CP-SF] Period: ' + periodStart.toISOString().slice(0,10) +
+    ' to ' + periodEnd.toISOString().slice(0,10));
+  console.log('[CP-SF] Applicable Weekdays: ' + totalWeekdays);
+  console.log('[CP-SF] ────────────────────────────────────────────────────────');
 
-  /* Per-CSS table */
+  /* Files used — exact filenames */
+  console.log('[CP-SF] FILES SELECTED BY sfPickFilesForMonth:');
+  filesUsed.forEach(function(f) {
+    console.log('[CP-SF]   ' + f.type + ': ' + f.name + ' (' + f.cases + ' raw parsed records)');
+  });
+  if (filesUsed.length === 0) console.log('[CP-SF]   (no files)');
+  console.log('[CP-SF] ────────────────────────────────────────────────────────');
+
+  /* Per-CSS summary table */
+  console.log('[CP-SF] PER-MEMBER SUMMARY:');
   var cpDiagRows = members.map(function(m) {
     var sfn = '';
     Object.keys(nameMap).forEach(function(k) { if (nameMap[k] === m.name) sfn = k; });
@@ -4759,14 +5171,30 @@ function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap,
   });
   console.table(cpDiagRows);
 
+  /* Per-member CASE NUMBER LISTS — the core reconciliation data */
+  console.log('[CP-SF] ────────────────────────────────────────────────────────');
+  console.log('[CP-SF] PER-MEMBER CASE NUMBERS (for reconciliation):');
+  Object.keys(result).sort().forEach(function(dn) {
+    var m = result[dn];
+    var csArr  = []; m._csNums.forEach(function(cn) { csArr.push(cn); });
+    var cliArr = []; m._cliNums.forEach(function(cn) { cliArr.push(cn); });
+    csArr.sort();
+    cliArr.sort();
+    console.log('[CP-SF]   ' + dn + ':');
+    console.log('[CP-SF]     CSS Created (' + csArr.length + '): ' + (csArr.length > 0 ? csArr.join(', ') : '(none)'));
+    console.log('[CP-SF]     Client Created (' + cliArr.length + '): ' + (cliArr.length > 0 ? cliArr.join(', ') : '(none)'));
+  });
+
   /* Team totals */
+  console.log('[CP-SF] ────────────────────────────────────────────────────────');
   var teamCs = 0, teamCli = 0, teamTot = 0;
   members.forEach(function(m) {
     teamCs  += m.cs_created;
     teamCli += m.client_created;
     teamTot += m.total;
   });
-  console.log('[CP-SF] Team Totals: CS Created=' + teamCs + ', Client Created=' + teamCli + ', Combined=' + teamTot);
+  console.log('[CP-SF] TEAM TOTALS: CS Created=' + teamCs +
+    ', Client Created=' + teamCli + ', Combined=' + teamTot);
 
   /* Unique case numbers per source (cross-check for dedup) */
   var allCsNums = new Set(), allCliNums = new Set();
@@ -4780,21 +5208,36 @@ function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap,
   /* Ignored SF names */
   var ignoredNames = Object.keys(ignored);
   if (ignoredNames.length > 0) {
-    console.log('[CP-SF] Ignored SF names (not in Config mapping):');
+    console.log('[CP-SF] ────────────────────────────────────────────────────────');
+    console.log('[CP-SF] IGNORED SF NAMES (not in Config mapping):');
     ignoredNames.forEach(function(n) {
-      console.log('  - "' + n + '" (' + ignored[n] + ' records)');
+      console.log('[CP-SF]   "' + n + '" (' + ignored[n] + ' records)');
     });
   }
-  console.log('[CP-SF] ════ END CASE PRODUCTIVITY DIAGNOSTIC ════');
+
+  /* Effective Workdays detail */
+  console.log('[CP-SF] ────────────────────────────────────────────────────────');
+  console.log('[CP-SF] EFFECTIVE WORKDAYS DETAIL:');
+  members.forEach(function(m) {
+    console.log('[CP-SF]   ' + m.name + ': ' + totalWeekdays + ' weekdays - ' +
+      m.leave_days + ' leave = ' + m.effective_wd + ' eff. workdays → ' +
+      m.total + ' / ' + m.effective_wd + ' = ' + m.avg.toFixed(2) + ' (' + m.status + ')');
+  });
+  console.log('[CP-SF] ════════════════════════════════════════════════════════');
+  console.log('[CP-SF]  END CASE PRODUCTIVITY DIAGNOSTIC');
+  console.log('[CP-SF] ════════════════════════════════════════════════════════');
 
   return { members: members, ignored: ignoredNames, totalWeekdays: totalWeekdays };
 }
 
 /* ── Main orchestrator: fetch + compute Salesforce data ──────────────────
+   v81: Reads ALL SF export files, extracts each file's actual report period
+   from metadata rows, groups files by report-month (not filename-month),
+   then selects the latest export per type for the requested month.
    Returns { irt_ort_members, violationDetails, cp_members,
-             sf_month, sf_report_date, sf_warnings, sf_ignored, sf_files_used }
-   or partial data if some pipelines fail.                                 */
-async function sfFetchData(token, config, leaveMap) {
+             sf_month, sf_report_date, sf_warnings, sf_ignored,
+             sf_files_used, sf_available_months }                          */
+async function sfFetchData(token, config, leaveMap, reportingMonthOverride, rawCpVals) {
   const warnings = [];
   console.log('[SF] \u2550\u2550\u2550\u2550 Salesforce Pipeline starting \u2550\u2550\u2550\u2550');
 
@@ -4802,157 +5245,209 @@ async function sfFetchData(token, config, leaveMap) {
   const nameMap = config.sf_name_map || {};
   const mapSize = Object.keys(nameMap).length;
   if (mapSize === 0) {
-    console.warn('[SF] No Salesforce Name mapping in Config tab.\n' +
-      '     To fix: add a section to your Config sheet with:\n' +
-      '     Row: "Salesforce Name" (col A) | "Dashboard Name" (col B)\n' +
-      '     Then list each SF display name \u2192 dashboard name below it.');
-    warnings.push('No SF Name mapping in Config \u2014 add "Salesforce Name"/"Dashboard Name" section.');
-    return { case_productivity: null, sf_warnings: warnings };
+    console.warn('[SF] No Salesforce Name mapping in Config tab.');
+    warnings.push('No SF Name mapping in Config.');
+    return { case_productivity: null, sf_warnings: warnings, sf_available_months: [] };
   }
   console.log('[SF] Name mapping loaded (' + mapSize + ' entries):', Object.entries(nameMap).map(function(e) { return e[0] + ' \u2192 ' + e[1]; }).join(', '));
 
   /* 2. List all Salesforce exports */
-  let listing;
+  var listing;
   try {
     listing = await sfListExports(token);
   } catch (e) {
     warnings.push('Failed to list Salesforce Exports folder: ' + (e.message || e));
-    return { case_productivity: null, sf_warnings: warnings };
+    return { case_productivity: null, sf_warnings: warnings, sf_available_months: [] };
   }
-  warnings.push(...listing.warnings);
+  warnings.push.apply(warnings, listing.warnings);
   if (listing.files.length === 0) {
     warnings.push('No Salesforce export files found.');
-    return { case_productivity: null, sf_warnings: warnings };
+    return { case_productivity: null, sf_warnings: warnings, sf_available_months: [] };
   }
 
-  /* 3. Determine target month (from Config year/month) */
-  const targetMonth = config.year + '-' + String(config.month).padStart(2, '0');
-  let monthKey = targetMonth;
+  /* 3. v81: Read ALL files in parallel to extract report periods */
+  console.log('[SF] Reading ' + listing.files.length + ' file(s) to detect report periods...');
+  var readPromises = listing.files.map(function(f) {
+    return sfReadBlock1(f.id, token).then(function(result) {
+      return { file: f, result: result };
+    }).catch(function(e) {
+      console.warn('[SF] Failed to read ' + f.name + ': ' + e.message);
+      return { file: f, result: null };
+    });
+  });
+  var readResults = await Promise.all(readPromises);
+
+  /* 4. v81: Determine each file's report month from metadata, fall back to filename */
+  var reportMonthSet = new Set();
+  var fileInfos = [];  /* { file, block, reportMonth } */
+  readResults.forEach(function(item) {
+    if (!item.result) return;
+    var reportMonth = sfExtractReportPeriod(item.result.metadataRows);
+    if (!reportMonth) {
+      /* Fallback: use filename month */
+      reportMonth = item.file.parsed.monthKey;
+      console.log('[SF] File ' + item.file.name + ': no date filter in metadata, using filename month: ' + reportMonth);
+    }
+    reportMonthSet.add(reportMonth);
+    fileInfos.push({
+      file: item.file,
+      block: item.result.block,
+      reportMonth: reportMonth
+    });
+  });
+
+  var availableReportMonths = Array.from(reportMonthSet).sort();
+  console.log('[SF] Report periods detected: ' + availableReportMonths.join(', '));
+
+  /* 5. v81: Determine target month */
+  var configTargetMonth = config.year + '-' + String(config.month).padStart(2, '0');
+  var targetMonth = reportingMonthOverride || configTargetMonth;
+  var monthKey = targetMonth;
 
   /* If target month has no files, fall back to the latest available */
-  if (!listing.months.has(targetMonth)) {
-    const sorted = [...listing.months].sort();
-    monthKey = sorted[sorted.length - 1];
-    warnings.push('No Salesforce files for ' + targetMonth + '; using latest available: ' + monthKey);
-  }
-
-  /* 4. Pick the latest file per type for the chosen month */
-  const { cssFile, clientFile } = sfPickFilesForMonth(listing.files, monthKey);
-  const filesUsed = [];
-
-  if (!cssFile && !clientFile) {
-    warnings.push('No matching Salesforce files for ' + monthKey);
-    return { case_productivity: null, sf_warnings: warnings };
-  }
-  if (!cssFile)    warnings.push('CSS Created file missing for ' + monthKey + ' — CS counts will be 0.');
-  if (!clientFile) warnings.push('Client Created file missing for ' + monthKey + ' — Client counts will be 0.');
-
-  /* 5. Read Block 1 from each file */
-  let cssRecords = [], clientRecords = [];
-  if (cssFile) {
-    try {
-      const block = await sfReadBlock1(cssFile.id, token);
-      cssRecords  = sfParseBlock(block, 'css');
-      filesUsed.push({ name: cssFile.name, type: 'CSS Created', cases: cssRecords.length });
-      console.log('[SF] CSS Created — parsed', cssRecords.length, 'records from', cssFile.name);
-    } catch (e) {
-      warnings.push('Failed to read CSS Created file: ' + (e.message || e));
-    }
-  }
-  if (clientFile) {
-    try {
-      const block    = await sfReadBlock1(clientFile.id, token);
-      clientRecords  = sfParseBlock(block, 'client');
-      filesUsed.push({ name: clientFile.name, type: 'Client Created', cases: clientRecords.length });
-      console.log('[SF] Client Created — parsed', clientRecords.length, 'records from', clientFile.name);
-    } catch (e) {
-      warnings.push('Failed to read Client Created file: ' + (e.message || e));
+  if (!reportMonthSet.has(targetMonth)) {
+    if (availableReportMonths.length > 0) {
+      monthKey = availableReportMonths[availableReportMonths.length - 1];
+      warnings.push('No Salesforce data for ' + targetMonth + '; using latest available: ' + monthKey);
+    } else {
+      warnings.push('No report periods detected from any file.');
+      return { case_productivity: null, sf_warnings: warnings, sf_available_months: availableReportMonths };
     }
   }
 
-  /* 6. Determine report date from the latest file's filename */
-  const repFile = cssFile || clientFile;
-  const reportDate = repFile.parsed;
+  /* 6. v81: Pick the latest file per type for the chosen report month
+     "Latest" = most recent filename timestamp (export date), NOT report date */
+  var cssInfos    = fileInfos.filter(function(fi) { return fi.file.parsed.type === 'css'    && fi.reportMonth === monthKey; });
+  var clientInfos = fileInfos.filter(function(fi) { return fi.file.parsed.type === 'client' && fi.reportMonth === monthKey; });
+  cssInfos.sort(function(a, b) { return b.file.parsed.ts - a.file.parsed.ts; });
+  clientInfos.sort(function(a, b) { return b.file.parsed.ts - a.file.parsed.ts; });
 
-  /* 7. Compute IRT/ORT metrics (v73 — decoupled from Case Productivity) */
+  var cssInfo    = cssInfos[0]    || null;
+  var clientInfo = clientInfos[0] || null;
+  var filesUsed = [];
+
+  console.log('[SF] ── File selection for report period ' + monthKey + ' ──');
+  console.log('[SF] CSS Created candidates (' + cssInfos.length + '):');
+  cssInfos.forEach(function(fi) {
+    console.log('[SF]   ' + (fi === cssInfo ? '\u2192 SELECTED: ' : '  ') + fi.file.name +
+                ' (exported: ' + fi.file.parsed.dateStr + ', report period: ' + fi.reportMonth + ')');
+  });
+  console.log('[SF] Client Created candidates (' + clientInfos.length + '):');
+  clientInfos.forEach(function(fi) {
+    console.log('[SF]   ' + (fi === clientInfo ? '\u2192 SELECTED: ' : '  ') + fi.file.name +
+                ' (exported: ' + fi.file.parsed.dateStr + ', report period: ' + fi.reportMonth + ')');
+  });
+  console.log('[SF] ── End file selection ──');
+
+  if (!cssInfo && !clientInfo) {
+    warnings.push('No matching Salesforce files for report period ' + monthKey);
+    return { case_productivity: null, sf_warnings: warnings, sf_available_months: availableReportMonths };
+  }
+  if (!cssInfo)    warnings.push('CSS Created file missing for ' + monthKey + ' \u2014 CS counts will be 0.');
+  if (!clientInfo) warnings.push('Client Created file missing for ' + monthKey + ' \u2014 Client counts will be 0.');
+
+  /* 7. Parse Block 1 from the already-read data (no extra API calls) */
+  var cssRecords = [], clientRecords = [];
+  if (cssInfo) {
+    try {
+      cssRecords = sfParseBlock(cssInfo.block, 'css');
+      filesUsed.push({ name: cssInfo.file.name, type: 'CSS Created', cases: cssRecords.length, reportMonth: monthKey });
+      console.log('[SF] CSS Created \u2014 parsed', cssRecords.length, 'records from', cssInfo.file.name);
+    } catch (e) {
+      warnings.push('Failed to parse CSS Created file: ' + (e.message || e));
+    }
+  }
+  if (clientInfo) {
+    try {
+      clientRecords = sfParseBlock(clientInfo.block, 'client');
+      filesUsed.push({ name: clientInfo.file.name, type: 'Client Created', cases: clientRecords.length, reportMonth: monthKey });
+      console.log('[SF] Client Created \u2014 parsed', clientRecords.length, 'records from', clientInfo.file.name);
+    } catch (e) {
+      warnings.push('Failed to parse Client Created file: ' + (e.message || e));
+    }
+  }
+
+  /* 8. Determine report date from the latest file's filename (for workday calc) */
+  var repFile = cssInfo ? cssInfo.file : clientInfo.file;
+  var reportDate = repFile.parsed;
+
+  /* 9. Compute IRT/ORT metrics */
   var irtOrt = sfComputeIrtOrt(cssRecords, clientRecords, nameMap);
   var ignoredNames = Object.keys(irtOrt.ignored);
   if (ignoredNames.length > 0) {
     warnings.push('Ignored Salesforce names (not in roster): ' + ignoredNames.join(', '));
   }
 
-  /* ── Diagnostic console output ─────────────────────────────────── */
+  /* ── Diagnostic console output ───────────────────────────────────── */
   console.log('[IRT/ORT] \u2550\u2550\u2550\u2550 DIAGNOSTIC REPORT \u2550\u2550\u2550\u2550');
-  console.log('[IRT/ORT] Month: ' + monthKey + '  |  Files: ' + filesUsed.map(function(f){ return f.name; }).join(', '));
+  console.log('[IRT/ORT] Report period: ' + monthKey + '  |  Files: ' + filesUsed.map(function(f){ return f.name; }).join(', '));
 
-  /* Per-CSS table */
   var diagRows = irtOrt.members.map(function(m) {
-    /* find this member's SF name from nameMap (reverse lookup) */
     var sfn = '';
     Object.keys(nameMap).forEach(function(k) { if (nameMap[k] === m.name) sfn = k; });
     return {
-      'CSS':             m.name,
-      'SF Name':         sfn,
-      'CS Total':        m.cs_created,
-      'CS Violated':     m.violated_cs,
-      'CLI Total':       m.client_created,
-      'CLI Violated':    m.violated_cli,
-      'Comb Violated':   m.tot_viol,
-      'CS Comp%':        m.comp_cs,
-      'CLI Comp%':       m.comp_cli,
-      'Comb Comp%':      m.comp_comb
+      'CSS': m.name, 'SF Name': sfn,
+      'CS Total': m.cs_created, 'CS Violated': m.violated_cs,
+      'CLI Total': m.client_created, 'CLI Violated': m.violated_cli,
+      'Comb Violated': m.tot_viol,
+      'CS Comp%': m.comp_cs, 'CLI Comp%': m.comp_cli, 'Comb Comp%': m.comp_comb
     };
   });
   console.table(diagRows);
 
-  /* Violated case details */
   if (irtOrt.violationDetails.length > 0) {
     console.log('[IRT/ORT] Violated case details (' + irtOrt.violationDetails.length + ' cases):');
     console.table(irtOrt.violationDetails.map(function(v) {
       return {
-        'Case#':    v.caseNumber,
-        'Source':   v.source,
-        'CSS':      v.dashName,
-        'SF Name':  v.sfName,
-        'IRT':      v.irt,
-        'ORT':      v.ort,
-        'Why':      'IRT=' + v.irt + (v.irt>0?' (>0)':'') + ', ORT=' + v.ort + (v.ort>0?' (>0)':'') + ' \u2192 1 violated case'
+        'Case#': v.caseNumber, 'Source': v.source, 'CSS': v.dashName, 'SF Name': v.sfName,
+        'IRT': v.irt, 'ORT': v.ort,
+        'Why': 'IRT=' + v.irt + (v.irt>0?' (>0)':'') + ', ORT=' + v.ort + (v.ort>0?' (>0)':'') + ' \u2192 1 violated case'
       };
     }));
   } else {
     console.log('[IRT/ORT] No violated cases found.');
   }
-
-  /* Ignored names */
   if (ignoredNames.length > 0) {
-    console.log('[IRT/ORT] Ignored SF names (not in Config mapping):');
+    console.log('[IRT/ORT] Ignored SF names:');
     ignoredNames.forEach(function(n) {
       console.log('  \u2022 "' + n + '" (' + irtOrt.ignored[n] + ' records)');
     });
   }
-
-  /* Warnings */
   if (warnings.length > 0) {
     console.log('[IRT/ORT] Warnings:');
     warnings.forEach(function(w) { console.log('  \u26A0 ' + w); });
   }
   console.log('[IRT/ORT] \u2550\u2550\u2550\u2550 END DIAGNOSTIC \u2550\u2550\u2550\u2550');
 
-  /* 8. Compute Case Productivity from same SF records (v77 — separate pipeline) */
+  /* 10. v82: Re-derive leave_map for the actual data month if raw CP values are available */
+  var effectiveLeaveMap = leaveMap || {};
+  if (rawCpVals && rawCpVals.length > 0) {
+    var mkParts = monthKey.split('-');
+    var mkMonthNum = parseInt(mkParts[1], 10);
+    var mkMonthName = ['January','February','March','April','May','June',
+      'July','August','September','October','November','December'][mkMonthNum - 1];
+    var tempConfig = Object.assign({}, config, { month_name: mkMonthName });
+    var cpReparse = parseCaseProductivity(rawCpVals, tempConfig);
+    effectiveLeaveMap = cpReparse.leave_map || {};
+    console.log('[CP-SF] Leave map re-parsed for ' + mkMonthName + ':', JSON.stringify(effectiveLeaveMap));
+  }
+
+  /* 11. Compute Case Productivity */
   var cpResult = sfComputeCaseProductivity(
-    cssRecords, clientRecords, nameMap, leaveMap || {}, reportDate, monthKey, filesUsed
+    cssRecords, clientRecords, nameMap, effectiveLeaveMap, reportDate, monthKey, filesUsed
   );
 
   return {
-    irt_ort_members:    irtOrt.members,
-    violationDetails:   irtOrt.violationDetails,
-    cp_members:         cpResult.members,
-    cp_totalWeekdays:   cpResult.totalWeekdays,
-    sf_month:           monthKey,
-    sf_report_date:     reportDate,
-    sf_warnings:        warnings,
-    sf_ignored:         ignoredNames,
-    sf_files_used:      filesUsed
+    irt_ort_members:     irtOrt.members,
+    violationDetails:    irtOrt.violationDetails,
+    cp_members:          cpResult.members,
+    cp_totalWeekdays:    cpResult.totalWeekdays,
+    sf_month:            monthKey,
+    sf_report_date:      reportDate,
+    sf_warnings:         warnings,
+    sf_ignored:          ignoredNames,
+    sf_files_used:       filesUsed,
+    sf_available_months: availableReportMonths
   };
 }
 
@@ -4972,8 +5467,31 @@ async function loadSignInBg(token) {
    SECTION 9 — DATA FETCHER
    Resolves the Excel file, reads all 6 sheets in parallel, parses each one,
    and assembles the data object that buildDashboard(D) expects.
+   v80: Supports Reporting Month selector — caches raw sheet values for
+        re-parsing when month changes; passes month filter to TB/SV parsers.
 ════════════════════════════════════════════════════════════════════════════ */
-async function fetchDashboardData(token) {
+
+/* v80: cached raw values for re-parsing on month change */
+let _rawTbVals  = null;
+let _rawSvVals  = null;
+let _rawQlVals  = null;   /* v81: raw Quality sheet values */
+let _rawCpVals  = null;   /* v82: raw Case Productivity sheet values (for leave_map re-parse) */
+let _rawPfVals  = null;   /* v82: raw PFTC sheet values (for month filtering) */
+let _cachedConfig   = null;
+let _cachedCpParsed = null;
+let _cachedQuality  = null;
+let _cachedPftc     = null;
+let _cachedSfListing = null;  /* { files, months, warnings } from sfListExports */
+
+/* v80: helper — compute previous month string from YYYY-MM */
+function prevMonthStr(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const pm = m > 1 ? m - 1 : 12;
+  const py = m > 1 ? y : y - 1;
+  return py + '-' + String(pm).padStart(2, '0');
+}
+
+async function fetchDashboardData(token, reportingMonthOverride) {
   await resolveExcelFile(token);
 
   /* ── Step 1: Read all sheets in parallel ─────────────────────────────── */
@@ -4983,13 +5501,22 @@ async function fetchDashboardData(token) {
   /* We need Config AND Case Productivity (for leave days) before the SF pipeline */
   const configResult = await sheetPromises[0];
   const config = parseConfig(Array.isArray(configResult) ? configResult : []);
+  _cachedConfig = config;
 
   /* Parse Case Productivity early — we need the leave_map for the SF pipeline */
   const cpResult = await sheetPromises[1].catch(e => { console.error('[Graph] CP sheet failed:', e); return []; });
-  const cpParsed = parseCaseProductivity(Array.isArray(cpResult) ? cpResult : [], config);
+  const cpRawVals = Array.isArray(cpResult) ? cpResult : [];
+  _rawCpVals = cpRawVals;  /* v82: cache for re-parsing leave_map on month change */
+  const cpParsed = parseCaseProductivity(cpRawVals, config);
+  _cachedCpParsed = cpParsed;
 
-  /* Start SF pipeline with config + leaveMap (v77) */
-  const sfPromise = sfFetchData(token, config, cpParsed.leave_map);
+  /* v80: determine the reporting month to use */
+  const configMonth = config.year + '-' + String(config.month).padStart(2, '0');
+
+  /* Start SF pipeline with config + leaveMap (v77)
+     v80: pass reportingMonthOverride so sfFetchData uses the right month
+     v82: pass rawCpVals so sfFetchData can re-derive leave_map for actual data month */
+  const sfPromise = sfFetchData(token, config, cpParsed.leave_map, reportingMonthOverride, cpRawVals);
 
   /* Wait for remaining sheets */
   const settled = await Promise.allSettled(sheetPromises);
@@ -5007,11 +5534,37 @@ async function fetchDashboardData(token) {
   const qlVals     = getValues(settled[4], 'Quality');
   const pfVals     = getValues(settled[5], 'PFTC');
 
+  /* v80: cache raw values for re-parsing */
+  _rawTbVals = tbVals;
+  _rawSvVals = svVals;
+
+  /* v80: first-pass parse of TB/SV without filter to discover available months */
+  const tbUnfiltered = parseTouchBase(tbVals);
+  const svUnfiltered = parseSurveys(svVals, config);
+  /* v81: first-pass parse of Quality without filter to discover months */
+  const qlUnfiltered = parseQuality(qlVals);
+
+  /* v80: collect all available months from all sources */
+  const allMonthSet = new Set();
+  /* From SF listing (via sfFetchData result — populated below) */
+  /* From Touch Base */
+  (tbUnfiltered.availableMonths || []).forEach(m => allMonthSet.add(m));
+  /* From Case Surveys */
+  (svUnfiltered.availableMonths || []).forEach(m => allMonthSet.add(m));
+  /* From Quality (v81) */
+  (qlUnfiltered.availableMonths || []).forEach(m => allMonthSet.add(m));
+  /* From Config */
+  allMonthSet.add(configMonth);
+
   /* ── Step 2: Parse remaining sheets ──────────────────────────────────── */
-  const touch_base        = parseTouchBase(tbVals);
-  const surveys           = parseSurveys(svVals, config);
-  const quality           = parseQuality(qlVals);
-  const pftc              = parsePFTC(pfVals);
+  /* v82: cache raw PFTC values for re-parsing on month change */
+  _rawPfVals = pfVals;
+  /* v82: first-pass parse PFTC unfiltered to discover available months */
+  const pfUnfiltered = parsePFTC(pfVals);
+  (pfUnfiltered.availableMonths || []).forEach(m => allMonthSet.add(m));
+
+  /* v81: cache raw Quality values for re-parsing on month change */
+  _rawQlVals = qlVals;
 
   /* ── Step 3: Wait for Salesforce pipeline ─────────────────────────── */
   let sfResult;
@@ -5021,6 +5574,42 @@ async function fetchDashboardData(token) {
     console.warn('[SF] Salesforce pipeline error:', e);
     sfResult = { irt_ort_members: null, cp_members: null, sf_warnings: ['SF pipeline error: ' + (e.message || e)] };
   }
+
+  /* Add SF months to available set */
+  if (sfResult.sf_available_months) {
+    sfResult.sf_available_months.forEach(m => allMonthSet.add(m));
+  }
+
+  /* v80: finalize available months and set default */
+  _availableMonths = [...allMonthSet].sort();
+  if (!reportingMonthOverride) {
+    /* Default to latest available month */
+    _reportingMonth = _availableMonths.length > 0
+      ? _availableMonths[_availableMonths.length - 1]
+      : configMonth;
+  } else {
+    _reportingMonth = reportingMonthOverride;
+  }
+
+  /* v80: now re-parse TB and SV with the reporting month filter */
+  const rptMonth    = _reportingMonth;
+  const rptPrevMonth = prevMonthStr(rptMonth);
+  const touch_base  = parseTouchBase(tbVals, rptMonth);
+  const surveys     = parseSurveys(svVals, config, rptMonth, rptPrevMonth);
+  /* v81: Quality filtered by reporting month */
+  const quality     = parseQuality(qlVals, rptMonth);
+  _cachedQuality = quality;
+  /* v82: PFTC filtered by reporting month */
+  const pftc        = parsePFTC(pfVals, rptMonth);
+  _cachedPftc = pftc;
+
+  /* v82: re-parse leave_map for the selected reporting month (not just Config month) */
+  const rptMonParts = rptMonth.split('-');
+  const rptMonNum   = parseInt(rptMonParts[1], 10);
+  const rptMonName  = MONTH_NAMES[rptMonNum - 1];
+  const rptConfig   = Object.assign({}, config, { month_name: rptMonName });
+  const cpReparse   = parseCaseProductivity(cpRawVals, rptConfig);
+  const leaveMapForMonth = cpReparse.leave_map || {};
 
   /* ── Step 3b: Read existing VCR reviews (non-blocking, best-effort) ── */
   let vcrReviews = [];
@@ -5058,6 +5647,16 @@ async function fetchDashboardData(token) {
 
   const axis_limits = computeAxisLimits({ case_productivity, touch_base, surveys, quality, pftc, irt_ort });
 
+  /* v80: Reporting Month diagnostics */
+  console.log('[Dashboard] Available Reporting Months: ' + _availableMonths.join(', '));
+  console.log('[Dashboard] Reporting Month: ' + rptMonth);
+  console.log('[Touch Base] Filtered month: ' + rptMonth +
+    ' (' + touch_base.raw.length + ' members)');
+  console.log('[Case Surveys] Filtered months: ' + rptPrevMonth + ', ' + rptMonth);
+  /* v82: PFTC diagnostics */
+  console.log('[PFTC] Filtered month: ' + rptMonth + ' (' + pftc.raw.length + ' records)');
+  console.log('[PFTC] Leave map for month: ' + JSON.stringify(leaveMapForMonth));
+
   console.log('[Dashboard] Data assembled \u2014 period:', config.report_date,
               '| CP members:', case_productivity.length,
               '| CP source:', sfCpMembers ? 'Salesforce' : (legacyCp.length > 0 ? 'Legacy Excel' : 'None'),
@@ -5071,7 +5670,14 @@ async function fetchDashboardData(token) {
     sf_files_used:        sfResult.sf_files_used || [],
     sf_ignored:           sfResult.sf_ignored || [],
     sf_violation_details: sfResult.violationDetails || [],
-    vcr_reviews:          vcrReviews
+    vcr_reviews:          vcrReviews,
+    reporting_month:      rptMonth,
+    /* v80: raw values cached for month-change re-parsing */
+    _raw_tbVals:    tbVals,
+    _raw_svVals:    svVals,
+    _raw_qlVals:    qlVals,    /* v81 */
+    _raw_leaveMap:  leaveMapForMonth,  /* v82: month-specific leave_map */
+    _raw_legacyCp:  legacyCp
   };
 }
 
@@ -5711,6 +6317,13 @@ function processData(D) {
   const cfg = D.config;
   const ax  = D.axis_limits;
 
+  /* v80: override config month names with survey metadata (reporting month aware) */
+  const svMeta = D.surveys || {};
+  const cfgForSv = Object.assign({}, cfg, {
+    month_name:      svMeta.curr_month_name || cfg.month_name,
+    prev_month_name: svMeta.prev_month_name || cfg.prev_month_name
+  });
+
   const cpA  = [...D.case_productivity].sort((a,b) => a.name.localeCompare(b.name));
   const cpLb = cpA.map(r => r.name);
   const cpCs = cpA.map(r => r.cs_created);
@@ -5772,7 +6385,7 @@ function processData(D) {
   const teamCombComp = totAllCases > 0
     ? Math.round(((totAllCases - totViol) / totAllCases) * 1000) / 10 : 100;
 
-  return { cfg, ax, cpA, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
+  return { cfg, cfgForSv, ax, cpA, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
            em, ca, svRaw, svRank, ql, qLb, qPct, qCol, qMin, qMax,
            pf, pfLb,
            irtAlpha, irtCpMap, totViol,
@@ -5939,7 +6552,7 @@ function buildCharts(p) {
   /* Register PFTC badge plugin */
   try { Chart.register(pftcBadgePlugin); } catch(e) { /* already registered */ }
 
-  const { cfg, ax, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
+  const { cfg, cfgForSv, ax, cpLb, cpCs, cpCl, cpAP, cpAS, cpAO, cpAE,
           em, ca, svRank, ql, qLb, qPct, qCol, qMin, qMax,
           pf, pfLb,
           irtAlpha, irtCpMap } = p;
@@ -5992,13 +6605,13 @@ function buildCharts(p) {
   const svCfg = baseCfg(
     svRank.map(r => r.name),
     [
-      { label:cfg.prev_month_name, data:svRank.map(r=>r.prev),
+      { label:cfgForSv.prev_month_name, data:svRank.map(r=>r.prev),
         backgroundColor: themeSvpvColor(), borderRadius:2, barThickness:10 },
-      { label:cfg.month_name,      data:svRank.map(r=>r.curr),
+      { label:cfgForSv.month_name,      data:svRank.map(r=>r.curr),
         backgroundColor:'#5B7388', borderRadius:2, barThickness:10 }
     ],
     ax.sv_max, 0,
-    (chart, di) => ttSvRank(chart, di, cfg.prev_month_name, cfg.month_name)
+    (chart, di) => ttSvRank(chart, di, cfgForSv.prev_month_name, cfgForSv.month_name)
   );
   svCfg.options.plugins.datalabels = {
     anchor:'end', align:'end', clamp:true, color: themeDlblColor(),
@@ -6261,7 +6874,7 @@ function vcrRenderTable() {
     var globalIdx = start + idx;
     return '<tr>' +
       '<td>' + v.dashName + '</td>' +
-      '<td>' + v.caseNumber + ' <button class="vcr-copy-btn" onclick="vcrCopyCase(\'' + v.caseNumber + '\',this)" title="Copy case number">&#x2398;</button></td>' +
+      '<td>' + v.caseNumber + ' <button class="vcr-copy-btn" onclick="vcrCopyCase(\'' + v.caseNumber + '\',this)" title="Copy case number"><span class="vcr-copy-icon">&#x2398;</span><span class="vcr-copy-label">&#x2713; Copied</span></button></td>' +
       '<td>' + v.source + '</td>' +
       '<td>' + (v.accountName || '<span style="color:var(--cm)">—</span>') + '</td>' +
       '<td>' + (v.subject || '<span style="color:var(--cm)">—</span>') + '</td>' +
@@ -6286,14 +6899,15 @@ function vcrPage(dir) {
 /* ── Copy case number to clipboard ───────────────────────────────────── */
 function vcrCopyCase(caseNum, btn) {
   navigator.clipboard.writeText(caseNum).then(function() {
+    /* v82: CSS-driven "✓ Copied" feedback — consistent with eLearning copy button */
     btn.classList.add('copied');
-    btn.innerHTML = '&#x2713;';
+    btn.title = 'Copied!';
     setTimeout(function() {
       btn.classList.remove('copied');
-      btn.innerHTML = '&#x2398;';
-    }, 1500);
+      btn.title = 'Copy case number';
+    }, 1800);
   }).catch(function() {
-    showToast('Could not copy — clipboard access denied.');
+    showToast('Could not copy \u2014 clipboard access denied.');
   });
 }
 
@@ -6484,7 +7098,7 @@ function buildDashboard(D) {
   const p = processData(D);
   renderHeader(p.cfg);
   renderCpTable(p.cpA);
-  renderSvTable(p.svRaw, p.cfg);
+  renderSvTable(p.svRaw, p.cfgForSv);
   renderQualityNote(p.ql);
   renderFooter(p.cfg);
   renderIrtOrt(p);
@@ -6495,6 +7109,184 @@ function buildDashboard(D) {
     _vcrSignedInUser
   );
   buildCharts(p);
+
+  /* v80: populate Reporting Month selector */
+  populateReportingMonthSelector();
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION 18b — REPORTING MONTH SELECTOR (v80)
+   Populates the dropdown from available months, handles month change by
+   re-fetching SF data and re-parsing Touch Base / Case Surveys.
+════════════════════════════════════════════════════════════════════════════ */
+function populateReportingMonthSelector() {
+  const sel = document.getElementById('rptMonthSelect');
+  if (!sel) return;
+  sel.innerHTML = _availableMonths.map(function(mk) {
+    var parts = mk.split('-');
+    var label = MONTH_NAMES[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+    var attr  = mk === _reportingMonth ? ' selected' : '';
+    return '<option value="' + mk + '"' + attr + '>' + label + '</option>';
+  }).join('');
+}
+
+/* v82: Reporting Month loading overlay helpers */
+function showRptLoading(monthLabel) {
+  var overlay = document.getElementById('rpt-loading-overlay');
+  if (!overlay) return;
+  var sub = document.getElementById('rpt-loading-sub');
+  if (sub) sub.textContent = 'Preparing your ' + monthLabel + ' dashboard';
+  overlay.classList.remove('hidden', 'rpt-hide');
+}
+function hideRptLoading() {
+  var overlay = document.getElementById('rpt-loading-overlay');
+  if (!overlay) return;
+  overlay.classList.add('rpt-hide');
+  setTimeout(function() { overlay.classList.add('hidden'); }, 380);
+}
+
+async function onReportingMonthChange() {
+  var sel = document.getElementById('rptMonthSelect');
+  if (!sel) return;
+  var newMonth = sel.value;
+  if (newMonth === _reportingMonth) return;
+
+  _reportingMonth = newMonth;
+  console.log('[Dashboard] Reporting Month changed to: ' + _reportingMonth);
+
+  /* v82: Compute month label for loading dialog */
+  var mParts = _reportingMonth.split('-');
+  var rptYear = parseInt(mParts[0], 10);
+  var rptMon  = parseInt(mParts[1], 10);
+  var monthLabel = MONTH_NAMES[rptMon - 1] + ' ' + rptYear;
+
+  /* v82: Show loading overlay immediately */
+  showRptLoading(monthLabel);
+
+  var D = _lastDashboardData;
+  var t = _lastToken;
+  if (!D || !t) {
+    console.warn('[Dashboard] No cached data/token — refresh required.');
+    hideRptLoading();
+    return;
+  }
+
+  /* Yield to browser so overlay paints before heavy work begins */
+  await new Promise(function(r) { setTimeout(r, 60); });
+
+  /* ── Re-run SF pipeline for the new month ────────────────────────── */
+  try {
+    destroyAll();
+    var sfResult = await sfFetchData(t, D.config, D._raw_leaveMap || {}, _reportingMonth, _rawCpVals);
+
+    /* Build new D with updated SF data */
+    var sfCpMembers = (sfResult.cp_members && sfResult.cp_members.length > 0)
+      ? sfResult.cp_members : null;
+    var legacyCp = (D._raw_legacyCp && D._raw_legacyCp.length > 0)
+      ? D._raw_legacyCp : [];
+
+    D.case_productivity = sfCpMembers || legacyCp;
+    D.irt_ort = (sfResult.irt_ort_members && sfResult.irt_ort_members.length > 0)
+      ? sfResult.irt_ort_members : null;
+    D.sf_warnings         = sfResult.sf_warnings || [];
+    D.sf_files_used       = sfResult.sf_files_used || [];
+    D.sf_ignored          = sfResult.sf_ignored || [];
+    D.sf_violation_details = sfResult.violationDetails || [];
+
+    /* ── Re-parse Touch Base for selected month ───────────────────── */
+    D.touch_base = parseTouchBase(D._raw_tbVals, _reportingMonth);
+
+    /* ── Re-parse Surveys for selected + previous month ───────────── */
+    var pMon = rptMon > 1 ? rptMon - 1 : 12;
+    var pYear = rptMon > 1 ? rptYear : rptYear - 1;
+    var svCurrStr = _reportingMonth;
+    var svPrevStr = pYear + '-' + String(pMon).padStart(2, '0');
+    var svConfig = Object.assign({}, D.config, {
+      curr_month_str:  svCurrStr,
+      prev_month_str:  svPrevStr,
+      month_name:      MONTH_NAMES[rptMon - 1],
+      prev_month_name: MONTH_NAMES[pMon - 1]
+    });
+    D.surveys = parseSurveys(D._raw_svVals, svConfig);
+
+    /* v81: Re-parse Quality for selected month */
+    if (D._raw_qlVals) {
+      D.quality = parseQuality(D._raw_qlVals, _reportingMonth);
+    }
+
+    /* v82: Re-parse PFTC for selected month */
+    if (_rawPfVals) {
+      D.pftc = parsePFTC(_rawPfVals, _reportingMonth);
+    }
+
+    /* Update config month/year for header display */
+    D.config = Object.assign({}, D.config, {
+      month: rptMon, year: rptYear,
+      month_name: MONTH_NAMES[rptMon - 1],
+      report_date: MONTH_NAMES[rptMon - 1] + ' ' + rptYear,
+      curr_month_str: svCurrStr,
+      prev_month_str: svPrevStr,
+      prev_month_name: MONTH_NAMES[pMon - 1]
+    });
+
+    /* Recompute axis limits */
+    D.axis_limits = computeAxisLimits({
+      case_productivity: D.case_productivity, touch_base: D.touch_base,
+      surveys: D.surveys, quality: D.quality, pftc: D.pftc, irt_ort: D.irt_ort
+    });
+
+    _lastDashboardData = D;
+    buildDashboard(D);
+
+    /* v80 diagnostics */
+    logReportingMonthDiag();
+
+    showToast('Reporting Month: ' + monthLabel);
+
+  } catch (e) {
+    console.error('[Dashboard] Reporting month change failed:', e);
+    showToast('Failed to switch month \u2014 see console.');
+  } finally {
+    /* v82: Always hide the loading overlay, even on error */
+    hideRptLoading();
+  }
+}
+
+/* ── v80 Diagnostics ──────────────────────────────────────────────────── */
+function logReportingMonthDiag() {
+  if (!_reportingMonth || !_lastDashboardData) return;
+  var D = _lastDashboardData;
+  var mParts = _reportingMonth.split('-');
+  var rptMon = parseInt(mParts[1], 10);
+  var rptYear = parseInt(mParts[0], 10);
+  var pMon = rptMon > 1 ? rptMon - 1 : 12;
+  var pYear = rptMon > 1 ? rptYear : rptYear - 1;
+
+  console.log('[Dashboard] ════ REPORTING MONTH DIAGNOSTICS (v82) ════');
+  console.log('[Dashboard] Available Months: ' + _availableMonths.join(', '));
+  console.log('[Dashboard] Selected Reporting Month: ' + MONTH_NAMES[rptMon - 1] + ' ' + rptYear + ' (' + _reportingMonth + ')');
+  console.log('[CP-SF] Selected month: ' + _reportingMonth);
+  if (D.sf_files_used && D.sf_files_used.length) {
+    D.sf_files_used.forEach(function(f) {
+      console.log('[CP-SF] ' + f.type + ' file: ' + f.name + (f.reportMonth ? ' (report period: ' + f.reportMonth + ')' : ''));
+    });
+  }
+  console.log('[Touch Base] Filtered month: ' + _reportingMonth);
+  console.log('[Quality] Filtered month: ' + _reportingMonth);
+  /* v82: PFTC diagnostics */
+  console.log('[PFTC] Filtered month: ' + _reportingMonth);
+  if (D.pftc && D.pftc.raw) {
+    console.log('[PFTC] Records used: ' + D.pftc.raw.length);
+    D.pftc.raw.forEach(function(r) {
+      console.log('[PFTC]   ' + r.name + ': ' + r.total + ' pts (Appreciate=' + r.appreciate + ', Commendation=' + r.commendation + ')');
+    });
+  }
+  var svPrev = pYear + '-' + String(pMon).padStart(2, '0');
+  console.log('[Case Surveys] Filtered months: ' + svPrev + ', ' + _reportingMonth);
+  if (elData) {
+    console.log('[eLearning] Member filters: ALL, ' + elData.csMembers.join(', '));
+  }
+  console.log('[Dashboard] ════ END REPORTING MONTH DIAGNOSTICS ════');
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -6525,6 +7317,7 @@ function setLastRefresh() {
 /* Load data from Graph and render — called after sign-in and from Refresh */
 async function loadAndBuild(token) {
   const t = token || await getToken();
+  _lastToken = t;       /* v80: cache for reporting month changes */
   destroyAll();
   /* Start logo load immediately — non-blocking, races the data fetch.
      The sign-in overlay stays visible while Excel sheets load (2-5 s),
@@ -6536,6 +7329,7 @@ async function loadAndBuild(token) {
   /* Load SignIn_Page.jpg background — independent loader */
   loadSignInBg(t).catch(() => {});
   const D = await fetchDashboardData(t);
+  _lastDashboardData = D;  /* v80: cache for month-change re-render */
   buildDashboard(D);
   hideSignInOverlay();
   setLastRefresh();
@@ -8131,6 +8925,49 @@ function cafRenderTable(rows) {
       cafOpenRequestUpdate(idx);
     });
   }
+
+  /* v82: Sync top scrollbar proxy with the table's horizontal scroll */
+  cafInitTopScroll();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   v82: TOP HORIZONTAL SCROLLBAR — synced proxy above the CAF table
+   A lightweight <div> mirrors the table's scrollWidth so the browser renders
+   a native scrollbar.  Both scroll events are cross-wired so scrolling one
+   moves the other.  Sizes are recalculated on each render.
+═════════════════════════════════════════════════════════════════════════════ */
+let _cafScrollSyncing = false;
+function cafInitTopScroll() {
+  const topBar   = document.getElementById('caf-top-scroll');
+  const inner    = document.getElementById('caf-top-scroll-inner');
+  const tblWrap  = document.getElementById('caf-tbl-wrap');
+  if (!topBar || !inner || !tblWrap) return;
+
+  /* Set inner div width to match the table's scroll width */
+  requestAnimationFrame(function() {
+    inner.style.width = tblWrap.scrollWidth + 'px';
+    console.log('[CAF] Top scrollbar initialized — scrollWidth=' + tblWrap.scrollWidth + 'px');
+  });
+
+  /* Remove old listeners before re-attaching (prevents duplicates on re-render) */
+  topBar._cafTopHandler  && topBar.removeEventListener('scroll', topBar._cafTopHandler);
+  tblWrap._cafBtmHandler && tblWrap.removeEventListener('scroll', tblWrap._cafBtmHandler);
+
+  topBar._cafTopHandler = function() {
+    if (_cafScrollSyncing) return;
+    _cafScrollSyncing = true;
+    tblWrap.scrollLeft = topBar.scrollLeft;
+    _cafScrollSyncing = false;
+  };
+  tblWrap._cafBtmHandler = function() {
+    if (_cafScrollSyncing) return;
+    _cafScrollSyncing = true;
+    topBar.scrollLeft = tblWrap.scrollLeft;
+    _cafScrollSyncing = false;
+  };
+
+  topBar.addEventListener('scroll',  topBar._cafTopHandler);
+  tblWrap.addEventListener('scroll', tblWrap._cafBtmHandler);
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -8671,10 +9508,22 @@ function elParse(values) {
     return null;
   }
 
+  /* v80: detect Course Link column — it's a data column, NOT a CS member */
+  const courseLinkIdx = headers.findIndex((h, idx) => {
+    if (idx === courseIdx) return false;   /* skip the course name column */
+    return /course\s*link/i.test(h) || (h.toLowerCase() === 'link');
+  });
+
   /* CS columns start right after the last known header column */
   const lastFixed  = Math.max(courseIdx, intDeadIdx, sapDeadIdx);
   const startCsIdx = lastFixed + 1;
-  const csMembers  = headers.slice(startCsIdx).filter(h => h.length > 0);
+
+  /* v80: filter out non-CS-member columns (Course Link, Status, etc.) */
+  const nonMemberPatterns = /^(course\s*link|link|status|course\s*name|sap\s*deadline|cs\s*internal\s*deadline)$/i;
+  const allPostHeaders = headers.slice(startCsIdx).map((h, j) => ({ name: h, idx: startCsIdx + j }));
+  const csMemberEntries = allPostHeaders.filter(e => e.name.length > 0 && !nonMemberPatterns.test(e.name));
+  const csMembers = csMemberEntries.map(e => e.name);
+  const csMemberIndices = csMemberEntries.map(e => e.idx);
 
   /* Parse data rows */
   const courses = [];
@@ -8687,13 +9536,18 @@ function elParse(values) {
       name       : name,
       intDeadline: intDeadIdx >= 0 && row[intDeadIdx] != null ? String(row[intDeadIdx]).trim() : '',
       sapDeadline: sapDeadIdx >= 0 && row[sapDeadIdx] != null ? String(row[sapDeadIdx]).trim() : '',
+      courseLink  : courseLinkIdx >= 0 && row[courseLinkIdx] != null ? String(row[courseLinkIdx]).trim() : '',
       status     : {}
     };
-    csMembers.forEach((cs, j) => {
-      const idx = startCsIdx + j;
-      course.status[cs] = row[idx] != null ? String(row[idx]).trim() : '';
+    csMemberEntries.forEach((e, j) => {
+      course.status[e.name] = row[e.idx] != null ? String(row[e.idx]).trim() : '';
     });
     courses.push(course);
+  }
+
+  console.log('[EL] Member filters: ALL, ' + csMembers.join(', '));
+  if (courseLinkIdx >= 0) {
+    console.log('[EL] Course Link column detected at index ' + courseLinkIdx + ' — excluded from member tiles');
   }
 
   return { courses, csMembers };
@@ -8842,6 +9696,9 @@ function elRenderTable() {
   const showAll = elSelected === 'ALL';
   const showCs  = showAll ? elData.csMembers : [elSelected];
 
+  /* v80: check if any course has a link */
+  const hasLinks = elData.courses.some(c => c.courseLink && c.courseLink.length > 0);
+
   const statusPill = (s) => {
     const lv = (s || '').toLowerCase();
     if (lv === 'completed') return '<span class="el-status el-status-completed">Completed</span>';
@@ -8849,9 +9706,21 @@ function elRenderTable() {
     return s ? '<span class="el-status el-status-other">' + cafEsc(s) + '</span>' : '\u2014';
   };
 
+  /* v80: compact link cell renderer */
+  const linkCell = (url) => {
+    if (!url) return '<td class="el-td-link">\u2014</td>';
+    const escaped = cafEsc(url);
+    const copyIcon = '<svg viewBox="0 0 16 16"><rect x="5" y="1" width="9" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="4" width="9" height="11" rx="1.5" fill="var(--cb,#fff)" stroke="currentColor" stroke-width="1.3"/></svg>';
+    return '<td class="el-td-link"><div class="el-link-cell">' +
+      '<a class="el-link-anchor" href="' + escaped + '" target="_blank" rel="noopener">LINK</a>' +
+      '<button class="el-copy-btn" title="Copy course URL" onclick="elCopyLink(this,\'' + escaped.replace(/'/g, "\\'") + '\')">' + copyIcon + '<span class="el-copy-label">\u2713 Copied</span></button>' +
+      '</div></td>';
+  };
+
   /* CS headers centered to align with status pills */
   const headers =
     '<th class="el-th-course">eLearning Course</th>' +
+    (hasLinks ? '<th class="el-th-link">Course Link</th>' : '') +
     '<th class="el-th-intdead">CS Internal Deadline</th>' +
     '<th class="el-th-sapdead">SAP Deadline</th>' +
     showCs.map(cs => '<th class="el-th-cs">' + cafEsc(cs) + '</th>').join('');
@@ -8869,18 +9738,41 @@ function elRenderTable() {
 
     return '<tr' + rowCls + '>' +
       '<td class="el-td-course">' + cafEsc(c.name) + warnBadge + '</td>' +
+      (hasLinks ? linkCell(c.courseLink) : '') +
       '<td class="el-td-intdead el-deadline-int">' + cafEsc(c.intDeadline) + '</td>' +
       '<td class="el-td-sapdead el-deadline-sap">' + cafEsc(c.sapDeadline) + '</td>' +
       showCs.map(cs => '<td class="el-td-status">' + statusPill(c.status[cs]) + '</td>').join('') +
     '</tr>';
   }).join('');
 
-  const colSpan = 3 + showCs.length;
+  const colSpan = (hasLinks ? 4 : 3) + showCs.length;
   tbl.innerHTML =
     '<thead><tr>' + headers + '</tr></thead>' +
     '<tbody>' +
     (dataRows || '<tr><td colspan="' + colSpan + '" class="caf-empty">No courses found.</td></tr>') +
     '</tbody>';
+}
+
+/* v80: Copy course link URL to clipboard */
+function elCopyLink(btn, url) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      btn.classList.add('copied');
+      btn.title = 'Copied!';
+      setTimeout(() => { btn.classList.remove('copied'); btn.title = 'Copy course URL'; }, 1800);
+    }).catch(() => {});
+  } else {
+    /* Fallback for older browsers */
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 1800);
+  }
 }
 
 /* ── Render: Pending eLearning ───────────────────────────────────────────── */
