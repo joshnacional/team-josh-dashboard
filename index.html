@@ -144,15 +144,15 @@ body{
 /* ════════════════════════════════════════════════════════════════════════════
    HEADER  (v4 — unchanged, plus new sub-elements)
 ════════════════════════════════════════════════════════════════════════════ */
-/* v85: premium purple gradient header */
+/* v86: refined premium purple header — deeper base, sophisticated gradient */
 .hdr{
-  background:linear-gradient(135deg,#4A28E0 0%,#5D36FF 40%,#7858FF 100%);
+  background:linear-gradient(135deg,#2D1B69 0%,#3E24A8 35%,#5D36FF 70%,#7452FA 100%);
   display:flex;
   align-items:center;
   padding:0 16px;
   height:58px;
   gap:12px;
-  box-shadow:0 2px 12px rgba(93,54,255,.18),inset 0 -1px 0 rgba(0,0,0,.08);
+  box-shadow:0 3px 16px rgba(45,27,105,.32),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.12);
 }
 .hdr-logo{height:30px;flex-shrink:0}
 .hdr-divider{width:1px;height:26px;background:rgba(255,255,255,.35)}
@@ -1449,16 +1449,23 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
   outline:none;width:210px;transition:border-color .15s,background .25s,color .25s;
   flex-shrink:0}
 .caf-search:focus{border-color:#5D36FF;box-shadow:0 0 0 3px rgba(93,54,255,.10)}
-/* v84: Internal reference note banner (LP-style card) */
+/* v86: Internal reference note — centered, dual purple accent, soft purple bg */
 .caf-note-banner{
-  background:var(--ch);
-  border:1px solid var(--cd);
+  background:rgba(93,54,255,.06);
+  border:1px solid rgba(93,54,255,.18);
   border-left:3px solid #5D36FF;
+  border-right:3px solid #5D36FF;
   border-radius:8px;
-  padding:7px 13px 7px 10px;
+  padding:7px 14px;
   max-width:600px;
-  margin:0 0 8px;
+  margin:0 auto 12px;
   transition:background .25s,border-color .25s;
+}
+html[data-theme="dark"] .caf-note-banner{
+  background:rgba(93,54,255,.10);
+  border-color:rgba(93,54,255,.28);
+  border-left-color:#5D36FF;
+  border-right-color:#5D36FF;
 }
 .caf-note-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
 .caf-note-ttl{font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:var(--ct);transition:color .25s}
@@ -2465,17 +2472,17 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
                placeholder="Search all columns&#x2026;" autocomplete="off">
       </div>
 
-      <!-- v84: Internal reference note banner (LP-style card) -->
-      <div class="caf-note-banner">
-        <div class="caf-note-top"><span class="caf-note-ttl">Client Assignment File</span><span class="caf-note-sep">&mdash;</span><span class="caf-note-sub">Internal Reference</span></div>
-        <p class="caf-note-body">For any changes to our <strong>INTERNAL</strong> Client Assignment File reference, please click <strong>Request Update</strong> and complete the necessary actions.</p>
-      </div>
-
       <!-- ── CSS Member filter tiles ────────────────────────────────────── -->
       <div class="caf-css-wrap">
         <div class="caf-css-row" id="caf-css-row">
           <div class="caf-loading-state">Loading assignment data…</div>
         </div>
+      </div>
+
+      <!-- v86: Internal reference note — repositioned below member tiles -->
+      <div class="caf-note-banner">
+        <div class="caf-note-top"><span class="caf-note-ttl">Client Assignment File</span><span class="caf-note-sep">&mdash;</span><span class="caf-note-sub">Internal Reference</span></div>
+        <p class="caf-note-body">For any changes to our <strong>INTERNAL</strong> Client Assignment File reference, please click <strong>Request Update</strong> and complete the necessary actions.</p>
       </div>
 
       <!-- ── Team Summary cards ─────────────────────────────────────────── -->
