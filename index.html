@@ -256,19 +256,24 @@ body{
   width:17px;height:17px;
   fill:currentColor;
   pointer-events:none;
-  transition:transform .18s ease;
+  transition:transform .28s ease;
 }
+/* v90: smooth icon rotation when theme switches */
+.tb-icon-btn svg.tb-theme-spin{
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+html[data-theme="dark"] #theme-icon-svg{transform:rotate(360deg)}
 /* Refresh spin animation */
 .tb-icon-btn.spinning svg{animation:spin .7s linear infinite}
 
-/* ── Toolbar tooltip ─────────────────────────────────────────────────── */
+/* ── v90: Toolbar tooltip — renders BELOW button to avoid .dashboard overflow:hidden clipping */
 .tb-icon-btn::after{
   content:attr(data-tip);
   position:absolute;
-  bottom:calc(100% + 8px);
+  top:calc(100% + 8px);
   left:50%;
-  transform:translateX(-50%) translateY(4px);
-  background:#1C0C6E;
+  transform:translateX(-50%) translateY(-4px);
+  background:rgba(28,12,110,.92);
   color:#fff;
   font-family:'72','72full',sans-serif;
   font-size:10px;
@@ -279,22 +284,22 @@ body{
   white-space:nowrap;
   pointer-events:none;
   opacity:0;
-  transition:opacity .18s ease,transform .18s ease;
+  transition:opacity .18s ease .12s,transform .18s ease .12s;
   z-index:99;
-  box-shadow:0 3px 10px rgba(0,0,0,.28);
+  box-shadow:0 3px 12px rgba(0,0,0,.32);
 }
-/* Tooltip arrow */
+/* Tooltip arrow (points upward toward the icon) */
 .tb-icon-btn::before{
   content:'';
   position:absolute;
-  bottom:calc(100% + 4px);
+  top:calc(100% + 3px);
   left:50%;
-  transform:translateX(-50%) translateY(4px);
+  transform:translateX(-50%) translateY(-4px);
   border:5px solid transparent;
-  border-top-color:#1C0C6E;
+  border-bottom-color:rgba(28,12,110,.92);
   pointer-events:none;
   opacity:0;
-  transition:opacity .18s ease,transform .18s ease;
+  transition:opacity .18s ease .12s,transform .18s ease .12s;
   z-index:99;
 }
 .tb-icon-btn:hover::after,
@@ -306,17 +311,9 @@ body{
 html.is-capturing .tb-icon-btn::after,
 html.is-capturing .tb-icon-btn::before{display:none!important}
 
-/* Refresh button */
-.btn-refresh{margin-left:8px}
+/* Spin animation (used by toolbar refresh icon) */
 .btn-icon{display:inline-block}
-.btn-refresh.spinning .btn-icon{animation:spin .7s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-/* Theme toggle */
-.btn-theme{margin-left:6px;min-width:72px;justify-content:center}
-
-/* Screenshot button */
-.btn-screenshot{margin-left:4px}
 
 /* During html2canvas capture: strip focus rings / outlines from every element
    so the captured PNG matches the dashboard's normal visual appearance.      */
@@ -5968,7 +5965,8 @@ function applyTheme(dark) {
   const btnEl = document.getElementById('btnTheme');
   if (dark) {
     /* Sun icon */
-    if (svgEl) svgEl.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    /* Sun icon — filled rays that render with fill:currentColor */
+    if (svgEl) svgEl.innerHTML = '<circle cx="12" cy="12" r="4.5"/><rect x="11" y="1" width="2" height="3" rx="1"/><rect x="11" y="20" width="2" height="3" rx="1"/><rect x="20" y="11" width="3" height="2" rx="1"/><rect x="1" y="11" width="3" height="2" rx="1"/><rect x="17.3" y="3.3" width="2" height="3" rx="1" transform="rotate(45 18.3 4.8)"/><rect x="4.7" y="17.7" width="2" height="3" rx="1" transform="rotate(45 5.7 19.2)"/><rect x="17.7" y="17.3" width="3" height="2" rx="1" transform="rotate(45 19.2 18.3)"/><rect x="3.3" y="4.7" width="3" height="2" rx="1" transform="rotate(45 4.8 5.7)"/>';
     if (btnEl) btnEl.setAttribute('data-tip', 'Light Mode');
   } else {
     /* Moon icon */
@@ -5987,9 +5985,9 @@ function initTheme() {
   const saved = sessionStorage.getItem('tj-theme');
   if (saved === 'dark') {
     document.documentElement.dataset.theme = 'dark';
-    /* v89: swap to sun SVG + tooltip */
+    /* v90: swap to filled sun SVG + tooltip */
     const svgEl = document.getElementById('theme-icon-svg');
-    if (svgEl) svgEl.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    if (svgEl) svgEl.innerHTML = '<circle cx="12" cy="12" r="4.5"/><rect x="11" y="1" width="2" height="3" rx="1"/><rect x="11" y="20" width="2" height="3" rx="1"/><rect x="20" y="11" width="3" height="2" rx="1"/><rect x="1" y="11" width="3" height="2" rx="1"/><rect x="17.3" y="3.3" width="2" height="3" rx="1" transform="rotate(45 18.3 4.8)"/><rect x="4.7" y="17.7" width="2" height="3" rx="1" transform="rotate(45 5.7 19.2)"/><rect x="17.7" y="17.3" width="3" height="2" rx="1" transform="rotate(45 19.2 18.3)"/><rect x="3.3" y="4.7" width="3" height="2" rx="1" transform="rotate(45 4.8 5.7)"/>';
     const btnEl = document.getElementById('btnTheme');
     if (btnEl) btnEl.setAttribute('data-tip', 'Light Mode');
   }
