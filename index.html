@@ -178,7 +178,7 @@ body{
 }
 .hdr-user.visible{display:block}
 
-/* ── Header buttons (premium mini-tile — same design language as nav tiles) */
+/* ── Header buttons — Sign-in keeps the old text style ───────────────── */
 .hdr-btn{
   background:rgba(255,255,255,.15);
   border:1px solid rgba(255,255,255,.28);
@@ -210,6 +210,102 @@ body{
 }
 .hdr-btn:disabled{opacity:.45;cursor:not-allowed}
 
+/* ── v89: iOS-inspired compact icon toolbar ──────────────────────────── */
+.hdr-toolbar{
+  display:flex;
+  align-items:center;
+  gap:2px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.20);
+  border-radius:24px;
+  padding:3px 4px;
+  box-shadow:0 2px 8px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  flex-shrink:0;
+  margin-left:10px;
+}
+/* Individual icon button inside the toolbar */
+.tb-icon-btn{
+  position:relative;
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  border:none;
+  background:transparent;
+  border-radius:50%;
+  color:rgba(255,255,255,.88);
+  cursor:pointer;
+  font-size:15px;
+  line-height:1;
+  transition:background .18s,color .18s,transform .18s ease;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  flex-shrink:0;
+}
+.tb-icon-btn:hover:not(:disabled){
+  background:rgba(255,255,255,.18);
+  color:#fff;
+  transform:scale(1.12);
+}
+.tb-icon-btn:active:not(:disabled){
+  transform:scale(.92);
+  background:rgba(255,255,255,.10);
+}
+.tb-icon-btn:disabled{opacity:.40;cursor:not-allowed}
+/* SVG icon inside toolbar button */
+.tb-icon-btn svg{
+  width:17px;height:17px;
+  fill:currentColor;
+  pointer-events:none;
+  transition:transform .18s ease;
+}
+/* Refresh spin animation */
+.tb-icon-btn.spinning svg{animation:spin .7s linear infinite}
+
+/* ── Toolbar tooltip ─────────────────────────────────────────────────── */
+.tb-icon-btn::after{
+  content:attr(data-tip);
+  position:absolute;
+  bottom:calc(100% + 8px);
+  left:50%;
+  transform:translateX(-50%) translateY(4px);
+  background:#1C0C6E;
+  color:#fff;
+  font-family:'72','72full',sans-serif;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.2px;
+  padding:4px 9px;
+  border-radius:6px;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s ease,transform .18s ease;
+  z-index:99;
+  box-shadow:0 3px 10px rgba(0,0,0,.28);
+}
+/* Tooltip arrow */
+.tb-icon-btn::before{
+  content:'';
+  position:absolute;
+  bottom:calc(100% + 4px);
+  left:50%;
+  transform:translateX(-50%) translateY(4px);
+  border:5px solid transparent;
+  border-top-color:#1C0C6E;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s ease,transform .18s ease;
+  z-index:99;
+}
+.tb-icon-btn:hover::after,
+.tb-icon-btn:hover::before{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+/* Hide tooltips during screenshot capture */
+html.is-capturing .tb-icon-btn::after,
+html.is-capturing .tb-icon-btn::before{display:none!important}
+
 /* Refresh button */
 .btn-refresh{margin-left:8px}
 .btn-icon{display:inline-block}
@@ -236,12 +332,11 @@ html.is-capturing .caf-dlg::before{opacity:0 !important}
 html.is-capturing .rpt-loading-overlay{display:none !important}
 html.is-capturing #toast{display:none !important}
 
-/* During capture: hide emoji / Unicode icon characters inside header buttons.
-   html2canvas cannot render complex emoji (📷 🌙 ⛶) and draws them as
-   solid black boxes.  Hiding the spans removes the boxes; the button text
-   labels (Dark, Refresh Data, Screenshot, Full Screen) remain fully visible. */
+/* During capture: hide emoji / Unicode icon characters inside header buttons
+   and toolbar tooltips. html2canvas cannot render complex emoji correctly.    */
 html.is-capturing .btn-icon,
 html.is-capturing #theme-icon{visibility:hidden}
+html.is-capturing .hdr-toolbar{backdrop-filter:none;-webkit-backdrop-filter:none}
 
 /* ════════════════════════════════════════════════════════════════════════════
    SAP 3D BACKGROUND WATERMARK
@@ -271,9 +366,6 @@ html.is-capturing #theme-icon{visibility:hidden}
 /* Dark mode: suppress decorative watermark — clean solid canvas             */
 html[data-theme="dark"] .tab-section::before,
 html[data-theme="dark"] .caf-dlg::before{opacity:0}
-
-/* Full Screen button */
-.btn-fullscreen{margin-left:4px}
 
 /* Sign-in button (header — shown only when not authenticated) */
 .btn-signin{
@@ -2067,27 +2159,25 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
             onclick="signIn()" title="Sign in with Microsoft 365">
       Sign In
     </button>
-    <button class="hdr-btn btn-theme" id="btnTheme"
-            onclick="toggleTheme()" title="Toggle light / dark mode">
-      <span id="theme-icon">&#x1F319;</span>
-      <span id="theme-label">Dark</span>
-    </button>
-    <!-- Refresh is disabled until authenticated -->
-    <button class="hdr-btn btn-refresh" id="btnRefresh"
-            onclick="refreshDashboard()" title="Reload data from SharePoint"
-            disabled>
-      <span class="btn-icon">&#x21BB;</span> Refresh Data
-    </button>
-    <!-- Screenshot: captures the full dashboard to PNG -->
-    <button class="hdr-btn btn-screenshot" id="btnScreenshot"
-            onclick="takeScreenshot()" title="Download full dashboard as PNG">
-      <span class="btn-icon">&#x1F4F7;</span> Screenshot
-    </button>
-    <!-- Full Screen: enters / exits browser fullscreen presentation mode -->
-    <button class="hdr-btn btn-fullscreen" id="btnFullscreen"
-            onclick="toggleFullscreen()" title="Enter fullscreen presentation mode">
-      <span class="btn-icon">&#x26F6;</span> Full Screen
-    </button>
+    <!-- v89: iOS-inspired compact icon toolbar -->
+    <div class="hdr-toolbar" id="hdr-toolbar">
+      <button class="tb-icon-btn" id="btnScreenshot"
+              onclick="takeScreenshot()" data-tip="Screenshot">
+        <svg viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2 7.17 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.17L15 2H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg>
+      </button>
+      <button class="tb-icon-btn" id="btnFullscreen"
+              onclick="toggleFullscreen()" data-tip="Full Screen">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
+      <button class="tb-icon-btn" id="btnRefresh"
+              onclick="refreshDashboard()" data-tip="Refresh Data" disabled>
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 8 8h-2a6 6 0 1 1-1.76-4.24L14 10h6V4l-2.35 2.35z"/></svg>
+      </button>
+      <button class="tb-icon-btn" id="btnTheme"
+              onclick="toggleTheme()" data-tip="Dark Mode">
+        <svg id="theme-icon-svg" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 0 1-4.54 2.46 5.4 5.4 0 0 1-5.4-5.4c0-1.14.35-2.2.95-3.07A9.06 9.06 0 0 0 12 3z"/></svg>
+      </button>
+    </div>
   </header>
 
   <!-- ── Tab Navigation ──────────────────────────────────────────────── -->
@@ -5873,14 +5963,17 @@ function themeCharts() {
 
 function applyTheme(dark) {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-  const icon  = document.getElementById('theme-icon');
-  const label = document.getElementById('theme-label');
+  /* v89: swap SVG icon path + toolbar tooltip */
+  const svgEl = document.getElementById('theme-icon-svg');
+  const btnEl = document.getElementById('btnTheme');
   if (dark) {
-    icon.textContent  = '☀';
-    label.textContent = 'Light';
+    /* Sun icon */
+    if (svgEl) svgEl.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    if (btnEl) btnEl.setAttribute('data-tip', 'Light Mode');
   } else {
-    icon.textContent  = '🌙';
-    label.textContent = 'Dark';
+    /* Moon icon */
+    if (svgEl) svgEl.innerHTML = '<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 0 1-4.54 2.46 5.4 5.4 0 0 1-5.4-5.4c0-1.14.35-2.2.95-3.07A9.06 9.06 0 0 0 12 3z"/>';
+    if (btnEl) btnEl.setAttribute('data-tip', 'Dark Mode');
   }
   sessionStorage.setItem('tj-theme', dark ? 'dark' : 'light');
   themeCharts();
@@ -5894,8 +5987,11 @@ function initTheme() {
   const saved = sessionStorage.getItem('tj-theme');
   if (saved === 'dark') {
     document.documentElement.dataset.theme = 'dark';
-    document.getElementById('theme-icon').textContent  = '☀';
-    document.getElementById('theme-label').textContent = 'Light';
+    /* v89: swap to sun SVG + tooltip */
+    const svgEl = document.getElementById('theme-icon-svg');
+    if (svgEl) svgEl.innerHTML = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    const btnEl = document.getElementById('btnTheme');
+    if (btnEl) btnEl.setAttribute('data-tip', 'Light Mode');
   }
 }
 
@@ -6021,6 +6117,7 @@ async function takeScreenshot() {
           '#toast{display:none!important}' +
           '#chart-tt{display:none!important}' +
           '.lp-pop{display:none!important}' +
+          '.tb-icon-btn::after,.tb-icon-btn::before{display:none!important}' +
           /* v84: minor fidelity — force scrollbar areas invisible, ensure
              tab nav buttons + toolbar render with solid opaque backgrounds,
              and collapse the top-scroll mirror div to avoid blank bars */
@@ -6047,7 +6144,6 @@ async function takeScreenshot() {
     document.body.removeChild(link);
 
     /* "Saved!" feedback AFTER capture (never appears in screenshot) */
-    btn.innerHTML = '<span class="btn-icon">&#x2713;</span> Saved!';
     showToast('Saved: ' + fname);
     await new Promise(function(r) { setTimeout(r, 1800); });
 
@@ -6086,16 +6182,17 @@ function toggleFullscreen() {
   }
 }
 
-/* Update button label to reflect current fullscreen state */
+/* v89: Update fullscreen icon + tooltip to reflect current state */
 document.addEventListener('fullscreenchange', () => {
   const btn = document.getElementById('btnFullscreen');
   if (!btn) return;
+  const svg = btn.querySelector('svg');
   if (document.fullscreenElement) {
-    btn.innerHTML = '<span class="btn-icon">&#x26F6;</span> Exit Full Screen';
-    btn.title     = 'Exit fullscreen mode (or press Esc)';
+    if (svg) svg.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+    btn.setAttribute('data-tip', 'Exit Full Screen');
   } else {
-    btn.innerHTML = '<span class="btn-icon">&#x26F6;</span> Full Screen';
-    btn.title     = 'Enter fullscreen presentation mode';
+    if (svg) svg.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+    btn.setAttribute('data-tip', 'Full Screen');
   }
 });
 
@@ -7440,7 +7537,6 @@ async function refreshDashboard() {
   const btn = document.getElementById('btnRefresh');
   btn.disabled = true;
   btn.classList.add('spinning');
-  btn.innerHTML = '<span class="btn-icon">&#x21BB;</span> Refreshing…';
   ttHide(true);
   /* v88: show the same loading dialog used by Reporting Month switch */
   showRptLoading('Getting the latest data ready');
@@ -7464,7 +7560,6 @@ async function refreshDashboard() {
     hideRptLoading();
     btn.disabled = false;
     btn.classList.remove('spinning');
-    btn.innerHTML = '<span class="btn-icon">&#x21BB;</span> Refresh Data';
   }
 }
 
