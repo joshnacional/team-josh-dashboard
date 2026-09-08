@@ -7226,12 +7226,12 @@ function populateReportingMonthSelector() {
   }).join('');
 }
 
-/* v82: Reporting Month loading overlay helpers */
-function showRptLoading(monthLabel) {
+/* v82+v88: Loading overlay helpers — subtitle is now a free-form string */
+function showRptLoading(subtitle) {
   var overlay = document.getElementById('rpt-loading-overlay');
   if (!overlay) return;
   var sub = document.getElementById('rpt-loading-sub');
-  if (sub) sub.textContent = 'Preparing your ' + monthLabel + ' dashboard';
+  if (sub) sub.textContent = subtitle || 'Preparing your dashboard';
   overlay.classList.remove('hidden', 'rpt-hide');
 }
 function hideRptLoading() {
@@ -7257,7 +7257,7 @@ async function onReportingMonthChange() {
   var monthLabel = MONTH_NAMES[rptMon - 1] + ' ' + rptYear;
 
   /* v82: Show loading overlay immediately */
-  showRptLoading(monthLabel);
+  showRptLoading('Preparing your ' + monthLabel + ' dashboard');
 
   var D = _lastDashboardData;
   var t = _lastToken;
@@ -7442,6 +7442,8 @@ async function refreshDashboard() {
   btn.classList.add('spinning');
   btn.innerHTML = '<span class="btn-icon">&#x21BB;</span> Refreshing…';
   ttHide(true);
+  /* v88: show the same loading dialog used by Reporting Month switch */
+  showRptLoading('Getting the latest data ready');
   try {
     const token = await getToken();
     await loadAndBuild(token);
@@ -7459,6 +7461,7 @@ async function refreshDashboard() {
       showToast('Refresh failed: ' + (e.message || 'unknown error'));
     }
   } finally {
+    hideRptLoading();
     btn.disabled = false;
     btn.classList.remove('spinning');
     btn.innerHTML = '<span class="btn-icon">&#x21BB;</span> Refresh Data';
