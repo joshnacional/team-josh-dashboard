@@ -974,6 +974,39 @@ html[data-theme="dark"] .cse-hint{color:#8B7EAE}
   .cse-action{width:100%;align-items:flex-start;padding-left:0;flex-direction:row;gap:10px}
 }
 
+/* ═══ v93: PFTC Submit shortcut button ════════════════════════════════════ */
+.card-head-flex{display:flex;align-items:center;justify-content:space-between}
+.pftc-submit-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid rgba(93,54,255,.35);
+  border-radius:5px;padding:2px 8px;
+  font-family:"72","72full",sans-serif;font-size:8px;font-weight:700;
+  color:#5D36FF;cursor:pointer;letter-spacing:.2px;
+  text-decoration:none;white-space:nowrap;
+  transition:background .15s,border-color .15s,box-shadow .15s,transform .15s,color .15s;
+  position:relative;
+}
+.pftc-submit-btn:hover{
+  background:rgba(93,54,255,.08);border-color:#5D36FF;
+  box-shadow:0 2px 8px rgba(93,54,255,.15);transform:translateY(-0.5px);
+}
+.pftc-submit-btn svg{width:10px;height:10px;fill:none;stroke:#5D36FF;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,transform .15s}
+.pftc-submit-btn:hover svg{transform:translate(1px,-1px)}
+html[data-theme="dark"] .pftc-submit-btn{border-color:rgba(116,82,250,.4);color:#A889FF}
+html[data-theme="dark"] .pftc-submit-btn svg{stroke:#A889FF}
+html[data-theme="dark"] .pftc-submit-btn:hover{background:rgba(93,54,255,.15);border-color:#7452FA;color:#C4B5FF}
+html[data-theme="dark"] .pftc-submit-btn:hover svg{stroke:#C4B5FF}
+/* Tooltip — consistent with toolbar tooltips, positioned below */
+.pftc-submit-btn::after{
+  content:attr(data-tip);
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:#1C0C6E;color:#fff;font-size:8px;font-weight:600;letter-spacing:.2px;
+  padding:3px 8px;border-radius:4px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;
+}
+html[data-theme="dark"] .pftc-submit-btn::after{background:#E2D8FF;color:#1C0C6E}
+.pftc-submit-btn:hover::after{opacity:1}
+
 /* ════════════════════════════════════════════════════════════════════════════
    v92: VCR DEPRECATED — MANAGED BY CS EXPERTS
    Visual muting ONLY — section remains FULLY FUNCTIONAL.
@@ -2536,7 +2569,7 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
     <!-- ═══ PFTC (col 3, bottom) ════════════════════════════════════════ -->
     <div class="card">
       <div class="card-accent" style="background:#2CE0BF"></div>
-      <div class="card-head">PFTC</div>
+      <div class="card-head card-head-flex">PFTC<a class="pftc-submit-btn" href="https://apps.powerapps.com/play/e/default-42f7676c-f455-423c-82f6-dc2d99791af7/a/b155cf60-acc2-404e-bd21-1fe2b6ec7b3b?tenantId=42f7676c-f455-423c-82f6-dc2d99791af7&amp;hint=3c79c752-b305-4a2a-8b29-ffabeeba75c4&amp;sourcetime=1780625787333" target="_blank" rel="noopener noreferrer" data-tip="Open PFTC Submission Form"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Submit PFTC</a></div>
       <div class="card-body">
         <div class="sec-hdr">PFTC Leaderboard</div>
         <div class="chart-wrap h200"><canvas id="chartPftc"></canvas></div>
