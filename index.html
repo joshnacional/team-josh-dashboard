@@ -809,6 +809,104 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 .irt-tc-bar-fill{height:2px;border-radius:2px}
 
 /* ════════════════════════════════════════════════════════════════════════════
+   v91: CS EXPERTS DASHBOARD CALLOUT / HANDOFF PANEL
+════════════════════════════════════════════════════════════════════════════ */
+.cse-callout{padding:10px 10px 0}
+.cse-card{
+  position:relative;
+  background:linear-gradient(135deg,rgba(93,54,255,.05) 0%,rgba(76,177,255,.05) 100%);
+  border:1.5px solid rgba(93,54,255,.22);
+  border-radius:12px;
+  padding:18px 20px 16px;
+  overflow:hidden;
+  transition:background .25s,border-color .25s;
+}
+html[data-theme="dark"] .cse-card{
+  background:linear-gradient(135deg,rgba(93,54,255,.10) 0%,rgba(76,177,255,.08) 100%);
+  border-color:rgba(93,54,255,.32);
+}
+/* Top decorative accent bar */
+.cse-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#5D36FF 0%,#4CB1FF 100%);
+  border-radius:12px 12px 0 0;
+}
+/* Header row */
+.cse-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cse-icon-wrap{
+  flex-shrink:0;width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#5D36FF 0%,#7452FA 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(93,54,255,.25);
+}
+.cse-icon-wrap svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cse-title{font-size:12px;font-weight:800;letter-spacing:.3px;color:var(--ct);transition:color .25s}
+.cse-subtitle{font-size:9.5px;color:var(--cm);margin-top:1px;transition:color .25s}
+/* Workflow steps */
+.cse-flow{display:flex;align-items:stretch;gap:0;margin-bottom:14px}
+.cse-step{flex:1;display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--cb);border:1px solid var(--cd);border-radius:8px;transition:background .25s,border-color .25s}
+.cse-step-num{
+  flex-shrink:0;width:22px;height:22px;border-radius:50%;
+  background:#5D36FF;color:#fff;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.cse-step-text{font-size:9.5px;color:var(--ct);line-height:1.45;transition:color .25s}
+.cse-step-text strong{font-weight:700;color:#5D36FF}
+/* Connector arrow between steps */
+.cse-connector{
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  width:28px;color:var(--cm);font-size:14px;transition:color .25s;
+}
+.cse-connector svg{width:16px;height:16px;stroke:var(--cm);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Action row */
+.cse-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cse-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#5D36FF 0%,#7452FA 100%);
+  border:none;border-radius:7px;padding:7px 16px;
+  font-family:"72","72full",sans-serif;font-size:10px;font-weight:700;
+  color:#fff;cursor:pointer;letter-spacing:.2px;
+  text-decoration:none;
+  box-shadow:0 2px 8px rgba(93,54,255,.3);
+  transition:background .15s,box-shadow .15s,transform .15s;
+}
+.cse-btn:hover{background:linear-gradient(135deg,#7452FA 0%,#8B6EFF 100%);box-shadow:0 4px 12px rgba(93,54,255,.4);transform:translateY(-1px)}
+.cse-btn svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cse-hint{font-size:9px;color:var(--cm);transition:color .25s}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   v91: VCR DEPRECATED — MANAGED BY CS EXPERTS
+════════════════════════════════════════════════════════════════════════════ */
+.vcr-section{position:relative}
+.vcr-section .card{
+  filter:grayscale(.55) opacity(.55);
+  pointer-events:none;
+  user-select:none;
+  transition:filter .25s;
+}
+/* Badge overlay */
+.vcr-managed-badge{
+  position:absolute;top:14px;right:16px;z-index:5;
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#5D36FF 0%,#4CB1FF 100%);
+  border-radius:6px;padding:4px 12px;
+  box-shadow:0 2px 10px rgba(93,54,255,.35);
+  pointer-events:auto;
+}
+.vcr-managed-badge svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.vcr-managed-badge span{font-size:8px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#fff}
+/* Subtle message below badge */
+.vcr-managed-msg{
+  text-align:center;font-size:9px;color:var(--cm);
+  margin:-6px 0 0;padding:0 10px;
+  transition:color .25s;
+  position:relative;z-index:5;
+}
+.vcr-managed-msg a{color:#5D36FF;font-weight:700;text-decoration:none}
+.vcr-managed-msg a:hover{text-decoration:underline}
+
+/* ════════════════════════════════════════════════════════════════════════════
    VIOLATION CASE REVIEW (VCR) SECTION
 ════════════════════════════════════════════════════════════════════════════ */
 /* v85: extra top breathing room separates VCR from IRT/ORT Compliance above */
@@ -2402,8 +2500,46 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
     </div><!-- /card -->
   </div><!-- /irt-section -->
 
-  <!-- ═══ VIOLATION CASE REVIEW ═══════════════════════════════════════════ -->
+  <!-- ═══ v91: CS EXPERTS DASHBOARD CALLOUT ═══════════════════════════════ -->
+  <div class="cse-callout">
+    <div class="cse-card">
+      <div class="cse-header">
+        <div class="cse-icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div>
+          <div class="cse-title">CS Experts Dashboard</div>
+          <div class="cse-subtitle">Violation case review and dispute management has moved to the CS Experts Dashboard.</div>
+        </div>
+      </div>
+      <div class="cse-flow">
+        <div class="cse-step">
+          <div class="cse-step-num">1</div>
+          <div class="cse-step-text">Review your <strong>IRT/ORT violation cases</strong> on the CS Experts Dashboard with enhanced filtering and real-time updates.</div>
+        </div>
+        <div class="cse-connector"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+        <div class="cse-step">
+          <div class="cse-step-num">2</div>
+          <div class="cse-step-text">Submit your dispute or validation directly &mdash; Josh will file approved cases automatically.</div>
+        </div>
+      </div>
+      <div class="cse-actions">
+        <a class="cse-btn" href="https://static.ekx.cloud.sap/api/chat/files/view/token/ba64fda6-a24f-457c-b4e3-28ff09321468?path=%2Fopen_case_dashboard.html" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Open CS Experts Dashboard
+        </a>
+        <span class="cse-hint">Opens in a new tab &mdash; no sign-in required</span>
+      </div>
+    </div>
+  </div><!-- /cse-callout -->
+
+  <!-- ═══ VIOLATION CASE REVIEW (deprecated — managed by CS Experts) ═════ -->
   <div class="vcr-section" id="vcr-section" style="display:none">
+    <!-- v91: Managed badge overlay -->
+    <div class="vcr-managed-badge">
+      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      <span>Managed by CS Experts</span>
+    </div>
     <div class="card">
       <div class="card-accent" style="background:#5D36FF"></div>
       <div class="card-head">IRT/ORT Violation Case Review</div>
@@ -2472,6 +2608,9 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
       </div><!-- /card-body -->
     </div><!-- /card -->
   </div><!-- /vcr-section -->
+  <div class="vcr-managed-msg" id="vcr-managed-msg" style="display:none">
+    This section is now read-only. <a href="https://static.ekx.cloud.sap/api/chat/files/view/token/ba64fda6-a24f-457c-b4e3-28ff09321468?path=%2Fopen_case_dashboard.html" target="_blank" rel="noopener">Go to CS Experts Dashboard</a> for full functionality.
+  </div>
 
   <!-- VCR Review Modal -->
   <div class="vcr-modal-overlay" id="vcr-modal-overlay">
@@ -7259,12 +7398,17 @@ function renderViolationReview(violationDetails, existingReviews, signedInUser) 
   var section = document.getElementById('vcr-section');
   if (!section) return;
 
+  /* v91: managed-msg mirrors VCR section visibility */
+  var managedMsg = document.getElementById('vcr-managed-msg');
+
   /* Only show VCR section if there are violation cases */
   if (_vcrData.length === 0) {
     section.style.display = 'none';
+    if (managedMsg) managedMsg.style.display = 'none';
     return;
   }
   section.style.display = '';
+  if (managedMsg) managedMsg.style.display = '';
 
   /* Populate member dropdown */
   var memberSelect = document.getElementById('vcr-f-member');
