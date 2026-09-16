@@ -809,94 +809,226 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 .irt-tc-bar-fill{height:2px;border-radius:2px}
 
 /* ════════════════════════════════════════════════════════════════════════════
-   v91: CS EXPERTS DASHBOARD CALLOUT / HANDOFF PANEL
+   v92: CS EXPERTS DASHBOARD CALLOUT / HANDOFF PANEL
+   Horizontal layout matching reference design — soft lavender bg with
+   abstract decorative shapes, 2-step flow, primary action button.
 ════════════════════════════════════════════════════════════════════════════ */
 .cse-callout{padding:10px 10px 0}
 .cse-card{
   position:relative;
-  background:linear-gradient(135deg,rgba(93,54,255,.05) 0%,rgba(76,177,255,.05) 100%);
-  border:1.5px solid rgba(93,54,255,.22);
-  border-radius:12px;
-  padding:18px 20px 16px;
+  background:linear-gradient(135deg,#EDE7FB 0%,#E1E8FE 40%,#E8DBFC 70%,#DDDFFB 100%);
+  border:1.5px solid rgba(93,54,255,.18);
+  border-radius:14px;
+  padding:0;
   overflow:hidden;
   transition:background .25s,border-color .25s;
 }
 html[data-theme="dark"] .cse-card{
-  background:linear-gradient(135deg,rgba(93,54,255,.10) 0%,rgba(76,177,255,.08) 100%);
-  border-color:rgba(93,54,255,.32);
+  background:linear-gradient(135deg,rgba(93,54,255,.18) 0%,rgba(76,177,255,.10) 40%,rgba(93,54,255,.14) 70%,rgba(100,120,255,.12) 100%);
+  border-color:rgba(93,54,255,.35);
 }
-/* Top decorative accent bar */
+/* Top accent bar */
 .cse-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,#5D36FF 0%,#4CB1FF 100%);
-  border-radius:12px 12px 0 0;
+  background:linear-gradient(90deg,#5D36FF 0%,#8B6EFF 40%,#4CB1FF 100%);
+  border-radius:14px 14px 0 0;z-index:2;
 }
-/* Header row */
-.cse-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+/* Abstract decorative shapes — soft purple/white glow blobs */
+.cse-card::after{
+  content:'';position:absolute;top:-30%;right:-5%;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(93,54,255,.10) 0%,rgba(93,54,255,.03) 50%,transparent 70%);
+  border-radius:50%;pointer-events:none;z-index:0;
+}
+.cse-inner{position:relative;z-index:1}
+/* Extra decorative blob (left side) via box-shadow on inner */
+.cse-inner::before{
+  content:'';position:absolute;bottom:-20px;left:5%;width:160px;height:140px;
+  background:radial-gradient(circle,rgba(116,82,250,.08) 0%,rgba(76,177,255,.04) 50%,transparent 70%);
+  border-radius:50%;pointer-events:none;z-index:0;
+}
+html[data-theme="dark"] .cse-card::after{
+  background:radial-gradient(circle,rgba(93,54,255,.15) 0%,rgba(93,54,255,.05) 50%,transparent 70%);
+}
+html[data-theme="dark"] .cse-inner::before{
+  background:radial-gradient(circle,rgba(116,82,250,.12) 0%,rgba(76,177,255,.06) 50%,transparent 70%);
+}
+/* ── Horizontal row layout ── */
+.cse-row{
+  display:flex;align-items:center;gap:0;
+  padding:14px 16px 12px;position:relative;z-index:1;
+}
+/* Left: icon + title group */
+.cse-left{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;
+  padding-right:14px;min-width:0;max-width:260px;
+}
 .cse-icon-wrap{
-  flex-shrink:0;width:36px;height:36px;border-radius:10px;
+  flex-shrink:0;width:38px;height:38px;border-radius:10px;
   background:linear-gradient(135deg,#5D36FF 0%,#7452FA 100%);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(93,54,255,.25);
+  box-shadow:0 2px 10px rgba(93,54,255,.30);
 }
 .cse-icon-wrap svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.cse-title{font-size:12px;font-weight:800;letter-spacing:.3px;color:var(--ct);transition:color .25s}
-.cse-subtitle{font-size:9.5px;color:var(--cm);margin-top:1px;transition:color .25s}
-/* Workflow steps */
-.cse-flow{display:flex;align-items:stretch;gap:0;margin-bottom:14px}
-.cse-step{flex:1;display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--cb);border:1px solid var(--cd);border-radius:8px;transition:background .25s,border-color .25s}
+.cse-title{font-size:11.5px;font-weight:800;letter-spacing:.2px;color:#1C0C6E;transition:color .25s}
+html[data-theme="dark"] .cse-title{color:#E2D8FF}
+.cse-subtitle{font-size:9px;color:#5B5080;margin-top:2px;line-height:1.4;transition:color .25s}
+html[data-theme="dark"] .cse-subtitle{color:#B0A4D4}
+/* Connector chevron between left and steps, and between steps */
+.cse-chevron{
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  width:22px;padding:0 2px;
+}
+.cse-chevron svg{width:14px;height:14px;stroke:#9B8CC4;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+html[data-theme="dark"] .cse-chevron svg{stroke:#7B6BA8}
+/* ── Step cards ── */
+.cse-steps{
+  flex:1;display:flex;align-items:stretch;gap:0;min-width:0;
+}
+.cse-step{
+  flex:1;display:flex;align-items:flex-start;gap:7px;
+  padding:9px 11px;min-width:0;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(93,54,255,.12);
+  border-radius:9px;
+  transition:background .25s,border-color .25s;
+}
+html[data-theme="dark"] .cse-step{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(93,54,255,.22);
+}
 .cse-step-num{
   flex-shrink:0;width:22px;height:22px;border-radius:50%;
   background:#5D36FF;color:#fff;font-size:10px;font-weight:800;
   display:flex;align-items:center;justify-content:center;
-  line-height:1;
+  line-height:1;box-shadow:0 1px 4px rgba(93,54,255,.25);
 }
-.cse-step-text{font-size:9.5px;color:var(--ct);line-height:1.45;transition:color .25s}
-.cse-step-text strong{font-weight:700;color:#5D36FF}
-/* Connector arrow between steps */
-.cse-connector{
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  width:28px;color:var(--cm);font-size:14px;transition:color .25s;
+.cse-step-content{min-width:0}
+.cse-step-title{font-size:9px;font-weight:700;color:#1C0C6E;line-height:1.3;transition:color .25s}
+html[data-theme="dark"] .cse-step-title{color:#E2D8FF}
+.cse-step-desc{font-size:8.5px;color:#5B5080;line-height:1.35;margin-top:2px;transition:color .25s}
+html[data-theme="dark"] .cse-step-desc{color:#A89CC8}
+/* Step 2 emphasis: slightly larger num, bolder title */
+.cse-step.cse-step-primary{
+  background:rgba(255,255,255,.88);
+  border-color:rgba(93,54,255,.22);
+  box-shadow:0 1px 6px rgba(93,54,255,.08);
 }
-.cse-connector svg{width:16px;height:16px;stroke:var(--cm);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* Action row */
-.cse-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.cse-btn{
-  display:inline-flex;align-items:center;gap:6px;
+html[data-theme="dark"] .cse-step.cse-step-primary{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(93,54,255,.30);
+}
+.cse-step-primary .cse-step-num{
+  width:24px;height:24px;font-size:11px;
   background:linear-gradient(135deg,#5D36FF 0%,#7452FA 100%);
-  border:none;border-radius:7px;padding:7px 16px;
-  font-family:"72","72full",sans-serif;font-size:10px;font-weight:700;
-  color:#fff;cursor:pointer;letter-spacing:.2px;
-  text-decoration:none;
-  box-shadow:0 2px 8px rgba(93,54,255,.3);
-  transition:background .15s,box-shadow .15s,transform .15s;
+  box-shadow:0 2px 8px rgba(93,54,255,.35);
 }
-.cse-btn:hover{background:linear-gradient(135deg,#7452FA 0%,#8B6EFF 100%);box-shadow:0 4px 12px rgba(93,54,255,.4);transform:translateY(-1px)}
-.cse-btn svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.cse-hint{font-size:9px;color:var(--cm);transition:color .25s}
+.cse-step-primary .cse-step-title{font-size:9.5px;font-weight:800;color:#1C0C6E}
+html[data-theme="dark"] .cse-step-primary .cse-step-title{color:#fff}
+.cse-step-primary .cse-step-title strong{color:#5D36FF;font-weight:800}
+.cse-step-primary .cse-step-desc{font-size:8.5px}
+/* ── Action area (button) ── */
+.cse-action{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding-left:14px;
+}
+.cse-btn{
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+  background:#fff;
+  border:1.5px solid #5D36FF;
+  border-radius:8px;padding:7px 14px;
+  font-family:"72","72full",sans-serif;font-size:9.5px;font-weight:700;
+  color:#5D36FF;cursor:pointer;letter-spacing:.15px;
+  text-decoration:none;
+  box-shadow:0 2px 8px rgba(93,54,255,.12);
+  transition:background .15s,box-shadow .15s,transform .15s,color .15s,border-color .15s;
+}
+.cse-btn:hover{
+  background:#5D36FF;color:#fff;
+  box-shadow:0 4px 14px rgba(93,54,255,.35);
+  transform:translateY(-1px);
+}
+.cse-btn:hover svg{stroke:#fff}
+html[data-theme="dark"] .cse-btn{
+  background:rgba(93,54,255,.15);border-color:#7452FA;color:#C4B5FF;
+}
+html[data-theme="dark"] .cse-btn:hover{
+  background:#5D36FF;color:#fff;border-color:#5D36FF;
+}
+html[data-theme="dark"] .cse-btn svg{stroke:#C4B5FF}
+html[data-theme="dark"] .cse-btn:hover svg{stroke:#fff}
+.cse-btn svg{width:12px;height:12px;fill:none;stroke:#5D36FF;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+.cse-hint{font-size:8px;color:#8B7EAE;transition:color .25s;white-space:nowrap}
+html[data-theme="dark"] .cse-hint{color:#8B7EAE}
+/* ── Bottom accent bar ── */
+.cse-bottom-bar{
+  height:3px;
+  background:linear-gradient(90deg,#5D36FF 0%,#8B6EFF 35%,#4CB1FF 100%);
+  border-radius:0 0 14px 14px;
+}
+/* ── Responsive: stack on narrow widths ── */
+@media(max-width:720px){
+  .cse-row{flex-wrap:wrap;gap:8px}
+  .cse-left{max-width:100%;padding-right:0}
+  .cse-chevron.cse-chevron-left{display:none}
+  .cse-steps{flex-wrap:wrap;width:100%;gap:6px}
+  .cse-action{width:100%;align-items:flex-start;padding-left:0;flex-direction:row;gap:10px}
+}
 
 /* ════════════════════════════════════════════════════════════════════════════
-   v91: VCR DEPRECATED — MANAGED BY CS EXPERTS
+   v92: VCR DEPRECATED — MANAGED BY CS EXPERTS
+   Visual muting ONLY — section remains FULLY FUNCTIONAL.
+   Gray treatment is cosmetic; pointer-events, hover states, and all
+   interactions are preserved.
 ════════════════════════════════════════════════════════════════════════════ */
 .vcr-section{position:relative}
+/* Muted appearance — grayscale + reduced opacity, but NO pointer-events:none */
 .vcr-section .card{
-  filter:grayscale(.55) opacity(.55);
-  pointer-events:none;
-  user-select:none;
-  transition:filter .25s;
+  filter:grayscale(.45) saturate(.6);
+  opacity:.6;
+  transition:filter .25s,opacity .25s;
 }
+/* Slightly restore on hover so the section feels alive */
+.vcr-section .card:hover{
+  filter:grayscale(.30) saturate(.7);
+  opacity:.68;
+}
+/* Card accent bar: muted gray-blue instead of purple */
+.vcr-section .card-accent{background:#8B9AAF !important}
+/* Card head: muted color */
+.vcr-section .card-head{color:#6B7A8D !important}
+html[data-theme="dark"] .vcr-section .card-head{color:#8A99AB !important}
+/* Muted VCR buttons — still fully clickable */
+.vcr-section .vcr-review-btn{
+  background:#7B8DA0;
+  transition:background .15s;
+}
+.vcr-section .vcr-review-btn:hover{background:#5D36FF}
+/* Muted note banner */
+.vcr-section .vcr-note-banner{
+  border-color:rgba(139,154,175,.25);
+  border-left-color:#8B9AAF;border-right-color:#8B9AAF;
+  background:rgba(139,154,175,.05);
+}
+html[data-theme="dark"] .vcr-section .vcr-note-banner{
+  border-color:rgba(139,154,175,.18);
+  border-left-color:#6B7A8D;border-right-color:#6B7A8D;
+  background:rgba(139,154,175,.06);
+}
+.vcr-section .vcr-note-sub{color:#8B9AAF}
+.vcr-section .vcr-note-action{color:#8B9AAF}
+/* Muted summary card top borders */
+.vcr-section .vcr-sum-card{border-top-color:#A0ADB8 !important}
 /* Badge overlay */
 .vcr-managed-badge{
   position:absolute;top:14px;right:16px;z-index:5;
   display:inline-flex;align-items:center;gap:5px;
-  background:linear-gradient(135deg,#5D36FF 0%,#4CB1FF 100%);
+  background:linear-gradient(135deg,#6B7A8D 0%,#8B9AAF 100%);
   border-radius:6px;padding:4px 12px;
-  box-shadow:0 2px 10px rgba(93,54,255,.35);
-  pointer-events:auto;
+  box-shadow:0 2px 8px rgba(107,122,141,.30);
 }
 .vcr-managed-badge svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .vcr-managed-badge span{font-size:8px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#fff}
-/* Subtle message below badge */
+/* Subtle message below VCR section */
 .vcr-managed-msg{
   text-align:center;font-size:9px;color:var(--cm);
   margin:-6px 0 0;padding:0 10px;
@@ -2500,36 +2632,52 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
     </div><!-- /card -->
   </div><!-- /irt-section -->
 
-  <!-- ═══ v91: CS EXPERTS DASHBOARD CALLOUT ═══════════════════════════════ -->
+  <!-- ═══ v92: CS EXPERTS DASHBOARD CALLOUT ═══════════════════════════════ -->
   <div class="cse-callout">
     <div class="cse-card">
-      <div class="cse-header">
-        <div class="cse-icon-wrap">
-          <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-        </div>
-        <div>
-          <div class="cse-title">CS Experts Dashboard</div>
-          <div class="cse-subtitle">Violation case review and dispute management has moved to the CS Experts Dashboard.</div>
+      <div class="cse-inner">
+        <div class="cse-row">
+          <!-- Left: icon + title -->
+          <div class="cse-left">
+            <div class="cse-icon-wrap">
+              <svg viewBox="0 0 24 24"><rect x="4" y="14" width="3" height="6" rx=".5"/><rect x="10.5" y="9" width="3" height="11" rx=".5"/><rect x="17" y="4" width="3" height="16" rx=".5"/><path d="M4 4v16h16" stroke-width="1.5"/></svg>
+            </div>
+            <div>
+              <div class="cse-title">CS Experts Dashboard</div>
+              <div class="cse-subtitle">Violation case review and dispute management has moved to the CS Experts Dashboard.</div>
+            </div>
+          </div>
+          <!-- Chevron -->
+          <div class="cse-chevron cse-chevron-left"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+          <!-- Steps -->
+          <div class="cse-steps">
+            <div class="cse-step">
+              <div class="cse-step-num">1</div>
+              <div class="cse-step-content">
+                <div class="cse-step-title">Open the CS Experts Dashboard</div>
+                <div class="cse-step-desc">Click the button to open the dashboard.</div>
+              </div>
+            </div>
+            <div class="cse-chevron"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
+            <div class="cse-step cse-step-primary">
+              <div class="cse-step-num">2</div>
+              <div class="cse-step-content">
+                <div class="cse-step-title">Check your <strong>IRT/ORT violations</strong> and <strong>OSLA cases</strong></div>
+                <div class="cse-step-desc">Review if each case is a valid violation and provide a justification if you wish to dispute.</div>
+              </div>
+            </div>
+          </div>
+          <!-- Action -->
+          <div class="cse-action">
+            <a class="cse-btn" href="https://static.ekx.cloud.sap/api/chat/files/view/token/ba64fda6-a24f-457c-b4e3-28ff09321468?path=%2Fopen_case_dashboard.html" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Open CS Experts Dashboard
+            </a>
+            <span class="cse-hint">Opens in a new tab</span>
+          </div>
         </div>
       </div>
-      <div class="cse-flow">
-        <div class="cse-step">
-          <div class="cse-step-num">1</div>
-          <div class="cse-step-text">Review your <strong>IRT/ORT violation cases</strong> on the CS Experts Dashboard with enhanced filtering and real-time updates.</div>
-        </div>
-        <div class="cse-connector"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></div>
-        <div class="cse-step">
-          <div class="cse-step-num">2</div>
-          <div class="cse-step-text">Submit your dispute or validation directly &mdash; Josh will file approved cases automatically.</div>
-        </div>
-      </div>
-      <div class="cse-actions">
-        <a class="cse-btn" href="https://static.ekx.cloud.sap/api/chat/files/view/token/ba64fda6-a24f-457c-b4e3-28ff09321468?path=%2Fopen_case_dashboard.html" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Open CS Experts Dashboard
-        </a>
-        <span class="cse-hint">Opens in a new tab &mdash; no sign-in required</span>
-      </div>
+      <div class="cse-bottom-bar"></div>
     </div>
   </div><!-- /cse-callout -->
 
