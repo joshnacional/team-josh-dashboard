@@ -178,6 +178,212 @@ body{
 }
 .hdr-user.visible{display:block}
 
+/* ── v97: Dashboard Activity — ACTIVE badge + viewer tracking ──────── */
+/* Now a direct flex child of .hdr, between .hdr-meta and .hdr-toolbar */
+.hdr-activity{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:14px;
+  flex-shrink:0;
+}
+/* Responsive: shrink gap and padding when header is tight */
+@media (max-width:1280px){
+  .hdr-activity{gap:5px;margin-left:8px}
+  .da-active-badge{padding:2px 7px 2px 5px;font-size:8.5px;gap:4px}
+  .da-viewer-btn{padding:3px 7px;font-size:9px;gap:4px}
+  .da-label{display:none}           /* collapse to "5" only, tooltip has full text */
+}
+@media (max-width:1080px){
+  .hdr-activity{gap:3px;margin-left:4px}
+  .da-active-badge{padding:2px 5px 2px 4px;font-size:8px;letter-spacing:.3px}
+  .da-viewer-btn{padding:2px 6px;font-size:8.5px}
+  .da-eye-icon{width:12px;height:12px}
+}
+.da-active-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:rgba(0,200,83,.14);
+  border:1px solid rgba(0,200,83,.32);
+  color:#00c853;
+  font-size:9.5px;
+  font-weight:700;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  padding:3px 9px 3px 7px;
+  border-radius:20px;
+  line-height:1;
+  white-space:nowrap;
+}
+.da-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:#00c853;
+  animation:daPulse 1.6s ease-in-out infinite;
+  flex-shrink:0;
+}
+@keyframes daPulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.45;transform:scale(.78)}
+}
+.da-viewer-btn{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.22);
+  color:rgba(255,255,255,.88);
+  font-size:10px;
+  font-weight:600;
+  font-family:inherit;
+  padding:4px 10px;
+  border-radius:16px;
+  cursor:pointer;
+  transition:background .15s,border-color .15s;
+  white-space:nowrap;
+  line-height:1;
+}
+.da-viewer-btn:hover{
+  background:rgba(255,255,255,.20);
+  border-color:rgba(255,255,255,.38);
+}
+.da-eye-icon{
+  width:14px;height:14px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  flex-shrink:0;
+}
+.da-label{white-space:nowrap}
+/* Tooltip for viewer button — same pattern as .tb-icon-btn::after */
+.da-viewer-btn::after{
+  content:attr(data-tip);
+  position:absolute;
+  top:calc(100% + 8px);
+  left:50%;
+  transform:translateX(-50%) translateY(-4px);
+  background:rgba(28,12,110,.92);
+  color:#fff;
+  font-family:'72','72full',sans-serif;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.2px;
+  padding:4px 9px;
+  border-radius:6px;
+  white-space:nowrap;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s ease .12s,transform .18s ease .12s;
+  z-index:99;
+  box-shadow:0 3px 12px rgba(0,0,0,.32);
+}
+.da-viewer-btn:hover::after{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+/* ── v97: Popover ── */
+.da-popover{
+  display:none;
+  position:fixed;
+  top:62px;right:18px;
+  width:280px;
+  background:#fff;
+  border:1px solid #e0e0e0;
+  border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);
+  z-index:120;
+  font-family:'72','72full',sans-serif;
+  overflow:hidden;
+}
+.da-popover.da-pop-open{display:block}
+.da-pop-hdr{
+  padding:12px 14px 8px;
+  border-bottom:1px solid #eee;
+}
+.da-pop-title{
+  font-size:12px;
+  font-weight:700;
+  color:#1a1a2e;
+  letter-spacing:.2px;
+}
+.da-pop-sub{
+  font-size:10px;
+  color:#666;
+  margin-top:2px;
+}
+.da-pop-body{
+  padding:8px 14px 12px;
+  max-height:200px;
+  overflow-y:auto;
+}
+.da-pop-empty{
+  font-size:11px;
+  color:#999;
+  text-align:center;
+  padding:14px 0;
+}
+.da-pop-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:5px 0;
+  border-bottom:1px solid #f4f4f4;
+}
+.da-pop-row:last-child{border-bottom:none}
+.da-pop-avatar{
+  width:26px;height:26px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#0070f2,#4cb1ff);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.da-pop-name{
+  font-size:11px;
+  font-weight:600;
+  color:#1a1a2e;
+}
+.da-pop-time{
+  font-size:9.5px;
+  color:#888;
+  margin-left:auto;
+  white-space:nowrap;
+}
+/* ── v97: Dark mode overrides ── */
+html[data-theme="dark"] .da-active-badge{
+  background:rgba(0,200,83,.12);
+  border-color:rgba(0,200,83,.28);
+}
+html[data-theme="dark"] .da-viewer-btn{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.16);
+  color:rgba(255,255,255,.8);
+}
+html[data-theme="dark"] .da-viewer-btn:hover{
+  background:rgba(255,255,255,.15);
+  border-color:rgba(255,255,255,.28);
+}
+html[data-theme="dark"] .da-popover{
+  background:#1d2329;
+  border-color:#373737;
+  box-shadow:0 8px 32px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);
+}
+html[data-theme="dark"] .da-pop-hdr{border-bottom-color:#373737}
+html[data-theme="dark"] .da-pop-title{color:#e8e8e8}
+html[data-theme="dark"] .da-pop-sub{color:#999}
+html[data-theme="dark"] .da-pop-name{color:#e8e8e8}
+html[data-theme="dark"] .da-pop-time{color:#777}
+html[data-theme="dark"] .da-pop-row{border-bottom-color:#2a2e34}
+html[data-theme="dark"] .da-pop-empty{color:#777}
+
 /* ── Header buttons — Sign-in keeps the old text style ───────────────── */
 .hdr-btn{
   background:rgba(255,255,255,.15);
@@ -2463,6 +2669,17 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
 <!-- ── Toast ────────────────────────────────────────────────────────────── -->
 <div id="toast"></div>
 
+<!-- ── v97: Dashboard Activity Popover ──────────────────────────────────── -->
+<div class="da-popover" id="da-popover">
+  <div class="da-pop-hdr">
+    <div class="da-pop-title">Dashboard Activity</div>
+    <div class="da-pop-sub">Last 24 Hours</div>
+  </div>
+  <div class="da-pop-body" id="da-pop-body">
+    <div class="da-pop-empty">No recent activity</div>
+  </div>
+</div>
+
 <div class="dashboard">
 
   <!-- ── Header ───────────────────────────────────────────────────────── -->
@@ -2478,6 +2695,15 @@ html[data-theme="dark"] .el-upc-due-soon{background:rgba(231,101,0,.26);color:#F
       <strong id="hdr-version"></strong><br>Data as of <span id="hdr-date"></span>
       <span id="last-refresh" class="last-refresh"></span>
       <span id="hdr-user"    class="hdr-user"></span>
+    </div>
+    <!-- v97: activity indicators — own flex child, sits left of toolbar -->
+    <div class="hdr-activity" id="hdr-activity" style="display:none">
+      <span class="da-active-badge"><span class="da-dot"></span>Active</span>
+      <button class="da-viewer-btn" id="da-viewer-btn" onclick="daTogglePopover()" data-tip="Dashboard activity — last 24 hours">
+        <svg class="da-eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="da-count" id="da-count">—</span>
+        <span class="da-label">viewed · last 24h</span>
+      </button>
     </div>
     <!-- Sign In button (visible only when not authenticated) -->
     <button class="hdr-btn btn-signin" id="btnSignIn"
@@ -3904,6 +4130,7 @@ async function _welcomeAndLoad() {
     const dataPromise = loadAndBuild();
     await _wlRunSequence();
     await dataPromise;            /* ensure full dashboard is ready before reveal */
+    daInit(); /* v97: start activity tracking after welcome + load */
   } catch(e) {
     console.error('[Welcome] Load error during welcome:', e);
     showToast('Dashboard load failed: ' + (e.message || 'unknown error'));
@@ -3958,6 +4185,7 @@ async function initAuth() {
     try {
       const token = await getToken();
       await loadAndBuild(token);
+      daInit(); /* v97: start activity tracking after successful auth + load */
       return;
     } catch(e) {
       /* silent failed — show sign-in */
@@ -3995,6 +4223,155 @@ function showSignInOverlay() {
 function hideSignInOverlay() {
   const el = document.getElementById('signin-overlay');
   if (el) el.classList.add('hidden');
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   v97: DASHBOARD ACTIVITY — ACTIVE badge + viewer tracking
+   Stores viewer events in team-josh-activity.json on OneDrive (same folder
+   as the Excel workbook). Records authenticated user + timestamp. Shows
+   unique viewers in the last 24 hours with a compact popover.
+════════════════════════════════════════════════════════════════════════════ */
+const DA_FILE = 'team-josh-activity.json';
+let _daViews = [];    /* array of {name, ts} — last-24h views */
+let _daLoaded = false;
+
+async function daInit() {
+  /* Only run when we have auth + identity */
+  var userName = TK.name();
+  if (!userName) return;
+
+  /* Show the activity row in the header */
+  var el = document.getElementById('hdr-activity');
+  if (el) el.style.display = '';
+
+  try {
+    var token = await getToken();
+    /* Ensure drive/folder are resolved */
+    if (!excelDriveId) await resolveExcelFile(token);
+    if (!lpDataFolderId) await lpResolveDataFolder(token);
+
+    await daReadFile(token);
+    await daRecordView(token, userName);
+    daRender();
+  } catch(e) {
+    console.warn('[DA] Activity tracking error (non-fatal):', e);
+    /* Non-fatal: dashboard still works, just no viewer count */
+    daRender();
+  }
+}
+
+async function daReadFile(token) {
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + excelDriveId +
+    '/items/' + lpDataFolderId + ':/' + DA_FILE + ':/content';
+  var resp = await fetch(url, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (resp.status === 404) {
+    _daViews = [];
+    return;
+  }
+  if (!resp.ok) throw new Error('DA read failed: HTTP ' + resp.status);
+  var data = await resp.json();
+  _daViews = Array.isArray(data.views) ? data.views : [];
+  _daLoaded = true;
+}
+
+async function daWriteFile(token) {
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + excelDriveId +
+    '/items/' + lpDataFolderId + ':/' + DA_FILE + ':/content';
+  var payload = JSON.stringify({ views: _daViews }, null, 2);
+  var resp = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/octet-stream'
+    },
+    body: payload
+  });
+  if (!resp.ok) throw new Error('DA write failed: HTTP ' + resp.status);
+}
+
+async function daRecordView(token, userName) {
+  var now = Date.now();
+  var cutoff = now - 24 * 60 * 60 * 1000;
+
+  /* Prune entries older than 24h */
+  _daViews = _daViews.filter(function(v) { return v.ts >= cutoff; });
+
+  /* Update or add this user's view (unique by name) */
+  var existing = _daViews.find(function(v) { return v.name === userName; });
+  if (existing) {
+    existing.ts = now;
+  } else {
+    _daViews.push({ name: userName, ts: now });
+  }
+
+  /* Write back */
+  await daWriteFile(token);
+}
+
+function daRender() {
+  var now = Date.now();
+  var cutoff = now - 24 * 60 * 60 * 1000;
+  var recent = _daViews.filter(function(v) { return v.ts >= cutoff; });
+
+  /* Sort by most recent first */
+  recent.sort(function(a, b) { return b.ts - a.ts; });
+
+  /* Update count in header */
+  var countEl = document.getElementById('da-count');
+  if (countEl) countEl.textContent = recent.length;
+
+  /* Populate popover body */
+  var body = document.getElementById('da-pop-body');
+  if (!body) return;
+
+  if (recent.length === 0) {
+    body.innerHTML = '<div class="da-pop-empty">No recent activity</div>';
+    return;
+  }
+
+  var rows = '';
+  recent.forEach(function(v) {
+    var d = new Date(v.ts);
+    var todayStr = new Date().toDateString();
+    var dayStr = d.toDateString();
+    var isToday = dayStr === todayStr;
+    var yest = new Date(now - 86400000).toDateString();
+    var isYesterday = dayStr === yest;
+    var prefix = isToday ? 'Today' : (isYesterday ? 'Yesterday' : d.toLocaleDateString('en-US', { month:'short', day:'numeric' }));
+    var time = d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12:true });
+    var timeStr = prefix + ', ' + time;
+
+    rows += '<div class="da-pop-row">'
+      + '<span class="da-pop-name">' + _daEsc(v.name) + '</span>'
+      + '<span class="da-pop-time">' + timeStr + '</span>'
+      + '</div>';
+  });
+  body.innerHTML = rows;
+}
+
+function _daEsc(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function daTogglePopover() {
+  var pop = document.getElementById('da-popover');
+  var btn = document.getElementById('da-viewer-btn');
+  if (!pop || !btn) return;
+
+  if (pop.classList.contains('da-pop-open')) {
+    pop.classList.remove('da-pop-open');
+    return;
+  }
+
+  /* Position popover below the button */
+  var rect = btn.getBoundingClientRect();
+  pop.style.top = (rect.bottom + 6) + 'px';
+  pop.style.right = Math.max(8, window.innerWidth - rect.right) + 'px';
+  pop.classList.add('da-pop-open');
 }
 
 function showConfigError() {
@@ -6511,6 +6888,7 @@ async function takeScreenshot() {
           '#toast{display:none!important}' +
           '#chart-tt{display:none!important}' +
           '.lp-pop{display:none!important}' +
+          '.da-popover{display:none!important}' +
           '.tb-icon-btn::after,.tb-icon-btn::before{display:none!important}' +
           /* v84: minor fidelity — force scrollbar areas invisible, ensure
              tab nav buttons + toolbar render with solid opaque backgrounds,
@@ -8047,6 +8425,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pop = document.getElementById('lp-pop');
     if (pop && !pop.classList.contains('hidden') && !pop.contains(e.target)) {
       lpClosePopover();
+    }
+    /* v97: Close activity popover when clicking outside */
+    const daPop = document.getElementById('da-popover');
+    const daBtn = document.getElementById('da-viewer-btn');
+    if (daPop && daPop.classList.contains('da-pop-open') &&
+        !daPop.contains(e.target) && daBtn && !daBtn.contains(e.target)) {
+      daPop.classList.remove('da-pop-open');
     }
   });
 });
