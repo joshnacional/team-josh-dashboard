@@ -3785,7 +3785,7 @@ async function _ensureTeamsToken() {
 
 /* Build the Teams chatMessage payload with an INLINE hosted-content image. */
 function _buildTeamsMessage(img, month, reportDate) {
-  var dashUrl = 'https://pages.github.tools.sap/I315275/Team_Josh_Dashboard/';
+  var dashUrl = 'https://joshnacional.github.io/team-josh-dashboard/';
   var tempId  = '1';
   var content =
     '<div><strong>Team Josh Executive Dashboard' + (month ? ' \u2014 ' + month : '') + '</strong></div>' +
@@ -7484,7 +7484,7 @@ function _buildDraftPayload(img, pdfB64, pdfName) {
   var subject  = 'Team Josh Performance Dashboard' + (month ? ' \u2014 ' + month : '') + ' | ' + reportDate;
   var cid      = 'teamjoshdashboard';
   var logoCid  = 'sapconcurlogo';
-  var dashUrl  = 'https://pages.github.tools.sap/I315275/Team_Josh_Dashboard/';
+  var dashUrl  = 'https://joshnacional.github.io/team-josh-dashboard/';
   /* Fill the available email body width (OWA/Outlook), preserve aspect ratio,
      and never upscale past the image's native resolution so users can open/
      zoom at full quality. */
