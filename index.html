@@ -1024,6 +1024,12 @@ html[data-theme="dark"] .tb-pct-cell.tb-st-low{background:rgba(210,10,10,.22);co
 .cp-name{font-weight:600;color:var(--ct);transition:color .25s}
 .cp-n{text-align:center}
 .cp-s{text-align:center}
+.cp-cn{display:inline-block;min-width:16px;text-align:center;font-weight:700;font-size:9px;border-radius:10px;padding:1px 7px}
+.cp-cn-met{color:#1E7A43;background:rgba(44,224,191,.18)}
+.cp-cn-need{color:#A04000;background:rgba(231,101,0,.16)}
+.cp-cn-na{color:var(--cm);background:var(--ch)}
+html[data-theme="dark"] .cp-cn-met{color:#4BE3A0;background:rgba(44,224,191,.14)}
+html[data-theme="dark"] .cp-cn-need{color:#FFB366;background:rgba(231,101,0,.2)}
 .cp-table tr:last-child td{border-bottom:none}
 .cp-table tr:hover td{background:var(--rh);transition:background .15s}
 
@@ -1104,10 +1110,11 @@ html[data-theme="dark"] .ios-card{background:var(--cb)}
 .ios-update-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ios-sub{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--cm);margin:0 0 4px;transition:color .25s}
 .ios-empty{font-size:10px;color:var(--cm);font-style:italic;padding:14px 4px;text-align:center;line-height:1.5}
-.ios-summary{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.ios-summary{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
 @media(max-width:860px){.ios-summary{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:520px){.ios-summary{grid-template-columns:repeat(2,1fr)}}
 .ios-card-tile{background:var(--ch);border-radius:8px;padding:7px 5px 6px;text-align:center;border-top:2px solid #5D36FF;transition:background .25s}
+.ios-flag-bad{color:#D20A0A;font-weight:800;font-size:8px;letter-spacing:.3px}
 .ios-card-tile.ios-card-pct{border-top-color:#2CE0BF}
 .ios-card-tile.ios-tile-ok{background:#E6F7EC;border-top-color:#1E7A43}
 .ios-card-tile.ios-tile-ok .ios-card-lbl,.ios-card-tile.ios-tile-ok .ios-card-val{color:#1E7A43}
@@ -2848,7 +2855,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
           <thead>
             <tr>
               <th>Name</th><th>CS&nbsp;Created</th><th>Client&nbsp;Created</th>
-              <th>Total</th><th>MTD&nbsp;Avg</th><th>Status</th>
+              <th>Total</th><th>MTD&nbsp;Avg</th><th>Cases&nbsp;Needed</th><th>Status</th>
             </tr>
           </thead>
           <tbody id="cp-tbody"></tbody>
@@ -2966,7 +2973,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
           </div>
           <!-- Action -->
           <div class="cse-action" style="margin-left:auto">
-            <a class="cse-btn" href="https://pages.github.tools.sap/I315434/CSOpenCaseDashboard/" target="_blank" rel="noopener noreferrer">
+            <a class="cse-btn" href="https://static.ekx.cloud.sap/e8bd8626-190a-413f-bfaa-3135263c857c/" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               Open CS Experts Dashboard
             </a>
@@ -4851,13 +4858,36 @@ function parseConfig(values) {
     sfMap[a.toLowerCase()] = b;
   }
 
+  /* ── v126: Case Owner Mapping — CSS Name (col A) → Pseudocode (col B) ──────
+     Dynamic read of the "CSS Name / Pseudocode" section (A34:B42 today, but
+     NOT fixed — supports added/removed rows). Keyed BY pseudocode for lookup. */
+  const coMap = {}; const coDupes = []; let coActive = false;
+  for (let i = 0; i < values.length; i++) {
+    const a = values[i][0] != null ? String(values[i][0]).trim() : '';
+    const b = values[i][1] != null ? String(values[i][1]).trim() : '';
+    if (!coActive) {
+      if (a.toLowerCase() === 'css name' && b.toLowerCase() === 'pseudocode') coActive = true;
+      continue;
+    }
+    if (!a && !b) break;              /* end of section */
+    if (!a || !b) continue;           /* skip incomplete row */
+    const key = b.toLowerCase().replace(/\s+/g, ' ');
+    if (Object.prototype.hasOwnProperty.call(coMap, key)) {
+      if (coDupes.indexOf(key) < 0) coDupes.push(key);   /* duplicate pseudocode → ambiguous */
+    } else {
+      coMap[key] = a;                 /* CSS Name EXACTLY as entered */
+    }
+  }
+
   return {
     year, month, month_name: monthName, report_date: reportDate,
     data_as_of: dataAsOfStr, version, theme,
     prev_month_name: prevMonthName,
     prev_month_str:  prevMonthStr,
     curr_month_str:  currMonthStr,
-    sf_name_map:     sfMap
+    sf_name_map:     sfMap,
+    case_owner_map:  coMap,
+    case_owner_dupes: coDupes
   };
 }
 function _defaultConfig() {
@@ -4871,7 +4901,9 @@ function _defaultConfig() {
     prev_month_name: getMonthName(pm),
     prev_month_str:  py + '-' + String(pm).padStart(2,'0'),
     curr_month_str:  y  + '-' + String(m).padStart(2,'0'),
-    sf_name_map:     {}
+    sf_name_map:     {},
+    case_owner_map:  {},
+    case_owner_dupes: []
   };
 }
 
@@ -8231,6 +8263,23 @@ function renderHeader(cfg) {
   document.getElementById('hdr-date').textContent    = cfg.data_as_of;
 }
 
+/* v127: Cases Needed = MAX(0, ROUNDUP(1.50 x Effective Workdays) - Total Cases).
+   Uses the workbook's Effective Workdays + actual case totals (NOT the displayed MTD Avg).
+   Whole numbers only; neutral placeholder when Effective Workdays is missing/invalid. */
+function _cpCasesNeededCell(r) {
+  var effWd = r.effective_wd;
+  if (typeof effWd !== 'number' || !isFinite(effWd) || effWd <= 0) {
+    return '<td class="cp-n"><span class="cp-cn cp-cn-na" title="Effective Workdays unavailable">\u2014</span></td>';
+  }
+  var target = Math.ceil(1.5 * effWd - 1e-9);                 /* ROUNDUP to whole cases */
+  var total  = (typeof r.total === 'number' && isFinite(r.total)) ? r.total : 0;
+  var need   = Math.max(0, target - total);
+  if (need === 0) {
+    return '<td class="cp-n"><span class="cp-cn cp-cn-met" title="Target met (MTD Avg \u2265 1.50)">0</span></td>';
+  }
+  return '<td class="cp-n"><span class="cp-cn cp-cn-need" title="' + need + ' more case' + (need === 1 ? '' : 's') + ' to reach a 1.50 average">' + need + '</span></td>';
+}
+
 function renderCpTable(cpA) {
   document.getElementById('cp-tbody').innerHTML = cpA.map(r => {
     const s = STATUS_STYLE[r.status] || { bg:'#EEF2F7', fg:'#1D2329' };
@@ -8240,6 +8289,7 @@ function renderCpTable(cpA) {
       '<td class="cp-n">'   + r.client_created + '</td>' +
       '<td class="cp-n">'   + r.total          + '</td>' +
       '<td class="cp-n">'   + r.avg.toFixed(2) + '</td>' +
+      _cpCasesNeededCell(r) +
       '<td class="cp-s"><span class="badge" style="background:' + s.bg + ';color:' + s.fg + '">' +
         r.status + '</span></td>' +
       '</tr>';
@@ -8350,12 +8400,23 @@ function renderIrtOrt(p) {
    recalculation/aggregation/inference. No OCR. No Salesforce fallback.
 ════════════════════════════════════════════════════════════════════════════ */
 var IOS_FILE    = 'team-josh-irtort-snapshot.json';
-var IOS_COLS    = ['Email Cases','Portal Cases','Combined Total','IRT Violations','ORT Violations','Unique Violated','IRT/ORT %'];
-var IOS_MEMBERS = ['Dhean Ian Opong','Hannah Mitz Cachola','Hart Cera','Jay Thor Quinones','John Macaraig','Roanne Joy Flores','Rob De Mesa'];
+/* v126: new CS Experts Compliance Breakdown columns (Option B) */
+var IOS_COLS    = ['Evaluated','Created','Portal','IRT Violations','ORT Violations','IRT Compliance','ORT Compliance','Overall Compliance'];
+var IOS_COLS_LEGACY = ['Email Cases','Portal Cases','Combined Total','IRT Violations','ORT Violations','Unique Violated','IRT/ORT %'];
+var IOS_PCT_COLS = ['IRT Compliance','ORT Compliance','Overall Compliance'];
+var IOS_PCT_COLS_LEGACY = ['IRT/ORT %'];
 var IOS_LEAD    = 'Josh Nacional';
+/* source header (normalized, lowercased, %/spaces stripped) -> internal/display column */
+var IOS_HDR = { 'evaluated':'Evaluated','created':'Created','portal':'Portal',
+  'irt viol':'IRT Violations','irt violations':'IRT Violations','irt vio':'IRT Violations',
+  'ort viol':'ORT Violations','ort violations':'ORT Violations','ort vio':'ORT Violations',
+  'irt comp':'IRT Compliance','irt compliance':'IRT Compliance',
+  'ort comp':'ORT Compliance','ort compliance':'ORT Compliance',
+  'overall':'Overall Compliance','overall compliance':'Overall Compliance' };
 var _iosSnapshot  = null;    /* last SUCCESSFULLY saved snapshot (page state) */
 var _iosPasteHtml = '';      /* captured text/html from the paste event */
 var _iosActiveTab = 'paste';
+var _iosDraft     = null;    /* v126: parsed+mapped draft pending confirmation */
 
 function _iosEsc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
 function _iosNorm(s){ return String(s==null?'':s).replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim(); }
@@ -8366,60 +8427,85 @@ function _iosNameMatch(cell,name){ var c=_iosNorm(cell),n=_iosNorm(name); if(!c)
 function _iosTime(iso){ try{ return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true}); }catch(e){ return String(iso); } }
 function _iosPctClass(text){ var t=String(text==null?'':text).replace(/%/g,'').replace(/,/g,'').trim(); if(t===''||t==='\u2014') return ''; var n=parseFloat(t); if(isNaN(n)) return ''; return n>=97 ? 'ios-pct-ok' : 'ios-pct-low'; }
 function _iosUser(){ var w=''; try{ w=(TK.email&&TK.email())||(TK.name&&TK.name())||''; }catch(_){ } return w; }
+/* v126: strip markdown bold / code / hyperlink markup so only clean values remain */
+function _iosCleanCell(s){ var t=String(s==null?'':s); t=t.replace(/\[([^\]]*)\]\([^)]*\)/g,'$1'); t=t.replace(/\*\*/g,'').replace(/__/g,'').replace(/`/g,''); return _iosNorm(t); }
+function _iosHdrKey(s){ return _iosCleanCell(s).toLowerCase().replace(/%/g,'').replace(/\s+/g,' ').trim(); }
 
-/* ── parsers (all produce rows = array of cell-string arrays) ───────────── */
+/* ── parsers (produce rows = array of cell-string arrays) ───────────────── */
 function _iosRowsFromHtml(htmlStr){
   try{
     var doc=new DOMParser().parseFromString(htmlStr,'text/html');
     var table=doc.querySelector('table'); if(!table) return null;
     var out=[];
     Array.prototype.forEach.call(table.querySelectorAll('tr'),function(tr){
-      var cells=Array.prototype.map.call(tr.querySelectorAll('th,td'),function(c){ return _iosNorm(c.textContent); });
+      var cells=Array.prototype.map.call(tr.querySelectorAll('th,td'),function(c){ return _iosCleanCell(c.textContent); });
       if(cells.length) out.push(cells);
     });
     return out.length?out:null;
   }catch(e){ return null; }
 }
+function _iosIsSepRow(cells){ return cells.length>0 && cells.every(function(c){ var x=String(c).replace(/\s/g,''); return x==='' || /^:?-{2,}:?$/.test(x); }); }
 function _iosRowsFromText(txt){
   var lines=String(txt).replace(/\r/g,'').split('\n').filter(function(l){ return l.trim()!==''; });
-  return lines.map(function(l){ return (l.indexOf('\t')>=0 ? l.split('\t') : l.split(/\s{2,}/)).map(_iosNorm); });
+  var out=[];
+  lines.forEach(function(l){
+    var cells;
+    if(l.indexOf('|')>=0){ cells=l.split('|'); if(cells.length&&cells[0].trim()==='') cells.shift(); if(cells.length&&cells[cells.length-1].trim()==='') cells.pop(); }
+    else if(l.indexOf('\t')>=0){ cells=l.split('\t'); }
+    else { cells=l.split(/\s{2,}/); }
+    cells=cells.map(_iosCleanCell);
+    if(_iosIsSepRow(cells)) return;                       /* markdown |---|---| separator */
+    if(cells.some(function(c){ return c!==''; })) out.push(cells);
+  });
+  return out;
 }
 function _iosRowsFromCsv(txt){
   var rows=[],row=[],field='',i=0,inQ=false,s=String(txt).replace(/\r\n/g,'\n').replace(/\r/g,'\n');
   while(i<s.length){ var ch=s[i];
     if(inQ){ if(ch==='"'){ if(s[i+1]==='"'){ field+='"'; i+=2; continue; } inQ=false; i++; continue; } field+=ch; i++; continue; }
     if(ch==='"'){ inQ=true; i++; continue; }
-    if(ch===','){ row.push(_iosNorm(field)); field=''; i++; continue; }
-    if(ch==='\n'){ row.push(_iosNorm(field)); rows.push(row); row=[]; field=''; i++; continue; }
+    if(ch===','){ row.push(_iosCleanCell(field)); field=''; i++; continue; }
+    if(ch==='\n'){ row.push(_iosCleanCell(field)); rows.push(row); row=[]; field=''; i++; continue; }
     field+=ch; i++;
   }
-  row.push(_iosNorm(field)); rows.push(row);
+  row.push(_iosCleanCell(field)); rows.push(row);
   return rows.filter(function(r){ return r.some(function(c){ return c!==''; }); });
 }
 
-/* ── map rows -> {summary, members[]} by header (preferred) or position ─── */
+/* ── map rows -> {summary, members[]}; members resolved by pseudocode via Config ─── */
 function _iosMapRows(rows){
   if(!rows||!rows.length) return null;
-  var headerIdx=-1, colMap=null;
+  var headerIdx=-1, colMap=null, nameIdx=0;
   for(var r=0;r<rows.length;r++){
-    var cs=rows[r].map(function(x){ return _iosNorm(x).toLowerCase(); });
-    var hits=IOS_COLS.filter(function(col){ return cs.some(function(c){ return c===col.toLowerCase() || c.replace('%','').trim()===col.toLowerCase().replace('%','').trim(); }); });
-    if(hits.length>=4){ headerIdx=r; colMap={};
-      IOS_COLS.forEach(function(col){ colMap[col]=rows[r].findIndex(function(h){ var hh=_iosNorm(h).toLowerCase(); return hh===col.toLowerCase()||hh.replace('%','').trim()===col.toLowerCase().replace('%','').trim(); }); });
-      break; }
+    var keys=rows[r].map(_iosHdrKey);
+    var hits=keys.filter(function(k){ return IOS_HDR[k]; }).length;
+    if(hits>=4){ headerIdx=r; colMap={};
+      IOS_COLS.forEach(function(col){ colMap[col]=keys.findIndex(function(k){ return IOS_HDR[k]===col; }); });
+      var ni=keys.findIndex(function(k){ return k.indexOf('case owner')>=0 || k.indexOf('team lead')>=0; });
+      nameIdx=ni>=0?ni:0; break; }
   }
-  function readByMap(cells){ var o={}; IOS_COLS.forEach(function(col){ var i=colMap[col]; o[col]=(i>=0&&cells[i]!=null)?_iosNorm(cells[i]):''; }); return o; }
-  function readByPos(cells){ var o={}; IOS_COLS.forEach(function(col,k){ o[col]=(cells[k+1]!=null)?_iosNorm(cells[k+1]):''; }); return o; }
-  var reader=colMap?readByMap:readByPos;
-  function firstCell(cells){ return _iosNorm(cells[0]); }
+  var _cfg=(typeof _lastDashboardData!=='undefined'&&_lastDashboardData)?_lastDashboardData.config:null;
+  var coMap=(_cfg&&_cfg.case_owner_map)?_cfg.case_owner_map:{};
+  var coDupes=(_cfg&&_cfg.case_owner_dupes)?_cfg.case_owner_dupes:[];
+  var result={ summary:null, members:[], headerFound:(headerIdx>=0), missingCols:[], mappingEmpty:(Object.keys(coMap).length===0) };
+  if(!colMap) return result;
+  result.missingCols=IOS_COLS.filter(function(c){ return colMap[c]<0; });
+  function labelCell(cells){ return _iosNorm(cells[nameIdx]!=null?cells[nameIdx]:(cells[0]||'')); }
+  function readRow(cells){ var o={}; IOS_COLS.forEach(function(col){ var i=colMap[col]; o[col]=(i>=0&&cells[i]!=null)?_iosNorm(cells[i]):''; }); return o; }
   var dataRows=rows.filter(function(_,i){ return i!==headerIdx; });
-  var sCells=dataRows.filter(function(c){ return _iosNameMatch(firstCell(c),IOS_LEAD); })[0];
-  var summary=sCells?reader(sCells):null;
-  var members=IOS_MEMBERS.map(function(name){
-    var cells=dataRows.filter(function(c){ return _iosNameMatch(firstCell(c),name); })[0];
-    var row=cells?reader(cells):{}; row.name=name; row._found=!!cells; return row;
+  var sCells=dataRows.filter(function(c){ return labelCell(c).toLowerCase()===IOS_LEAD.toLowerCase(); })[0];
+  result.summary=sCells?readRow(sCells):null;
+  dataRows.forEach(function(c){
+    var label=labelCell(c); if(!label) return;
+    if(label.toLowerCase()===IOS_LEAD.toLowerCase()) return;   /* never a member */
+    var key=label.toLowerCase().replace(/\s+/g,' ');
+    var row=readRow(c); row.pseudocode=label;
+    if(coDupes.indexOf(key)>=0){ row.flag='ambiguous'; row.cssName=''; row.name=''; }
+    else if(coMap[key]!=null){ row.cssName=coMap[key]; row.name=coMap[key]; row.flag=null; }
+    else { row.flag='unmatched'; row.cssName=''; row.name=''; }
+    result.members.push(row);
   });
-  return { summary:summary, members:members };
+  return result;
 }
 
 /* ── panel open/close/tabs ─────────────────────────────────────────────── */
@@ -8455,42 +8541,63 @@ function iosCsvChosen(e){ _iosErr('');
 
 /* ── editable preview (DRAFT — nothing applied yet) ────────────────────── */
 function _iosRenderPreview(mapped){
-  var rowsDef=[{name:IOS_LEAD,data:mapped.summary||{},lead:true}].concat(
-    IOS_MEMBERS.map(function(n){ var m=(mapped.members||[]).filter(function(x){ return x.name===n; })[0]||{name:n}; return {name:n,data:m,lead:false}; }));
-  var h='<div class="ios-prev-note">DRAFT &mdash; not yet applied. Review every value against the CS Experts Dashboard and correct any cell. Empty required cells are highlighted.</div>';
-  h+='<div class="ios-prev-wrap"><table class="ios-prev-table"><thead><tr><th class="ios-th-name">Team Lead / Case Owner</th>'+IOS_COLS.map(function(c){ return '<th>'+_iosEsc(c)+'</th>'; }).join('')+'</tr></thead><tbody>';
-  rowsDef.forEach(function(rd,ri){
-    h+='<tr'+(rd.lead?' class="ios-row-lead"':'')+'><td class="ios-td-name">'+_iosEsc(rd.name)+(rd.lead?' <span class="ios-lead-tag">summary</span>':'')+'</td>';
-    IOS_COLS.forEach(function(col){ var v=(rd.data&&rd.data[col]!=null)?rd.data[col]:'';
-      h+='<td><input class="ios-cell" type="text" data-ri="'+ri+'" data-col="'+_iosEsc(col)+'" value="'+_iosEsc(v)+'" oninput="_iosValidate()"></td>'; });
-    h+='</tr>';
+  _iosDraft=mapped;
+  var prev=document.getElementById('ios-preview');
+  if(!mapped || !mapped.headerFound){
+    _iosErr('Could not find the Compliance Breakdown header row (Evaluated, Created, Portal, IRT viol, ORT viol, IRT comp, ORT comp, Overall). Copy the full table including its header and paste again.');
+    if(prev){ prev.innerHTML=''; prev.style.display='none'; } return;
+  }
+  var errs=[];
+  if(mapped.missingCols && mapped.missingCols.length) errs.push('Missing source column(s): '+mapped.missingCols.join(', ')+'.');
+  if(mapped.mappingEmpty) errs.push('Case Owner Mapping not found in the Config worksheet (CSS Name / Pseudocode). Add it in Config before importing.');
+  if(!mapped.summary) errs.push('Team-lead summary row "'+IOS_LEAD+'" not found.');
+  var ambiguous=mapped.members.filter(function(m){ return m.flag==='ambiguous'; });
+  var unmatched=mapped.members.filter(function(m){ return m.flag==='unmatched'; });
+  if(ambiguous.length) errs.push(ambiguous.length+' case owner(s) map to a DUPLICATE pseudocode in Config \u2014 resolve the duplicate in Config before applying.');
+  var applied=mapped.members.filter(function(m){ return m.cssName; });
+
+  var h='<div class="ios-prev-note">DRAFT &mdash; not yet applied. Displayed CSS Names come only from the Config Case Owner Mapping (pseudocode \u2192 CSS Name).</div>';
+  if(errs.length) h+='<div class="ios-missing" style="color:#A04000;font-weight:600">'+errs.map(_iosEsc).join('<br>')+'</div>';
+  if(unmatched.length) h+='<div class="ios-missing" style="color:#A04000">'+unmatched.length+' pseudocode(s) have no Config mapping and will be EXCLUDED: '+_iosEsc(unmatched.map(function(m){ return m.pseudocode; }).join(', '))+'</div>';
+  h+='<div class="ios-prev-wrap"><table class="ios-prev-table"><thead><tr><th class="ios-th-name">Pseudocode</th><th class="ios-th-name">CSS Name</th>'+IOS_COLS.map(function(c){ return '<th>'+_iosEsc(c)+'</th>'; }).join('')+'</tr></thead><tbody>';
+  if(mapped.summary){
+    h+='<tr class="ios-row-lead"><td class="ios-td-name">'+_iosEsc(IOS_LEAD)+' <span class="ios-lead-tag">summary</span></td><td class="ios-td-name">&mdash;</td>'+
+       IOS_COLS.map(function(c){ return '<td>'+_iosEsc(mapped.summary[c]!=null?mapped.summary[c]:'')+'</td>'; }).join('')+'</tr>';
+  }
+  mapped.members.forEach(function(m){
+    var cssCell = (m.flag==='unmatched') ? '<span class="ios-flag-bad">UNMATCHED</span>'
+                : (m.flag==='ambiguous') ? '<span class="ios-flag-bad">AMBIGUOUS</span>'
+                : _iosEsc(m.cssName);
+    h+='<tr><td class="ios-td-name">'+_iosEsc(m.pseudocode)+'</td><td class="ios-td-name">'+cssCell+'</td>'+
+       IOS_COLS.map(function(c){ return '<td>'+_iosEsc(m[c]!=null?m[c]:'')+'</td>'; }).join('')+'</tr>';
   });
   h+='</tbody></table></div>';
   h+='<label class="ios-verify"><input type="checkbox" id="ios-verify-chk" onchange="_iosValidate()"> I verified these match the source</label>';
   h+='<div class="ios-missing" id="ios-missing"></div>';
   h+='<div class="ios-confirm-bar"><button class="ios-btn-ghost" onclick="iosClosePanel()">Cancel</button>'+
      '<button class="ios-btn-primary" id="ios-confirm-btn" disabled onclick="iosConfirmApply()">Confirm &amp; Apply</button></div>';
-  var prev=document.getElementById('ios-preview'); if(prev){ prev.innerHTML=h; prev.style.display='block'; }
+  if(prev){ prev.innerHTML=h; prev.style.display='block'; }
+  _iosDraft._block   = (errs.length>0) || (applied.length===0);
+  _iosDraft._applied = applied;
+  _iosErr('');
   _iosValidate();
 }
 function _iosValidate(){
-  var cells=document.querySelectorAll('#ios-preview .ios-cell'); var missing=0;
-  Array.prototype.forEach.call(cells,function(inp){ if(inp.value.trim()===''){ inp.classList.add('ios-invalid'); missing++; } else inp.classList.remove('ios-invalid'); });
   var chk=document.getElementById('ios-verify-chk'); var checked=!!(chk&&chk.checked);
-  var btn=document.getElementById('ios-confirm-btn'); if(btn) btn.disabled=!(missing===0&&checked);
+  var blocked=(!_iosDraft)||_iosDraft._block;
+  var btn=document.getElementById('ios-confirm-btn'); if(btn) btn.disabled=!(checked && !blocked);
   var mEl=document.getElementById('ios-missing');
-  if(mEl) mEl.textContent = missing>0 ? (missing+' required cell'+(missing===1?'':'s')+' still empty.') : (checked?'':'Tick the verification box to enable Confirm & Apply.');
+  if(mEl) mEl.textContent = blocked ? 'Resolve the flagged issue(s) above before applying.' : (checked?'':'Tick the verification box to enable Confirm & Apply.');
 }
 
 /* ── Confirm & Apply -> save to OneDrive (only then update display) ─────── */
 async function iosConfirmApply(){
   if(!_isJoshUser()){ _iosErr('Update controls are restricted to Josh Nacional.'); return; }
   var btn=document.getElementById('ios-confirm-btn'); if(btn&&btn.disabled) return;
-  var cells=document.querySelectorAll('#ios-preview .ios-cell'); var byRow={};
-  Array.prototype.forEach.call(cells,function(inp){ var ri=inp.getAttribute('data-ri'), col=inp.getAttribute('data-col'); (byRow[ri]=byRow[ri]||{})[col]=inp.value; });
-  var summary={}; IOS_COLS.forEach(function(c){ summary[c]=(byRow['0']&&byRow['0'][c]!=null)?byRow['0'][c]:''; });
-  var members=IOS_MEMBERS.map(function(name,k){ var ri=String(k+1),o={name:name}; IOS_COLS.forEach(function(c){ o[c]=(byRow[ri]&&byRow[ri][c]!=null)?byRow[ri][c]:''; }); return o; });
-  var snap={ capturedAt:new Date().toISOString(), savedBy:_iosUser(), summary:summary, members:members };
+  if(!_iosDraft || _iosDraft._block){ return; }
+  var summary={}; IOS_COLS.forEach(function(c){ summary[c]=(_iosDraft.summary&&_iosDraft.summary[c]!=null)?_iosDraft.summary[c]:''; });
+  var members=(_iosDraft._applied||[]).map(function(m){ var o={ pseudocode:m.pseudocode, cssName:m.cssName, name:m.cssName }; IOS_COLS.forEach(function(c){ o[c]=(m[c]!=null)?m[c]:''; }); return o; });
+  var snap={ schema:2, cols:IOS_COLS.slice(), capturedAt:new Date().toISOString(), savedBy:_iosUser(), summary:summary, members:members };
   if(btn){ btn.disabled=true; btn.textContent='Saving\u2026'; } _iosErr('');
   try{
     await _iosSave(snap);
@@ -8527,20 +8634,24 @@ async function iosLoad(token){
 }
 
 /* ── display: 7 Team Overall cards + 7-member x 8-col table (verbatim) ──── */
+function _iosColsFor(snap){ var s=(snap&&snap.summary)||{}; if(snap&&Array.isArray(snap.cols)&&snap.cols.length) return snap.cols; return (('Evaluated' in s)||('Overall Compliance' in s))?IOS_COLS:IOS_COLS_LEGACY; }
+function _iosPctColsFor(cols){ if(cols===IOS_COLS_LEGACY) return IOS_PCT_COLS_LEGACY; if(cols===IOS_COLS) return IOS_PCT_COLS; return cols.filter(function(c){ return /compliance/i.test(c) || c==='IRT/ORT %'; }); }
 function _iosRenderDisplay(){
   var disp=document.getElementById('ios-display'); var badge=document.getElementById('ios-badge');
   if(!_iosSnapshot){
     if(badge) badge.textContent='Manually captured \u2014 not live';
-    if(disp) disp.innerHTML='<div class="ios-empty">No snapshot yet &mdash; click <strong>Update IRT/ORT Snapshot</strong> to paste the IRT/ORT Compliance % table from the CS Experts Dashboard.</div>';
+    if(disp) disp.innerHTML='<div class="ios-empty">No snapshot yet &mdash; click <strong>Update IRT/ORT Snapshot</strong> to paste the CS Experts Compliance Breakdown.</div>';
     return;
   }
+  var cols=_iosColsFor(_iosSnapshot); var pctCols=_iosPctColsFor(cols);
+  function isPct(c){ return pctCols.indexOf(c)>=0; }
   var sum=_iosSnapshot.summary||{};
   if(badge) badge.textContent='Manually captured \u2014 not live \u00b7 Last updated: '+_iosTime(_iosSnapshot.capturedAt);
-  var cards=IOS_COLS.map(function(col){ var v=(sum[col]!=null&&sum[col]!=='')?sum[col]:'\u2014'; var pc=''; if(col==='IRT/ORT %'){ var _k=_iosPctClass(v); pc=_k==='ios-pct-ok'?' ios-tile-ok':(_k==='ios-pct-low'?' ios-tile-low':' ios-card-pct'); }
+  var cards=cols.map(function(col){ var v=(sum[col]!=null&&sum[col]!=='')?sum[col]:'\u2014'; var pc=''; if(isPct(col)){ var _k=_iosPctClass(v); pc=_k==='ios-pct-ok'?' ios-tile-ok':(_k==='ios-pct-low'?' ios-tile-low':' ios-card-pct'); }
     return '<div class="ios-card-tile'+pc+'"><div class="ios-card-lbl">'+_iosEsc(col)+'</div><div class="ios-card-val">'+_iosEsc(v)+'</div></div>'; }).join('');
-  var head='<thead><tr><th class="ios-th-name">CSS Member</th>'+IOS_COLS.map(function(c){ return '<th>'+_iosEsc(c)+'</th>'; }).join('')+'</tr></thead>';
-  var body=(_iosSnapshot.members||[]).map(function(m){ return '<tr><td class="ios-td-name">'+_iosEsc(m.name)+'</td>'+
-    IOS_COLS.map(function(c){ var v=(m[c]!=null&&m[c]!=='')?m[c]:'\u2014'; var pc=(c==='IRT/ORT %')?_iosPctClass(v):''; return '<td'+(pc?' class="'+pc+'"':'')+'>'+_iosEsc(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+  var head='<thead><tr><th class="ios-th-name">CSS Member</th>'+cols.map(function(c){ return '<th>'+_iosEsc(c)+'</th>'; }).join('')+'</tr></thead>';
+  var body=(_iosSnapshot.members||[]).map(function(m){ var nm=(m.cssName!=null&&m.cssName!=='')?m.cssName:(m.name||''); return '<tr><td class="ios-td-name">'+_iosEsc(nm)+'</td>'+
+    cols.map(function(c){ var v=(m[c]!=null&&m[c]!=='')?m[c]:'\u2014'; var pc=isPct(c)?_iosPctClass(v):''; return '<td'+(pc?' class="'+pc+'"':'')+'>'+_iosEsc(v)+'</td>'; }).join('')+'</tr>'; }).join('');
   if(disp) disp.innerHTML='<div class="ios-sub">Team Overall</div><div class="ios-summary">'+cards+'</div>'+
     '<div class="ios-sub" style="margin-top:9px">Individual Compliance</div><div class="ios-tbl-wrap"><table class="ios-table">'+head+'<tbody>'+body+'</tbody></table></div>';
 }
