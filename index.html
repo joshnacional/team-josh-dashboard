@@ -6895,6 +6895,26 @@ async function fetchDashboardData(token, reportingMonthOverride) {
     _reportingMonth = reportingMonthOverride;
   }
 
+  /* v128: realign SF-derived sections to the finally-selected reporting month.
+     The SF pipeline above was started with the month known at call time
+     (reportingMonthOverride, or the workbook Config month as fallback). If the
+     selected month differs, re-derive the SF dataset ONCE so Case Productivity
+     and IRT/ORT match the selector on the first completed render. Both months
+     are normalized to YYYY-MM strings to avoid false mismatches, and the extra
+     fetch only runs on an actual mismatch. */
+  const _sfUsedMonth   = String(reportingMonthOverride || configMonth);
+  const _selectedMonth = String(_reportingMonth);
+  if (_selectedMonth !== _sfUsedMonth) {
+    console.log('[SF] Initial month realignment: SF fetched ' + _sfUsedMonth +
+                ' but selected reporting month is ' + _selectedMonth +
+                ' \u2014 re-deriving SF dataset once.');
+    try {
+      sfResult = await sfFetchData(token, config, cpParsed.leave_map, _reportingMonth, cpRawVals);
+    } catch (e) {
+      console.warn('[SF] Initial realignment fetch failed; keeping original SF result:', e);
+    }
+  }
+
   /* v80: now re-parse TB and SV with the reporting month filter */
   var _tPL0 = PERF.now();
   const rptMonth    = _reportingMonth;
