@@ -1025,11 +1025,16 @@ html[data-theme="dark"] .tb-pct-cell.tb-st-low{background:rgba(210,10,10,.22);co
 .cp-n{text-align:center}
 .cp-s{text-align:center}
 .cp-cn{display:inline-block;min-width:16px;text-align:center;font-weight:700;font-size:9px;border-radius:10px;padding:1px 7px}
-.cp-cn-met{color:#1E7A43;background:rgba(44,224,191,.18)}
-.cp-cn-need{color:#A04000;background:rgba(231,101,0,.16)}
+.cp-cn-met{color:#06361F;background:#5FC88C;box-shadow:0 0 0 1px rgba(30,158,90,.55),0 0 7px 2px rgba(44,200,130,.4);animation:cpPulseGreen 1.4s ease-in-out infinite}
+.cp-cn-need{color:#5A2E00;background:#F3A838;box-shadow:0 0 0 1px rgba(224,123,0,.7),0 0 9px 2px rgba(240,140,0,.5);animation:cpPulseAmber 1.4s ease-in-out infinite}
 .cp-cn-na{color:var(--cm);background:var(--ch)}
-html[data-theme="dark"] .cp-cn-met{color:#4BE3A0;background:rgba(44,224,191,.14)}
-html[data-theme="dark"] .cp-cn-need{color:#FFB366;background:rgba(231,101,0,.2)}
+html[data-theme="dark"] .cp-cn-met{color:#06301C;background:#34B277;box-shadow:0 0 0 1px rgba(70,220,150,.6),0 0 8px 2px rgba(44,224,191,.45);animation-name:cpPulseGreenDark}
+html[data-theme="dark"] .cp-cn-need{color:#2A1500;background:#E58A2A;box-shadow:0 0 0 1px rgba(255,160,70,.75),0 0 10px 2px rgba(255,150,40,.55);animation-name:cpPulseAmberDark}
+@keyframes cpPulseAmber{0%,100%{box-shadow:0 0 0 1px rgba(224,123,0,.55),0 0 6px 1px rgba(240,140,0,.35);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(224,123,0,.85),0 0 15px 4px rgba(240,140,0,.72);transform:scale(1.04)}}
+@keyframes cpPulseGreen{0%,100%{box-shadow:0 0 0 1px rgba(30,158,90,.45),0 0 5px 1px rgba(44,200,130,.28);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(30,158,90,.68),0 0 11px 3px rgba(44,200,130,.52);transform:scale(1.04)}}
+@keyframes cpPulseAmberDark{0%,100%{box-shadow:0 0 0 1px rgba(255,160,70,.6),0 0 7px 1px rgba(255,150,40,.4);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(255,160,70,.92),0 0 17px 5px rgba(255,150,40,.78);transform:scale(1.04)}}
+@keyframes cpPulseGreenDark{0%,100%{box-shadow:0 0 0 1px rgba(70,220,150,.5),0 0 6px 1px rgba(44,224,191,.3);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(70,220,150,.72),0 0 13px 4px rgba(44,224,191,.56);transform:scale(1.04)}}
+@media (prefers-reduced-motion: reduce){.cp-cn-met,.cp-cn-need{animation:none}}
 .cp-table tr:last-child td{border-bottom:none}
 .cp-table tr:hover td{background:var(--rh);transition:background .15s}
 
