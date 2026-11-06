@@ -1055,21 +1055,26 @@ html[data-theme="dark"] .uhm-card{background:var(--cb)}
 .uhm-table td.uhm-td-name{text-align:left;font-weight:600;white-space:nowrap}
 .uhm-grp-row td{background:var(--ch);font-weight:800;color:var(--ct);text-align:left;font-size:8.5px;letter-spacing:.3px;text-transform:uppercase;border-bottom:1.5px solid var(--cd)}
 .uhm-table tbody tr:hover td{background:var(--rh)}
-.uhm-bar{position:relative;width:78px;height:14px;border-radius:7px;background:var(--ch);overflow:hidden;display:inline-block;vertical-align:middle}
-.uhm-bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:7px;transition:width .3s}
-.uhm-bar-lo .uhm-bar-fill{background:#B42318}
-.uhm-bar-mid .uhm-bar-fill{background:#E76500}
-.uhm-bar-hi .uhm-bar-fill{background:#1E7A43}
-.uhm-bar-txt{position:relative;z-index:1;font-size:8px;font-weight:800;color:var(--ct);line-height:14px;padding-left:5px;text-shadow:0 0 2px var(--cb)}
+.uhm-bar{position:relative;display:inline-block;width:auto;min-width:46px;padding:2px 8px;border-radius:8px;text-align:center;line-height:1.4;vertical-align:middle;font-weight:800;font-size:9px}
+.uhm-bar-fill{display:none}
+.uhm-bar-txt{position:static;z-index:auto;color:inherit;font-weight:800;font-size:9px;line-height:1.4;padding:0;text-shadow:none}
+/* v133: pastel utilization chips — IRT/ORT Overall Compliance treatment (pale bg + dark text) */
+.uhm-bar-lo{background:#FCE8E8;color:#B42318}
+.uhm-bar-mid{background:#FFF1E0;color:#A04000}
+.uhm-bar-hi{background:#E6F7EC;color:#1E7A43}
+html[data-theme="dark"] .uhm-bar-lo{background:rgba(210,10,10,.18);color:#FF9A8A}
+html[data-theme="dark"] .uhm-bar-mid{background:rgba(231,101,0,.16);color:#F0A050}
+html[data-theme="dark"] .uhm-bar-hi{background:rgba(44,224,191,.14);color:#4BE3A0}
 .uhm-unacc{display:inline-block;min-width:34px;text-align:center;font-weight:800;font-size:9.5px;border-radius:8px;padding:2px 8px}
 .uhm-unacc-neg{color:#1E7A43;background:#E6F7EC}
 .uhm-unacc-zero{color:#1E7A43;background:#E6F7EC}
 .uhm-unacc-na{color:var(--cm);background:var(--ch)}
-.uhm-unacc-pos{color:#fff;background:#B42318;box-shadow:0 0 0 1px rgba(210,10,10,.55),0 0 9px 2px rgba(231,101,0,.55);animation:uhmUnaccPulse 1.5s ease-in-out infinite}
+/* v133: positive Unaccounted — pale red (IRT/ORT non-compliant) + dark text + SOFTENED pulse */
+.uhm-unacc-pos{color:#B42318;background:#FCE8E8;box-shadow:0 0 0 1px rgba(210,10,10,.25),0 0 6px 1px rgba(210,10,10,.2);animation:uhmUnaccPulse 1.5s ease-in-out infinite}
 html[data-theme="dark"] .uhm-unacc-neg{color:#4BE3A0;background:rgba(44,224,191,.14)}
 html[data-theme="dark"] .uhm-unacc-zero{color:#4BE3A0;background:rgba(44,224,191,.14)}
-html[data-theme="dark"] .uhm-unacc-pos{background:#C0392B;box-shadow:0 0 0 1px rgba(255,120,90,.6),0 0 10px 2px rgba(255,120,60,.6)}
-@keyframes uhmUnaccPulse{0%,100%{box-shadow:0 0 0 1px rgba(210,10,10,.45),0 0 5px 1px rgba(231,101,0,.35);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(210,10,10,.9),0 0 16px 5px rgba(231,101,0,.8);transform:scale(1.05)}}
+html[data-theme="dark"] .uhm-unacc-pos{color:#FF9A8A;background:rgba(210,10,10,.18);box-shadow:0 0 0 1px rgba(255,120,90,.3),0 0 7px 1px rgba(255,120,90,.25)}
+@keyframes uhmUnaccPulse{0%,100%{box-shadow:0 0 0 1px rgba(210,10,10,.22),0 0 4px 1px rgba(210,10,10,.14);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(210,10,10,.5),0 0 10px 3px rgba(210,10,10,.4);transform:scale(1.03)}}
 @media(prefers-reduced-motion:reduce){.uhm-unacc-pos{animation:none}}
 .uhm-panel{margin-top:11px;border-top:1px dashed var(--cd);padding-top:11px}
 .uhm-help{font-size:9px;color:var(--cm);line-height:1.5;margin-bottom:8px}
