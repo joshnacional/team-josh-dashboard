@@ -961,8 +961,8 @@ html[data-theme="dark"] .cp-cn-need{color:#2A1500;background:#E58A2A;box-shadow:
 .irt-tc-bar{width:100%;height:2px;border-radius:2px;background:var(--cg);overflow:hidden;margin-top:3px;transition:background .25s}
 .irt-tc-bar-fill{height:2px;border-radius:2px}
 /* ═══ v120: IRT/ORT Compliance manual snapshot (paste / CSV) ═══ */
-.ios-card{margin:10px 10px 0;background:#F8FAFC;border:1px solid var(--cd);border-radius:12px;padding:12px 14px;transition:background .25s,border-color .25s}
-html[data-theme="dark"] .ios-card{background:var(--cb)}
+.ios-card{margin:0;background:transparent;border:none;border-radius:0;padding:2px 2px 0;transition:background .25s,border-color .25s}
+html[data-theme="dark"] .ios-card{background:transparent}
 .ios-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px}
 .ios-title{font-size:11px;font-weight:800;letter-spacing:.2px;color:var(--ct);transition:color .25s}
 .ios-badge{font-size:8.5px;font-weight:600;color:var(--cm);background:var(--ch);border-radius:20px;padding:3px 9px;transition:background .25s,color .25s}
@@ -987,12 +987,12 @@ html[data-theme="dark"] .ios-card-tile.ios-tile-low{background:rgba(210,10,10,.1
 html[data-theme="dark"] .ios-card-tile.ios-tile-low .ios-card-lbl,html[data-theme="dark"] .ios-card-tile.ios-tile-low .ios-card-val{color:#FF9A8A}
 .ios-card-lbl{font-size:7px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--cm);line-height:1.3;transition:color .25s}
 .ios-card-val{font-size:16px;font-weight:700;color:var(--ct);line-height:1.1;margin-top:3px;word-break:break-word;transition:color .25s}
-.ios-tbl-wrap{overflow-x:auto}
-.ios-table{width:100%;border-collapse:collapse;font-size:9.5px;min-width:560px;background:var(--cb)}
-.ios-table th{background:var(--ch);color:var(--ct);font-weight:700;font-size:8px;letter-spacing:.3px;text-transform:uppercase;padding:5px 6px;border-bottom:1.5px solid var(--cd);text-align:center;white-space:nowrap;transition:background .25s,color .25s,border-color .25s}
-.ios-table th.ios-th-name{text-align:left}
-.ios-table td{padding:5px 6px;border-bottom:1px solid var(--rb);color:var(--ct);text-align:center;white-space:nowrap;transition:border-color .25s,color .25s}
-.ios-table td.ios-td-name{text-align:left;font-weight:600;white-space:normal;min-width:150px}
+.ios-tbl-wrap{overflow-x:hidden}
+.ios-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:8.5px;background:var(--cb)}
+.ios-table th{background:var(--ch);color:var(--ct);font-weight:700;font-size:7px;letter-spacing:.2px;text-transform:uppercase;padding:4px 3px;border-bottom:1.5px solid var(--cd);text-align:center;white-space:normal;word-break:break-word;transition:background .25s,color .25s,border-color .25s}
+.ios-table th.ios-th-name{text-align:left;width:16%}
+.ios-table td{padding:4px 3px;border-bottom:1px solid var(--rb);color:var(--ct);text-align:center;white-space:normal;word-break:break-word;transition:border-color .25s,color .25s}
+.ios-table td.ios-td-name{text-align:left;font-weight:600;white-space:normal;word-break:break-word}
 .ios-table tr:last-child td{border-bottom:none}
 .ios-table tbody tr:hover td{background:var(--rh)}
 .ios-table tbody td.ios-pct-ok{background:#E6F7EC;color:#1E7A43;font-weight:700}
@@ -1031,9 +1031,9 @@ html[data-theme="dark"] .ios-prev-note{color:#FFB366}
 .ios-missing{font-size:8.5px;color:var(--cm);margin-top:5px;min-height:11px}
 .ios-confirm-bar{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
 /* ════ v129: UTILIZATION & HOURS MONITORING ════ */
-.uhm-wrap{padding:0 10px;margin-top:10px}
-.uhm-card{background:#F8FAFC;border:1px solid var(--cd);border-radius:12px;padding:12px 14px;transition:background .25s,border-color .25s}
-html[data-theme="dark"] .uhm-card{background:var(--cb)}
+.uhm-wrap{margin:0;padding:12px;background:var(--cb);border:1px solid var(--cd);border-radius:14px;display:flex;flex-direction:column;min-width:0;box-sizing:border-box;transition:background .25s,border-color .25s}
+.uhm-card{margin:0;background:transparent;border:none;border-radius:0;padding:2px 2px 0;transition:background .25s,border-color .25s}
+html[data-theme="dark"] .uhm-card{background:transparent}
 .uhm-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px}
 .uhm-title{font-size:11px;font-weight:800;letter-spacing:.2px;color:var(--ct);transition:color .25s}
 .uhm-badge{font-size:8.5px;font-weight:600;color:var(--cm);background:var(--ch);border-radius:20px;padding:3px 9px;transition:background .25s,color .25s}
@@ -1045,19 +1045,19 @@ html[data-theme="dark"] .uhm-card{background:var(--cb)}
 .uhm-sum-head{font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--ct);margin:2px 0 7px;padding-left:8px;border-left:3px solid #5D36FF;line-height:1.35;transition:color .25s}
 .uhm-empty{font-size:10px;color:var(--cm);font-style:italic;padding:14px 4px;text-align:center;line-height:1.5}
 .uhm-summary{display:flex;flex-wrap:wrap;gap:5px}
-.uhm-tile{flex:1 1 120px;min-width:120px;background:var(--ch);border-radius:8px;padding:7px 5px 6px;text-align:center;border-top:2px solid #5D36FF;transition:background .25s}
+.uhm-tile{flex:1 1 0;min-width:70px;background:var(--ch);border-radius:8px;padding:7px 4px 6px;text-align:center;border-top:2px solid #5D36FF;transition:background .25s}
 .uhm-tile.uhm-tile-pct{border-top-color:#2CE0BF}
 .uhm-tile-lbl{font-size:7px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--cm);line-height:1.3;transition:color .25s}
 .uhm-tile-val{font-size:15px;font-weight:700;color:var(--ct);line-height:1.1;margin-top:3px;word-break:break-word;transition:color .25s}
-.uhm-tbl-wrap{overflow-x:auto}
-.uhm-table{width:100%;border-collapse:collapse;font-size:9px;min-width:920px;background:var(--cb)}
-.uhm-table th{background:var(--ch);color:var(--ct);font-weight:700;font-size:7.5px;letter-spacing:.3px;text-transform:uppercase;padding:5px 6px;border-bottom:1.5px solid var(--cd);text-align:center;white-space:nowrap;transition:background .25s,color .25s,border-color .25s}
-.uhm-table th.uhm-th-name{text-align:left}
-.uhm-table td{padding:5px 6px;border-bottom:1px solid var(--rb);color:var(--ct);text-align:center;white-space:nowrap;transition:border-color .25s,color .25s}
-.uhm-table td.uhm-td-name{text-align:left;font-weight:600;white-space:nowrap}
+.uhm-tbl-wrap{overflow-x:hidden}
+.uhm-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:8px;background:var(--cb)}
+.uhm-table th{background:var(--ch);color:var(--ct);font-weight:700;font-size:6.5px;letter-spacing:.1px;text-transform:uppercase;padding:4px 2px;border-bottom:1.5px solid var(--cd);text-align:center;white-space:normal;word-break:break-word;transition:background .25s,color .25s,border-color .25s}
+.uhm-table th.uhm-th-name{text-align:left;width:17%}
+.uhm-table td{padding:4px 2px;border-bottom:1px solid var(--rb);color:var(--ct);text-align:center;white-space:normal;word-break:break-word;transition:border-color .25s,color .25s}
+.uhm-table td.uhm-td-name{text-align:left;font-weight:600;white-space:normal;word-break:break-word}
 .uhm-grp-row td{background:var(--ch);font-weight:800;color:var(--ct);text-align:left;font-size:8.5px;letter-spacing:.3px;text-transform:uppercase;border-bottom:1.5px solid var(--cd)}
 .uhm-table tbody tr:hover td{background:var(--rh)}
-.uhm-bar{position:relative;display:inline-block;width:auto;min-width:46px;padding:2px 8px;border-radius:8px;text-align:center;line-height:1.4;vertical-align:middle;font-weight:800;font-size:9px}
+.uhm-bar{position:relative;display:inline-block;width:auto;max-width:100%;box-sizing:border-box;min-width:0;padding:2px 5px;border-radius:8px;text-align:center;line-height:1.35;vertical-align:middle;font-weight:800;font-size:8px}
 .uhm-bar-fill{display:none}
 .uhm-bar-txt{position:static;z-index:auto;color:inherit;font-weight:800;font-size:9px;line-height:1.4;padding:0;text-shadow:none}
 /* v133: pastel utilization chips — IRT/ORT Overall Compliance treatment (pale bg + dark text) */
@@ -1067,7 +1067,7 @@ html[data-theme="dark"] .uhm-card{background:var(--cb)}
 html[data-theme="dark"] .uhm-bar-lo{background:rgba(210,10,10,.18);color:#FF9A8A}
 html[data-theme="dark"] .uhm-bar-mid{background:rgba(231,101,0,.16);color:#F0A050}
 html[data-theme="dark"] .uhm-bar-hi{background:rgba(44,224,191,.14);color:#4BE3A0}
-.uhm-unacc{display:inline-block;min-width:34px;text-align:center;font-weight:800;font-size:9.5px;border-radius:8px;padding:2px 8px}
+.uhm-unacc{display:inline-block;max-width:100%;box-sizing:border-box;min-width:0;text-align:center;font-weight:800;font-size:8.5px;border-radius:8px;padding:2px 6px}
 .uhm-unacc-neg{color:#1E7A43;background:#E6F7EC}
 .uhm-unacc-zero{color:#1E7A43;background:#E6F7EC}
 .uhm-unacc-na{color:var(--cm);background:var(--ch)}
@@ -1110,19 +1110,24 @@ html[data-theme="dark"] .uhm-flag{color:#FF9A8A}
    Horizontal layout matching reference design — soft lavender bg with
    abstract decorative shapes, 2-step flow, primary action button.
 ════════════════════════════════════════════════════════════════════════════ */
-.cse-callout{padding:10px 10px 0}
+.cse-callout{margin:0;padding:12px;background:var(--cb);border:1px solid var(--cd);border-radius:14px;display:flex;flex-direction:column;min-width:0;transition:background .25s,border-color .25s}
+.tc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px 10px 0;align-items:stretch;box-sizing:border-box}
+@media(max-width:1100px){.tc-grid{grid-template-columns:1fr}}
+.cse-callout>.cse-card{margin:0 0 10px}
+@media(min-width:1101px){.tc-grid .ios-tbl-wrap,.tc-grid .uhm-tbl-wrap{max-height:360px;overflow-y:auto;overflow-x:hidden}}
 .cse-card{
   position:relative;
-  background:linear-gradient(135deg,#EDE7FB 0%,#E1E8FE 40%,#E8DBFC 70%,#DDDFFB 100%);
-  border:1.5px solid rgba(93,54,255,.18);
-  border-radius:14px;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--cd);
+  border-radius:0;
   padding:0;
-  overflow:hidden;
-  transition:background .25s,border-color .25s;
+  overflow:visible;
+  transition:border-color .25s;
 }
 html[data-theme="dark"] .cse-card{
-  background:linear-gradient(135deg,rgba(93,54,255,.18) 0%,rgba(76,177,255,.10) 40%,rgba(93,54,255,.14) 70%,rgba(100,120,255,.12) 100%);
-  border-color:rgba(93,54,255,.35);
+  background:transparent;
+  border-color:var(--cd);
 }
 /* Top accent bar */
 .cse-card::before{
@@ -1149,10 +1154,11 @@ html[data-theme="dark"] .cse-card::after{
 html[data-theme="dark"] .cse-inner::before{
   background:radial-gradient(circle,rgba(116,82,250,.12) 0%,rgba(76,177,255,.06) 50%,transparent 70%);
 }
+.cse-card::before,.cse-card::after,.cse-inner::before,.cse-bottom-bar{display:none !important;}
 /* ── Horizontal row layout ── */
 .cse-row{
   display:flex;align-items:center;gap:0;
-  padding:14px 16px 12px;position:relative;z-index:1;
+  padding:2px 2px 12px;position:relative;z-index:1;
 }
 /* Left: icon + title group */
 .cse-left{
@@ -2923,25 +2929,23 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
 
   <!-- ═══ v92: CS EXPERTS DASHBOARD CALLOUT ═══════════════════════════════ -->
+  <div class="tc-grid">
   <div class="cse-callout">
     <div class="cse-card">
       <div class="cse-inner">
         <div class="cse-row">
           <!-- Left: icon + title -->
           <div class="cse-left">
-            <div class="cse-icon-wrap">
-              <svg viewBox="0 0 24 24"><rect x="4" y="14" width="3" height="6" rx=".5"/><rect x="10.5" y="9" width="3" height="11" rx=".5"/><rect x="17" y="4" width="3" height="16" rx=".5"/><path d="M4 4v16h16" stroke-width="1.5"/></svg>
-            </div>
             <div>
-              <div class="cse-title">CS Experts Dashboard (Flagged Cases and IRT/ORT Compliance)</div>
-              <div class="cse-subtitle">Violation case review and dispute management has moved to the CS Experts Dashboard.</div>
+              <div class="cse-title">CS Experts Case Central Dashboard (Flagged Cases and IRT/ORT Compliance)</div>
+              <div class="cse-subtitle">Violation case review and dispute management has moved to the CS Experts Case Central Dashboard.</div>
             </div>
           </div>
           <!-- Action -->
           <div class="cse-action" style="margin-left:auto">
             <a class="cse-btn" href="https://static.ekx.cloud.sap/e8bd8626-190a-413f-bfaa-3135263c857c/" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              Open CS Experts Dashboard
+              Open CS Experts Case Central Dashboard
             </a>
             <span class="cse-hint">Opens in a new tab</span>
           </div>
@@ -2961,7 +2965,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
         <span class="upd-note" id="ios-update-note" style="display:none">Josh use only — do not update</span>
       </div>
       <div class="ios-display" id="ios-display">
-        <div class="ios-empty">No snapshot yet &mdash; click <strong>Update IRT/ORT Snapshot</strong> to paste the IRT/ORT Compliance % table from the CS Experts Dashboard.</div>
+        <div class="ios-empty">No snapshot yet &mdash; click <strong>Update IRT/ORT Snapshot</strong> to paste the IRT/ORT Compliance % table from the CS Experts Case Central Dashboard.</div>
       </div>
       <!-- Update workflow panel (hidden until opened) -->
       <div class="ios-panel" id="ios-panel" style="display:none">
@@ -2970,7 +2974,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
           <button class="ios-tab" id="ios-tab-csv" onclick="iosTab('csv')">CSV file</button>
         </div>
         <div class="ios-panel-body" id="ios-panel-paste">
-          <div class="ios-help">Open the CS Experts Dashboard, select the <strong>IRT/ORT Compliance %</strong> table (include the header row), copy it, paste below, then click <strong>Parse pasted table</strong>.</div>
+          <div class="ios-help">Open the CS Experts Case Central Dashboard, select the <strong>IRT/ORT Compliance %</strong> table (include the header row), copy it, paste below, then click <strong>Parse pasted table</strong>.</div>
           <textarea class="ios-paste" id="ios-paste" rows="6" placeholder="Paste the copied table here…" onpaste="iosOnPaste(event)"></textarea>
           <button class="ios-btn-ghost" onclick="iosParseFromPaste()">Parse pasted table</button>
         </div>
@@ -3014,6 +3018,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       </div>
     </div>
   </div>
+  </div><!-- /tc-grid -->
 
   <div class="footer"><span id="footer-info"></span><div class="footer-attrib">Created by Josh Nacional</div></div>
 
@@ -6969,6 +6974,25 @@ async function fetchDashboardData(token, reportingMonthOverride) {
       console.warn('[SF] Initial realignment fetch failed; keeping original SF result:', e);
     }
   }
+
+  /* v138: SINGLE SOURCE OF TRUTH — sync the config's Reporting-Month labels to
+     the finally-selected month so the header and ALL generated outputs
+     (Teams card title, Email subject/body, PDF filename, and the captured
+     dashboard header inside the PDF/email) match the selector. On initial load
+     the default month (latest available) can differ from the workbook Config
+     month; onReportingMonthChange already syncs on manual change. The as-of
+     date (data_as_of) is deliberately left unchanged — it is the report
+     generation date, NOT the Reporting Month. */
+  try {
+    var _rmParts = String(_reportingMonth).split('-');
+    var _rmNum   = parseInt(_rmParts[1], 10);
+    if (_rmParts.length === 2 && _rmNum >= 1 && _rmNum <= 12) {
+      config.month       = _rmNum;
+      config.year        = parseInt(_rmParts[0], 10);
+      config.month_name  = MONTH_NAMES[_rmNum - 1];
+      config.report_date = MONTH_NAMES[_rmNum - 1] + ' ' + _rmParts[0];
+    }
+  } catch (e) { console.warn('[v138] reporting-month label sync skipped:', e && e.message); }
 
   /* v80: now re-parse TB and SV with the reporting month filter */
   var _tPL0 = PERF.now();
@@ -12718,7 +12742,7 @@ function _uhmUtilBar(raw){
   var n=_uhmNum(raw);
   if(isNaN(n)) return '<span>'+( (raw===''||raw==null)?'\u2014':_uhmEsc(raw) )+'</span>';
   var pct=Math.max(0,Math.min(100,n));
-  var band=n<UHM_UTIL_BANDS.low?'uhm-bar-lo':(n<UHM_UTIL_BANDS.high?'uhm-bar-mid':'uhm-bar-hi');
+  var band='uhm-bar-hi';   /* v136: all valid utilization % use the pastel-green treatment (IRT/ORT Overall Compliance) */
   return '<span class="uhm-bar '+band+'"><span class="uhm-bar-fill" style="width:'+pct+'%"></span><span class="uhm-bar-txt">'+_uhmEsc(raw)+'</span></span>';
 }
 function _uhmUnaccCell(raw){
