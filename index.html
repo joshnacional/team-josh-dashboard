@@ -251,7 +251,9 @@ html[data-theme="dark"] .wn-item-txt,html[data-theme="dark"] .wn-tip-txt{color:#
 html[data-theme="dark"] .wn-tip{background:#1e2227}
 html[data-theme="dark"] .wn-tip-ttl{color:#e8e8e8}
 html[data-theme="dark"] .wn-btn-ghost{color:#b8c0cc;border-color:#3a3f46}
-@media (prefers-reduced-motion: reduce){ .wn-spot{transition:none} .wn-card{animation:none} }
+.wn-dot{position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50% 50% 50% 2px;background:#2CE0BF;border:1.5px solid rgba(255,255,255,.92);box-shadow:0 0 0 0 rgba(44,224,191,.5);display:none;animation:wnDotPulse 2.2s ease-out infinite;pointer-events:none}
+@keyframes wnDotPulse{0%{box-shadow:0 0 0 0 rgba(44,224,191,.5)}70%{box-shadow:0 0 0 6px rgba(44,224,191,0)}100%{box-shadow:0 0 0 0 rgba(44,224,191,0)}}
+@media (prefers-reduced-motion: reduce){ .wn-spot{transition:none} .wn-card{animation:none} .wn-dot{animation:none} }
 
 /* ── Header buttons — Sign-in keeps the old text style ───────────────── */
 .hdr-btn{
@@ -2742,6 +2744,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       <button class="tb-icon-btn" id="btnWhatsNew"
               onclick="wnOpenLatest()" data-tip="What's New">
         <svg viewBox="0 0 24 24"><path d="M12 2l1.6 4.6L18 8l-4.4 1.4L12 14l-1.6-4.6L6 8l4.4-1.4L12 2zm6 10l.9 2.5L21 15l-2.1.7L18 18l-.9-2.3L15 15l2.1-.5L18 12zM6 13l.8 2.2L9 16l-2.2.8L6 19l-.8-2.2L3 16l2.2-.8L6 13z"/></svg>
+        <span class="wn-dot" id="wn-dot" aria-hidden="true"></span>
       </button>
       <button class="tb-icon-btn" id="btnVoice" data-tour="choose-voice"
               onclick="cvOpenPanel()" data-tip="Choose Voice">
@@ -4391,6 +4394,7 @@ async function _welcomeAndLoad() {
     await _hideWelcomeOverlay();
   }
   try{ wnMaybeShow(); }catch(e){}   /* v131: What's New after welcome */
+  try{ wnRefreshIndicator(); }catch(e){}   /* v134: balloon indicator */
 }
 
 function _showWelcomeOverlay() {
@@ -4440,6 +4444,7 @@ async function initAuth() {
       const token = await getToken();
       await loadAndBuild(token);
       try{ wnMaybeShow(); }catch(e){}   /* v131: What's New for returning sessions (gated once) */
+      try{ wnRefreshIndicator(); }catch(e){}   /* v134: balloon indicator */
       return;
     } catch(e) {
       /* silent failed — show sign-in */
@@ -4579,10 +4584,12 @@ var _wnActive = null, _wnStep = 0, _wnOnReflow = null;
 function _wnEmail(){ try{ return (TK.email()||'').trim().toLowerCase(); }catch(e){ return ''; } }
 function _wnKey(rid){ return 'tj_whatsnew_' + rid + '_' + _wnEmail(); }
 function _wnDismissed(rid){ try{ return localStorage.getItem(_wnKey(rid))==='1'; }catch(e){ return false; } }
-function _wnSetDismissed(rid){ try{ localStorage.setItem(_wnKey(rid),'1'); }catch(e){} }
+function _wnSetDismissed(rid){ try{ localStorage.setItem(_wnKey(rid),'1'); }catch(e){} try{ wnRefreshIndicator(); }catch(_){} }
 function _wnTodayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _wnInWindow(r){ var t=_wnTodayStr(); return (!r.window) || (t>=r.window.start && t<=r.window.end); }
 function _wnLatest(){ return WHATS_NEW_RELEASES.length ? WHATS_NEW_RELEASES[WHATS_NEW_RELEASES.length-1] : null; }
+function _wnHasUnseen(){ try{ for(var i=0;i<WHATS_NEW_RELEASES.length;i++){ var r=WHATS_NEW_RELEASES[i]; if(_wnInWindow(r) && !_wnDismissed(r.id)) return true; } }catch(e){} return false; }
+function wnRefreshIndicator(){ var d=document.getElementById('wn-dot'); if(!d) return; d.style.display=_wnHasUnseen()?'block':'none'; }
 function _wnRangeLabel(r){
   if(!r.window) return '';
   try{ var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
