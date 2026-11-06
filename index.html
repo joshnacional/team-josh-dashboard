@@ -3800,7 +3800,8 @@ function _buildTeamsMessage(img, month, reportDate) {
     '<div><img src="../hostedContents/' + tempId + '/$value" alt="Team Josh Executive Dashboard" ' +
       'width="' + img.w + '" style="width:100%;max-width:' + img.w + 'px;height:auto;" /></div>' +
     '<div>&nbsp;</div>' +
-    '<div><a href="' + dashUrl + '">Team Josh Executive Dashboard</a></div>';
+    '<div><a href="' + dashUrl + '">Team Josh Executive Dashboard</a></div>' +
+    _wnTeamsNotice();
   return {
     body: { contentType: 'html', content: content },
     hostedContents: [{
@@ -4590,6 +4591,25 @@ function _wnInWindow(r){ var t=_wnTodayStr(); return (!r.window) || (t>=r.window
 function _wnLatest(){ return WHATS_NEW_RELEASES.length ? WHATS_NEW_RELEASES[WHATS_NEW_RELEASES.length-1] : null; }
 function _wnHasUnseen(){ try{ for(var i=0;i<WHATS_NEW_RELEASES.length;i++){ var r=WHATS_NEW_RELEASES[i]; if(_wnInWindow(r) && !_wnDismissed(r.id)) return true; } }catch(e){} return false; }
 function wnRefreshIndicator(){ var d=document.getElementById('wn-dot'); if(!d) return; d.style.display=_wnHasUnseen()?'block':'none'; }
+/* v135: active-release check for Chat/Email notices. Window-only (reuses the
+   existing release config + date window). Deliberately IGNORES per-user
+   dismissal/viewing status, per spec. Returns the latest in-window release. */
+function _wnActiveForNotice(){ try{ for(var i=WHATS_NEW_RELEASES.length-1;i>=0;i--){ var r=WHATS_NEW_RELEASES[i]; if(_wnInWindow(r)) return r; } }catch(e){} return null; }
+function _wnEmailNotice(){
+  if(!_wnActiveForNotice()) return '';
+  return '<div style="margin:2px 0 16px;padding:11px 14px;background:#F4F0FF;border:1px solid #D9CCFF;border-left:4px solid #5D36FF;border-radius:8px;font-family:Arial,sans-serif;">'+
+    '<div style="font-size:10pt;font-weight:bold;color:#3A1D9C;margin:0 0 3px;">\ud83c\udf89 New in Team Josh Dashboard!</div>'+
+    '<div style="font-size:9pt;color:#333333;line-height:1.45;">There are new updates and enhancements waiting for you. Open the Team Josh Executive Dashboard and check out What\u2019s New!</div>'+
+    '</div>';
+}
+function _wnTeamsNotice(){
+  if(!_wnActiveForNotice()) return '';
+  return '<div>&nbsp;</div>'+
+    '<div style="padding:9px 12px;background:#F4F0FF;border-left:4px solid #5D36FF;border-radius:6px;">'+
+      '<div><strong>\ud83c\udf89 New in Team Josh Dashboard!</strong></div>'+
+      '<div>There are new updates and enhancements waiting for you. Open the Team Josh Executive Dashboard and check out What\u2019s New!</div>'+
+    '</div>';
+}
 function _wnRangeLabel(r){
   if(!r.window) return '';
   try{ var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -7589,6 +7609,7 @@ function _buildDraftPayload(img, pdfB64, pdfName) {
       '<p style="margin:0 0 10px;' + bodyFont + '">Please see below the latest Team Josh Executive Dashboard' +
         (month ? ' for ' + month : '') + ', as of ' + reportDate + '.</p>' +
       '<p style="margin:0 0 10px;' + bodyFont + '">The dashboard reflects the current reporting-month selection.</p>' +
+      _wnEmailNotice() +
       '<p style="margin:14px 0 2px;' + bodyFont + '">Dashboard: Team Josh Executive Dashboard</p>' +
       '<p style="margin:0 0 12px;' + bodyFont + '">' +
         '<a href="' + dashUrl + '" style="' + bodyFont + 'color:#0563C1;text-decoration:underline;">Team Josh Executive Dashboard</a>' +
