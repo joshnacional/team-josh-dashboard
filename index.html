@@ -1040,11 +1040,10 @@ html[data-theme="dark"] .uhm-card{background:var(--cb)}
 .uhm-update-btn:hover{filter:brightness(1.08)}
 .uhm-update-btn svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .uhm-sub{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--cm);margin:0 0 4px;transition:color .25s}
+.uhm-sum-head{font-size:11px;font-weight:800;letter-spacing:.3px;color:var(--ct);margin:2px 0 7px;padding-left:8px;border-left:3px solid #5D36FF;line-height:1.35;transition:color .25s}
 .uhm-empty{font-size:10px;color:var(--cm);font-style:italic;padding:14px 4px;text-align:center;line-height:1.5}
-.uhm-summary{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-@media(max-width:860px){.uhm-summary{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:520px){.uhm-summary{grid-template-columns:repeat(2,1fr)}}
-.uhm-tile{background:var(--ch);border-radius:8px;padding:7px 5px 6px;text-align:center;border-top:2px solid #5D36FF;transition:background .25s}
+.uhm-summary{display:flex;flex-wrap:wrap;gap:5px}
+.uhm-tile{flex:1 1 120px;min-width:120px;background:var(--ch);border-radius:8px;padding:7px 5px 6px;text-align:center;border-top:2px solid #5D36FF;transition:background .25s}
 .uhm-tile.uhm-tile-pct{border-top-color:#2CE0BF}
 .uhm-tile-lbl{font-size:7px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--cm);line-height:1.3;transition:color .25s}
 .uhm-tile-val{font-size:15px;font-weight:700;color:var(--ct);line-height:1.1;margin-top:3px;word-break:break-word;transition:color .25s}
@@ -1063,13 +1062,13 @@ html[data-theme="dark"] .uhm-card{background:var(--cb)}
 .uhm-bar-hi .uhm-bar-fill{background:#1E7A43}
 .uhm-bar-txt{position:relative;z-index:1;font-size:8px;font-weight:800;color:var(--ct);line-height:14px;padding-left:5px;text-shadow:0 0 2px var(--cb)}
 .uhm-unacc{display:inline-block;min-width:34px;text-align:center;font-weight:800;font-size:9.5px;border-radius:8px;padding:2px 8px}
-.uhm-unacc-neg{color:#1E7A43;background:rgba(44,224,191,.2)}
-.uhm-unacc-zero{color:#1E7A43;background:rgba(44,224,191,.12)}
+.uhm-unacc-neg{color:#1E7A43;background:#E6F7EC}
+.uhm-unacc-zero{color:#1E7A43;background:#E6F7EC}
 .uhm-unacc-na{color:var(--cm);background:var(--ch)}
-.uhm-unacc-pos{color:#fff;background:#D20A0A;box-shadow:0 0 0 1px rgba(210,10,10,.55),0 0 9px 2px rgba(231,101,0,.55);animation:uhmUnaccPulse 1.5s ease-in-out infinite}
-html[data-theme="dark"] .uhm-unacc-neg{color:#4BE3A0;background:rgba(44,224,191,.16)}
-html[data-theme="dark"] .uhm-unacc-zero{color:#4BE3A0;background:rgba(44,224,191,.1)}
-html[data-theme="dark"] .uhm-unacc-pos{background:#E23A2A;box-shadow:0 0 0 1px rgba(255,120,90,.6),0 0 10px 2px rgba(255,120,60,.6)}
+.uhm-unacc-pos{color:#fff;background:#B42318;box-shadow:0 0 0 1px rgba(210,10,10,.55),0 0 9px 2px rgba(231,101,0,.55);animation:uhmUnaccPulse 1.5s ease-in-out infinite}
+html[data-theme="dark"] .uhm-unacc-neg{color:#4BE3A0;background:rgba(44,224,191,.14)}
+html[data-theme="dark"] .uhm-unacc-zero{color:#4BE3A0;background:rgba(44,224,191,.14)}
+html[data-theme="dark"] .uhm-unacc-pos{background:#C0392B;box-shadow:0 0 0 1px rgba(255,120,90,.6),0 0 10px 2px rgba(255,120,60,.6)}
 @keyframes uhmUnaccPulse{0%,100%{box-shadow:0 0 0 1px rgba(210,10,10,.45),0 0 5px 1px rgba(231,101,0,.35);transform:scale(1)}50%{box-shadow:0 0 0 1px rgba(210,10,10,.9),0 0 16px 5px rgba(231,101,0,.8);transform:scale(1.05)}}
 @media(prefers-reduced-motion:reduce){.uhm-unacc-pos{animation:none}}
 .uhm-panel{margin-top:11px;border-top:1px dashed var(--cd);padding-top:11px}
@@ -2979,7 +2978,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
   <!-- v129: UTILIZATION & HOURS MONITORING (manual per-month snapshot; Josh-only upload) -->
   <div class="uhm-wrap">
-    <div class="uhm-card">
+    <div class="uhm-card" data-tour="uhm">
       <div class="uhm-head">
         <div class="uhm-title">Utilization &amp; Hours Monitoring</div>
         <span class="uhm-badge" id="uhm-month-badge">Reporting Month: &mdash;</span>
@@ -2987,7 +2986,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
         <span class="uhm-badge" id="uhm-updated-badge">Last updated: &mdash;</span>
         <button class="uhm-update-btn" id="uhm-update-btn" onclick="uhmOpenPanel()">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
-          Upload Utilization Snapshot
+          Upload Utilization Data
         </button>
         <span class="upd-note" id="uhm-update-note" style="display:none">Josh use only &mdash; do not update</span>
       </div>
@@ -2996,12 +2995,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       </div>
       <!-- Upload workflow panel (hidden until opened) -->
       <div class="uhm-panel" id="uhm-panel" style="display:none">
-        <div class="uhm-help">Upload the Power BI / Excel utilization <strong>screenshot</strong> (stored as a visual reference). <strong>Paste the structured table</strong> &mdash; either copied from Excel or the table EKX extracted from your screenshot &mdash; so the ten columns are captured exactly. Set the <strong>Reporting Month</strong> this snapshot belongs to (defaults to the dashboard's current month), review the preview, verify, then confirm to save it to OneDrive. Pseudocodes are kept exactly as shown &mdash; they are not mapped to names.</div>
-        <div class="uhm-field">
-          <label>Screenshot (optional, stored as reference)</label>
-          <input type="file" accept="image/*" class="uhm-file" id="uhm-img" onchange="uhmImgChosen(event)">
-          <div class="uhm-imgprev" id="uhm-imgprev" style="display:none"></div>
-        </div>
+        <div class="uhm-help"><strong>How this works:</strong> (1) In EKX chat, upload your Power BI <strong>screenshot</strong> &mdash; EKX reads the image and returns a ready-to-paste table. (2) <strong>Paste that table below</strong> and click Parse. (3) Review/correct the preview, set the <strong>Reporting Month</strong> (defaults to the dashboard's current month), verify, then approve to save to OneDrive. <em>This panel does not read images &mdash; it only ingests the pasted table.</em> Pseudocodes are kept exactly as shown and are not mapped to names.</div>
         <div class="uhm-field">
           <label>Utilization table &mdash; copy the grouped rows from Excel (include the header row) and paste</label>
           <textarea class="uhm-paste" id="uhm-paste" rows="7" placeholder="Paste the copied utilization table here (Line of Business groups, pseudocode rows, and the metric columns)…" onpaste="uhmOnPaste(event)"></textarea>
@@ -3172,13 +3166,13 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
       <!-- ── CS Filter Tiles ───────────────────────────────────────────── -->
       <div class="el-cs-wrap">
-        <div class="el-cs-row" id="el-cs-row">
+        <div class="el-cs-row" id="el-cs-row" data-tour="elearning">
           <div class="el-loading-state">Loading eLearning data…</div>
         </div>
       </div>
 
       <!-- ── Team Summary cards ────────────────────────────────────────── -->
-      <div class="el-summary" id="el-summary" data-tour="elearning"></div>
+      <div class="el-summary" id="el-summary"></div>
 
       <!-- ── Course Compliance Table ──────────────────────────────────── -->
       <div class="el-section-card">
@@ -4123,21 +4117,23 @@ async function _wlSpeak() {
   speechSynthesis.cancel();
 
   const voices = await _wlGetVoices();
-  let voice = null;
-  let _cvChosen = false;
+  let chosen = null;
 
-  /* v131: a user-chosen voice (Choose Voice) takes priority, with graceful fallback */
+  /* v131: an explicitly chosen voice (Choose Voice) overrides the default.
+     Every other case uses the ORIGINAL default selection + settings, unchanged. */
   try {
     const _pref = _cvGetPref();
     if (_pref) {
-      voice = voices.find(v => v.voiceURI === _pref) || voices.find(v => v.name === _pref) || null;
-      if (voice) { _cvChosen = true; console.log('[WL Voice] User preference:', voice.name); }
-      else console.warn('[WL Voice] Saved voice unavailable — using default.');
+      chosen = voices.find(v => v.voiceURI === _pref) || voices.find(v => v.name === _pref) || null;
+      if (chosen) console.log('[WL Voice] User preference:', chosen.name);
+      else console.warn('[WL Voice] Saved voice unavailable — using original default.');
     }
   } catch(_) {}
 
+  /* ===== ORIGINAL default voice selection (restored verbatim) ===== */
+  let voice = null;
   /* 1. Exact match against approved male voice list */
-  if (!voice) for (const name of _WL_MALE_NAMES) {
+  for (const name of _WL_MALE_NAMES) {
     voice = voices.find(v => v.name === name);
     if (voice) { console.log('[WL Voice] Matched:', voice.name); break; }
   }
@@ -4167,10 +4163,17 @@ async function _wlSpeak() {
 
   return new Promise(resolve => {
     const utt = new SpeechSynthesisUtterance('Welcome to Team Josh Executive Dashboard.');
-    if (voice) utt.voice = voice;
-    utt.rate   = 0.87;
-    utt.pitch  = _cvChosen ? 1.0 : 0.1;   /* chosen voice: natural pitch; default auto-male: deep */
-    utt.volume = 0.82;
+    if (chosen) {
+      utt.voice  = chosen;        /* explicit user choice — natural pitch */
+      utt.rate   = 0.87;
+      utt.pitch  = 1.0;
+      utt.volume = 0.82;
+    } else {
+      if (voice) utt.voice = voice;   /* ORIGINAL default — exact pre-enhancement settings */
+      utt.rate   = 0.87;
+      utt.pitch  = 0.1;
+      utt.volume = 0.82;
+    }
     utt.onend  = resolve;
     utt.onerror = e => { console.warn('[WL Voice] Speech error:', e.error); resolve(); };
     speechSynthesis.speak(utt);
@@ -4548,7 +4551,7 @@ function cvPreviewIdx(i){
 ════════════════════════════════════════════════════════════════════════════ */
 var WHATS_NEW_RELEASES = [
   {
-    id: '2026-11',
+    id: '2026-11-r2',
     title: "What's New",
     window: { start: '2026-11-06', end: '2026-11-13' },
     items: [
@@ -4556,10 +4559,12 @@ var WHATS_NEW_RELEASES = [
         text:'Case Productivity now shows a Cases Needed column \u2014 the minimum additional cases each member needs to reach a 1.50 MTD average.' },
       { n:2, title:'IRT/ORT Compliance Snapshot', tab:'performance', target:'[data-tour="irtort"]',
         text:'The IRT/ORT Compliance Snapshot now reflects the CS Experts Dashboard (CS CaseCentral). Josh updates it manually from there.' },
-      { n:3, title:'eLearning \u2014 YTD Learning Hours', tab:'performance', target:'[data-tour="elearning"]',
+      { n:3, title:'eLearning \u2014 YTD Learning Hours', tab:'el', target:'[data-tour="elearning"]',
         text:'eLearning Compliance now highlights YTD Learning Hours on each member\u2019s photo tile.' },
       { n:4, title:'Choose Voice', tab:'performance', target:'[data-tour="choose-voice"]',
-        text:'New in Dashboard Tools: Choose Voice \u2014 pick the voice used for the welcome announcement.' }
+        text:'New in Dashboard Tools: Choose Voice \u2014 pick the voice used for the welcome announcement.' },
+      { n:5, title:'Utilization & Hours Monitoring', tab:'performance', target:'[data-tour="uhm"]',
+        text:'Introducing Utilization & Hours Monitoring! View team utilization, paid hours, productive and non-productive hours, and unaccounted hours by Line of Business.' }
     ]
   }
 ];
@@ -4610,19 +4615,24 @@ function wnStartTour(){ _wnCloseModal(); _wnStep=0; _wnTourShow(0); }
 
 function _wnTourShow(retry){
   if(!_wnActive){ return; }
+  retry = retry || 0;
   var total=_wnActive.items.length;
   var it=_wnActive.items[_wnStep];
   if(!it){ wnTourDone(); return; }
+  /* Switch to the step's tab FIRST (e.g. eLearning Compliance for step 3) */
   if(it.tab){ try{ switchTab(it.tab); }catch(_){} }
   var el=document.querySelector(it.target);
-  if(!el){
-    if(!retry){ setTimeout(function(){ _wnTourShow(1); }, 500); return; }  /* one retry for async-rendered targets */
+  var rect = el ? el.getBoundingClientRect() : null;
+  /* Ready only once the tab is shown AND the target is laid out (non-zero box) */
+  var ready = !!(rect && (rect.height>3 || rect.width>3));
+  if(!el || !ready){
+    if(retry<8){ setTimeout(function(){ _wnTourShow(retry+1); }, 250); return; }  /* wait for tab anim + async render */
     if(_wnStep<total-1){ _wnStep++; _wnTourShow(0); } else { wnTourDone(); }
     return;
   }
   try{ el.scrollIntoView({behavior:'smooth',block:'center'}); }catch(_){ try{ el.scrollIntoView(); }catch(__){} }
   var tour=document.getElementById('wn-tour'); if(tour) tour.classList.add('wn-tour-open');
-  setTimeout(function(){ _wnPlace(el, it); }, 260);
+  setTimeout(function(){ var e0=document.querySelector(it.target); if(e0) _wnPlace(e0, it); }, 300);
   if(!_wnOnReflow){
     _wnOnReflow=function(){ var it2=_wnActive&&_wnActive.items[_wnStep]; if(it2){ var e2=document.querySelector(it2.target); if(e2) _wnPlace(e2,it2); } };
     window.addEventListener('resize', _wnOnReflow, true);
@@ -12515,6 +12525,7 @@ function uhmImgChosen(e){ var f=e.target.files&&e.target.files[0]; if(!f){ _uhmP
   }; rd.readAsDataURL(f); }
 
 function uhmParse(){
+  if(!_isJoshUser()){ _uhmErr('Utilization upload is restricted to Josh Nacional.'); return; }
   var ta=document.getElementById('uhm-paste'); var txt=ta?ta.value:'';
   if(!txt||!txt.trim()){ _uhmErr('Paste the utilization table (copied from Excel) first.'); var pv=document.getElementById('uhm-preview'); if(pv){ pv.innerHTML=''; pv.style.display='none'; } return; }
   var rows=null; if(_uhmPasteHtml) rows=_uhmRowsFromHtml(_uhmPasteHtml); if(!rows) rows=_uhmRowsFromText(txt);
@@ -12617,6 +12628,7 @@ async function uhmConfirm(){
 
 /* persist: merge the month into the existing file so other months are preserved */
 async function _uhmSaveMonth(snap){
+  if(!_isJoshUser()) throw new Error('Not authorized: utilization save is restricted to Josh Nacional.');
   var token=await getToken();
   if(!excelDriveId || !excelItemId) throw new Error('dashboard data not fully loaded yet — let it finish, then retry');
   if(!lpDataFolderId) await lpResolveDataFolder(token);
@@ -12696,7 +12708,7 @@ function uhmRenderDisplay(){
   }
   if(ub) ub.textContent='Last updated: '+_uhmTime(snap.capturedAt);
   var cards=_uhmAggregate(snap);
-  var cardsHtml=cards.length ? ('<div class="uhm-sub">Summary ('+_uhmMonthLabel(month)+')</div><div class="uhm-summary">'+
+  var cardsHtml=cards.length ? ('<div class="uhm-sum-head">Summary ('+_uhmMonthLabel(month)+')</div><div class="uhm-summary">'+
     cards.map(function(c){ return '<div class="uhm-tile'+(c.pct?' uhm-tile-pct':'')+'"><div class="uhm-tile-lbl">'+_uhmEsc(c.label)+(c.note?' <span style="text-transform:none;font-weight:600">('+_uhmEsc(c.note)+')</span>':'')+'</div><div class="uhm-tile-val">'+_uhmEsc(c.val)+'</div></div>'; }).join('')+'</div>') : '';
   var head='<thead><tr><th class="uhm-th-name">Line of Business / Pseudocode</th>'+UHM_METRICS.map(function(c){ return '<th>'+_uhmEsc(c)+'</th>'; }).join('')+'</tr></thead>';
   var body=(snap.groups||[]).map(function(g){
