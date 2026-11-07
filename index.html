@@ -5256,6 +5256,7 @@ function cvPreviewIdx(i){
 var WHATS_NEW_RELEASES = [
   {
     id: '2026-11-r2',
+    rev: 4,                                  /* v151: revision-aware dismissal; bumped to re-show the new CAF announcement within the same window */
     title: "What's New",
     window: { start: '2026-11-06', end: '2026-11-13' },
     items: [
@@ -5274,7 +5275,9 @@ var WHATS_NEW_RELEASES = [
       { n:7, title:'Leave Planner — Calendar Improvements', tab:'leave', target:'#tab-btn-leave',
         text:'The Leave Planner calendar now uses softer pastel leave colors, clearer hover highlighting, and more noticeable Today and + Event / Task buttons (with a gentle heartbeat animation and hover tooltips). There’s also a handy clickable SAP Fiori Leave Tool link — official leave requests must still be filed through SAP Fiori.' },
       { n:8, title:'Daily Mood Check-in', target:null,
-        text:'Say hello on the welcome page! Pick how you’re feeling today and receive a little motivational message. It’s just for you — your response is not recorded.' }
+        text:'Say hello on the welcome page! Pick how you’re feeling today and receive a little motivational message. It’s just for you — your response is not recorded.' },
+      { n:9, title:'Client Assignment File — Quick Guide', tab:'caf', target:'#tab-btn-caf',
+        text:'Double-click any client row in the Client Assignment File to open the right-side drawer and view the complete client details. Use Request Update to access the Client Status Monitoring Form in the designated MS Teams channel — a confirmation prompt appears before it opens.' }
     ]
   }
 ];
@@ -5283,12 +5286,15 @@ var _wnActive = null, _wnStep = 0, _wnOnReflow = null;
 
 function _wnEmail(){ try{ return (TK.email()||'').trim().toLowerCase(); }catch(e){ return ''; } }
 function _wnKey(rid){ return 'tj_whatsnew_' + rid + '_' + _wnEmail(); }
+/* v150: a release's dismissal token depends on BOTH its id and its revision, so a new
+   revision within the same window re-shows once per user while preserving prior records. */
+function _wnRid(r){ return (r && r.id ? r.id : '') + (r && r.rev!=null ? ('.r'+r.rev) : ''); }
 function _wnDismissed(rid){ try{ return localStorage.getItem(_wnKey(rid))==='1'; }catch(e){ return false; } }
 function _wnSetDismissed(rid){ try{ localStorage.setItem(_wnKey(rid),'1'); }catch(e){} try{ wnRefreshIndicator(); }catch(_){} }
 function _wnTodayStr(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _wnInWindow(r){ var t=_wnTodayStr(); return (!r.window) || (t>=r.window.start && t<=r.window.end); }
 function _wnLatest(){ return WHATS_NEW_RELEASES.length ? WHATS_NEW_RELEASES[WHATS_NEW_RELEASES.length-1] : null; }
-function _wnHasUnseen(){ try{ for(var i=0;i<WHATS_NEW_RELEASES.length;i++){ var r=WHATS_NEW_RELEASES[i]; if(_wnInWindow(r) && !_wnDismissed(r.id)) return true; } }catch(e){} return false; }
+function _wnHasUnseen(){ try{ for(var i=0;i<WHATS_NEW_RELEASES.length;i++){ var r=WHATS_NEW_RELEASES[i]; if(_wnInWindow(r) && !_wnDismissed(_wnRid(r))) return true; } }catch(e){} return false; }
 function wnRefreshIndicator(){ var d=document.getElementById('wn-dot'); if(!d) return; d.style.display=_wnHasUnseen()?'block':'none'; }
 /* v135: active-release check for Chat/Email notices. Window-only (reuses the
    existing release config + date window). Deliberately IGNORES per-user
@@ -5323,7 +5329,7 @@ function wnMaybeShow(){
   try{
     for(var i=WHATS_NEW_RELEASES.length-1;i>=0;i--){
       var r=WHATS_NEW_RELEASES[i];
-      if(_wnInWindow(r) && !_wnDismissed(r.id)){ _wnShowModal(r); return; }
+      if(_wnInWindow(r) && !_wnDismissed(_wnRid(r))){ _wnShowModal(r); return; }
     }
   }catch(e){ console.warn('[WN] maybeShow failed:', e&&e.message); }
 }
@@ -5340,7 +5346,7 @@ function _wnShowModal(r){
   }).join('')+'</ul>';
   var m=document.getElementById('wn-modal'); if(m) m.classList.add('wn-open');
 }
-function wnModalSkip(){ if(_wnActive) _wnSetDismissed(_wnActive.id); _wnCloseModal(); }
+function wnModalSkip(){ if(_wnActive) _wnSetDismissed(_wnRid(_wnActive)); _wnCloseModal(); }
 function _wnCloseModal(){ var m=document.getElementById('wn-modal'); if(m) m.classList.remove('wn-open'); }
 function wnStartTour(){ _wnCloseModal(); _wnStep=0; _wnTourShow(0); }
 
@@ -5397,7 +5403,7 @@ function wnTourDone(){ _wnEndTour(); }
 function _wnEndTour(){
   var tour=document.getElementById('wn-tour'); if(tour) tour.classList.remove('wn-tour-open');
   if(_wnOnReflow){ window.removeEventListener('resize', _wnOnReflow, true); window.removeEventListener('scroll', _wnOnReflow, true); _wnOnReflow=null; }
-  if(_wnActive) _wnSetDismissed(_wnActive.id);
+  if(_wnActive) _wnSetDismissed(_wnRid(_wnActive));
 }
 
 function showConfigError() {
