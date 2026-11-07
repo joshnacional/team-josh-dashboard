@@ -150,10 +150,11 @@ body{
 .hdr{
   background:linear-gradient(135deg,#2D1B69 0%,#3E24A8 35%,#5D36FF 70%,#7452FA 100%);
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
-  padding:0 16px;
-  height:58px;
-  gap:12px;
+  padding:5px 16px 6px;
+  min-height:58px;
+  gap:3px 12px;
   box-shadow:0 3px 16px rgba(45,27,105,.32),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -1px 0 rgba(0,0,0,.12);
 }
 .hdr-logo{height:30px;flex-shrink:0}
@@ -179,6 +180,16 @@ body{
   margin-top:1px;
 }
 .hdr-user.visible{display:block}
+/* v145 (E6): left column stacks the top row + metadata; the toolbar centers across the full header */
+.hdr-left{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.hdr-top-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+.hdr-meta-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:0;margin:0;padding:0;background:transparent;border:none;font-size:10px;color:rgba(255,255,255,.72);line-height:1.3}
+.hdr-meta-bar .hmb-item{display:inline-flex;align-items:center;white-space:nowrap}
+.hdr-meta-bar strong{color:rgba(255,255,255,.88);font-weight:500}
+.hdr-meta-bar>*+*::before{content:'\2022';padding:0 8px;color:rgba(255,255,255,.42)}
+.hdr-meta-bar .last-refresh,.hdr-meta-bar .hdr-user{color:rgba(255,255,255,.72);font-size:10px;margin-top:0;white-space:nowrap}
+.hdr-meta-bar .last-refresh.visible,.hdr-meta-bar .hdr-user.visible{display:inline-flex;align-items:center}
+@media(max-width:640px){.hdr-meta-bar{font-size:9px}.hdr-meta-bar>*+*::before{padding:0 6px}}
 
 
 /* ════ v131: Choose Voice ════ */
@@ -291,11 +302,12 @@ html[data-theme="dark"] .wn-btn-ghost{color:#b8c0cc;border-color:#3a3f46}
 .hdr-toolbar{
   display:flex;
   align-items:center;
+  align-self:center;              /* v144: vertically center within the TOP header row */
   gap:2px;
   background:rgba(255,255,255,.12);
   border:1px solid rgba(255,255,255,.20);
-  border-radius:24px;
-  padding:3px 4px;
+  border-radius:28px;             /* v144: keep pill shape at the taller height */
+  padding:11px 4px;               /* v144: ~58px tall oblong (icons stay 34px) */
   box-shadow:0 2px 8px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.12);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   flex-shrink:0;
@@ -624,6 +636,52 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
 }
 .wl-slot.wl-slot-visible{opacity:1!important;}
 .wl-slot img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+/* v146 (E1): ephemeral mood check-in — styled for the dark frosted welcome dialog */
+.mood-panel{margin-top:14px;width:100%;max-width:450px;text-align:center;animation:moodFade .4s ease}
+@keyframes moodFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.mood-q{font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:.2px}
+.mood-scale{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.mood-opt{display:flex;flex-direction:column;align-items:center;gap:4px;width:76px;padding:9px 6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:12px;color:#fff;cursor:pointer;transition:background .15s,transform .15s;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mood-opt:hover{background:rgba(255,255,255,.22);transform:translateY(-2px)}
+.mood-emoji{font-size:26px;line-height:1}
+.mood-lbl{font-size:8.5px;font-weight:600;line-height:1.2;color:rgba(255,255,255,.9)}
+.mood-msg{font-size:13.5px;line-height:1.55;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:14px 16px;margin:4px auto 12px;max-width:420px}
+.mood-privacy{font-size:9.5px;color:rgba(255,255,255,.62);margin-bottom:12px;font-style:italic}
+.mood-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.mood-skip,.mood-continue,.mood-replay{font-size:11px;font-weight:700;border-radius:9px;padding:8px 16px;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;transition:background .15s}
+.mood-skip:hover,.mood-replay:hover{background:rgba(255,255,255,.24)}
+.mood-continue{background:#fff;color:#4327B8;border-color:#fff}
+.mood-continue:hover{background:#F0ECFF}
+/* v147 (E2/E4) management dialogs */
+.mgmt-head-btn{margin-left:auto;font-size:9px;font-weight:700;color:#fff;background:linear-gradient(135deg,#5D36FF,#7452FA);border:none;border-radius:7px;padding:5px 11px;cursor:pointer;box-shadow:0 2px 8px rgba(93,54,255,.28);transition:filter .15s}
+.mgmt-head-btn:hover{filter:brightness(1.08)}
+.ch-btns{display:flex;align-items:center;gap:6px;margin-left:auto}
+.ch-btns .mgmt-head-btn{margin-left:0}
+.pftc-submit-link{display:inline-flex;align-items:center;gap:5px;text-decoration:none}
+.pftc-submit-link svg{width:11px;height:11px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.pftc-submit-link:hover svg{transform:translate(1px,-1px)}
+.mgmt-dialog{max-width:540px;width:94vw}
+.mgmt-row{display:flex;flex-direction:column;gap:3px;margin-bottom:9px}
+.mgmt-row label,.mgmt-grid5 label{font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--cm)}
+.mgmt-row input,.mgmt-grid5 input,.mgmt-row select,.mgmt-grid5 select{font-size:12px;padding:6px 8px;border:1px solid var(--cd);border-radius:7px;background:var(--cb);color:var(--ct);font-family:inherit;width:100%;box-sizing:border-box;min-width:0}
+.mgmt-row select,.mgmt-grid5 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236D7990'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px;cursor:pointer}
+.mgmt-row select:focus,.mgmt-grid5 select:focus,.mgmt-row input:focus,.mgmt-grid5 input:focus{outline:none;border-color:#5D36FF;box-shadow:0 0 0 2px rgba(93,54,255,.18)}
+.mgmt-grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:9px}
+.mgmt-grid5>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mgmt-avg{font-size:12px;font-weight:800;color:#5D36FF;margin-bottom:8px}
+html[data-theme="dark"] .mgmt-avg{color:#B9A6FF}
+.mgmt-status{font-size:9.5px;color:var(--cm);min-height:13px;margin-bottom:6px;line-height:1.4}
+.mgmt-status-err{color:#BB0000}
+html[data-theme="dark"] .mgmt-status-err{color:#FF9A8A}
+.mgmt-list{max-height:210px;overflow-y:auto;border-top:1px solid var(--cd);padding-top:8px}
+.mgmt-empty{font-size:10px;color:var(--cm);padding:8px 2px;font-style:italic}
+.mgmt-li{display:flex;align-items:center;gap:8px;font-size:11px;padding:5px 2px;border-bottom:1px solid var(--rb);color:var(--ct)}
+.mgmt-li-main{flex:1;min-width:0;line-height:1.3}
+.mgmt-li-act{font-size:9px;font-weight:700;border:1px solid var(--cd);background:var(--ch);border-radius:6px;padding:3px 7px;cursor:pointer;color:var(--ct);flex:none}
+.mgmt-li-del{color:#BB0000;border-color:rgba(187,0,0,.3)}
+.mgmt-sub{font-size:10px;font-weight:800;color:var(--ct);margin:4px 0 7px;padding-top:7px;border-top:1px dashed var(--cd)}
+@media(max-width:560px){.mgmt-grid5{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.mood-panel{animation:none}.mood-opt:hover{transform:none}}
 
 /* ── Center logo — 170 px circular badge (clear radius = 95 px, gap 10 px) */
 .wl-center-logo{
@@ -1031,7 +1089,7 @@ html[data-theme="dark"] .ios-prev-note{color:#FFB366}
 .ios-missing{font-size:8.5px;color:var(--cm);margin-top:5px;min-height:11px}
 .ios-confirm-bar{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
 /* ════ v129: UTILIZATION & HOURS MONITORING ════ */
-.uhm-wrap{margin:0;padding:12px;background:var(--cb);border:1px solid var(--cd);border-radius:14px;display:flex;flex-direction:column;min-width:0;box-sizing:border-box;transition:background .25s,border-color .25s}
+.uhm-wrap{margin:0;padding:12px;background:var(--cb);border:1px solid var(--cd);border-top:3px solid #049F9A;border-radius:14px;display:flex;flex-direction:column;min-width:0;box-sizing:border-box;transition:background .25s,border-color .25s}
 .uhm-card{margin:0;background:transparent;border:none;border-radius:0;padding:2px 2px 0;transition:background .25s,border-color .25s}
 html[data-theme="dark"] .uhm-card{background:transparent}
 .uhm-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px}
@@ -1110,7 +1168,7 @@ html[data-theme="dark"] .uhm-flag{color:#FF9A8A}
    Horizontal layout matching reference design — soft lavender bg with
    abstract decorative shapes, 2-step flow, primary action button.
 ════════════════════════════════════════════════════════════════════════════ */
-.cse-callout{margin:0;padding:12px;background:var(--cb);border:1px solid var(--cd);border-radius:14px;display:flex;flex-direction:column;min-width:0;transition:background .25s,border-color .25s}
+.cse-callout{margin:0;padding:12px;background:var(--cb);border:1px solid var(--cd);border-top:3px solid #5D36FF;border-radius:14px;display:flex;flex-direction:column;min-width:0;transition:background .25s,border-color .25s}
 .tc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px 10px 0;align-items:stretch;box-sizing:border-box}
 @media(max-width:1100px){.tc-grid{grid-template-columns:1fr}}
 .cse-callout>.cse-card{margin:0 0 10px}
@@ -1354,11 +1412,13 @@ html[data-theme="dark"] .pftc-submit-btn::after{background:#E2D8FF;color:#1C0C6E
   transition:background .25s,border-color .25s;
 }
 .tab-btn{
-  background:var(--cb);
-  border:1px solid var(--cd);
+  background:rgba(255,255,255,.55);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);
+  backdrop-filter:blur(12px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.60);
   color:var(--cx);
   padding:10px 24px;
-  border-radius:12px;
+  border-radius:14px;
   font-family:inherit;
   font-size:11.5px;
   font-weight:600;
@@ -1366,8 +1426,8 @@ html[data-theme="dark"] .pftc-submit-btn::after{background:#E2D8FF;color:#1C0C6E
   letter-spacing:.15px;
   white-space:nowrap;
   line-height:1.5;
-  box-shadow:0 2px 8px rgba(0,0,0,.09),0 1px 2px rgba(0,0,0,.04),inset 0 1px 0 rgba(255,255,255,.70);
-  transition:background .2s,border-color .2s,color .2s,box-shadow .2s,transform .18s ease;
+  box-shadow:0 2px 10px rgba(31,38,55,.08),0 1px 2px rgba(31,38,55,.05),inset 0 1px 0 rgba(255,255,255,.65);
+  transition:background .25s,border-color .25s,color .25s,box-shadow .25s,transform .18s ease;
   will-change:transform;
   outline:none;
   -webkit-tap-highlight-color:transparent;
@@ -1375,6 +1435,12 @@ html[data-theme="dark"] .pftc-submit-btn::after{background:#E2D8FF;color:#1C0C6E
   align-items:center;
   gap:10px;
 }
+html[data-theme="dark"] .tab-btn{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.16);
+  box-shadow:0 2px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10);
+}
+@media(prefers-reduced-motion:reduce){.tab-btn{transition:background .25s,border-color .25s,color .25s}}
 /* SAP pictogram inside nav tile */
 .tab-icon{
   width:28px;height:28px;object-fit:contain;flex-shrink:0;
@@ -1488,18 +1554,42 @@ html[data-theme="dark"] .tab-btn.active{
   margin:0;transition:color .25s;
 }
 .lp-guide-fiori{
-  color:#5D36FF;font-weight:700;
+  color:#5D36FF;font-weight:800;
+  background:rgba(93,54,255,.1);border:1px solid rgba(93,54,255,.32);
+  border-radius:6px;padding:1px 7px;box-shadow:0 0 8px rgba(93,54,255,.35);white-space:nowrap;
+  animation:tjFioriPulse 2.4s ease-in-out infinite;
 }
+html[data-theme="dark"] .lp-guide-fiori{color:#CDBEFF;background:rgba(120,80,255,.18);border-color:rgba(120,80,255,.5);box-shadow:0 0 9px rgba(120,80,255,.5)}
+@keyframes tjFioriPulse{0%,100%{box-shadow:0 0 6px rgba(93,54,255,.26)}50%{box-shadow:0 0 13px rgba(93,54,255,.52)}}
+@media(prefers-reduced-motion:reduce){.lp-guide-fiori{animation:none}}
+.lp-fiori-link{display:inline-flex;align-items:center;gap:6px;margin:5px 0 0;padding:7px 12px;min-height:30px;background:#fff;border:1px solid #D9CFF7;border-radius:8px;color:#1C0C6E;font-weight:800;font-size:10.5px;line-height:1.25;text-decoration:underline;text-underline-offset:2px;cursor:pointer;box-shadow:0 0 8px rgba(93,54,255,.28);transition:box-shadow .15s,border-color .15s}
+.lp-fiori-link:hover{border-color:#5D36FF;box-shadow:0 0 13px rgba(93,54,255,.45);text-decoration:underline}
+html[data-theme="dark"] .lp-fiori-link{background:#fff;color:#1C0C6E;border-color:#C9BEF2}
+.lp-addevent-btn{background:rgba(93,54,255,.1);border:1px solid rgba(93,54,255,.32);color:#5D36FF;font-weight:700}
+.lp-addevent-btn:hover{background:rgba(93,54,255,.18)}
+.lp-day-events{display:flex;flex-direction:column;gap:2px;margin-top:2px}
+.lp-event-pill{display:block;font-size:8.5px;font-weight:700;line-height:1.25;padding:2px 6px;border-radius:5px;border:1px dashed #5D36FF;background:rgba(93,54,255,.08);color:#4327B8;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .15s}
+.lp-event-pill:hover{background:rgba(93,54,255,.16)}
+.lp-event-pill.lp-event-more{border-style:solid;font-style:italic;font-weight:600;color:var(--cm);background:var(--ch);border-color:var(--cd)}
+html[data-theme="dark"] .lp-event-pill{background:rgba(120,80,255,.16);color:#CDBEFF;border-color:#7452FA}
+.lp-ev-note{font-size:9px;color:var(--cm);line-height:1.45;background:var(--ch);border-radius:7px;padding:7px 9px;margin-top:2px}
 .lp-guide-action{
   font-size:10px;font-weight:700;color:#5D36FF;
   margin:3px 0 0;line-height:1.45;
 }
 .lp-today-btn{
   background:var(--cb);border:1px solid var(--cd);color:var(--ct);
-  padding:5px 12px;border-radius:8px;font-size:11px;font-family:inherit;
-  cursor:pointer;transition:background .15s,border-color .15s;
+  padding:6px 14px;min-height:30px;border-radius:8px;font-size:11.5px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s;
 }
 .lp-today-btn:hover{background:var(--ch);border-color:#5D36FF}
+.lp-pulse-btn{position:relative;display:inline-flex;align-items:center;gap:6px;animation:tjHeartbeat 1.8s ease-in-out infinite}
+.lp-pulse-btn:hover{box-shadow:0 2px 10px rgba(93,54,255,.25)}
+.lp-pulse-btn .lp-hb{width:22px;height:11px;flex:none;overflow:visible}
+.lp-pulse-btn .lp-hb polyline{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:46;animation:tjEcg 1.8s ease-in-out infinite}
+@keyframes tjHeartbeat{0%,100%{transform:scale(1)}8%{transform:scale(1.05)}16%{transform:scale(1)}24%{transform:scale(1.03)}32%{transform:scale(1)}}
+@keyframes tjEcg{0%{stroke-dashoffset:46;opacity:.35}30%{stroke-dashoffset:0;opacity:1}60%{opacity:.6}100%{stroke-dashoffset:0;opacity:.35}}
+@media(prefers-reduced-motion:reduce){.lp-pulse-btn{animation:none}.lp-pulse-btn .lp-hb polyline{animation:none;stroke-dashoffset:0;opacity:.8}}
 
 /* ── LP Legend ────────────────────────────────────────────────────────────── */
 .lp-legend{
@@ -1592,7 +1682,8 @@ html[data-theme="dark"] .tab-btn.active{
   padding:4px 5px 5px;cursor:pointer;background:var(--cb);
   position:relative;transition:background .12s,border-color .25s;
 }
-.lp-day:hover{background:var(--ch)}
+.lp-day:hover{background:#EAF0FF}
+html[data-theme="dark"] .lp-day:hover{background:rgba(90,130,255,.16)}
 .lp-day:nth-child(7n){border-right:none}
 .lp-day.other-month{background:var(--rb);cursor:default}
 .lp-day.other-month:hover{background:var(--rb)}
@@ -1927,21 +2018,23 @@ html[data-theme="dark"] .lp-holiday.lp-holiday-special{
 .caf-search:focus{border-color:#5D36FF;box-shadow:0 0 0 3px rgba(93,54,255,.10)}
 /* v86: Internal reference note — centered, dual purple accent, soft purple bg */
 .caf-note-banner{
-  background:rgba(93,54,255,.06);
-  border:1px solid rgba(93,54,255,.18);
+  background:#F1EEFC;
+  border:1px solid #DED6F8;
   border-left:3px solid #5D36FF;
   border-right:3px solid #5D36FF;
   border-radius:8px;
-  padding:7px 14px;
+  padding:8px 14px;
   max-width:600px;
   margin:0 auto 12px;
+  box-shadow:0 1px 3px rgba(93,54,255,.08);
   transition:background .25s,border-color .25s;
 }
 html[data-theme="dark"] .caf-note-banner{
-  background:rgba(93,54,255,.10);
-  border-color:rgba(93,54,255,.28);
-  border-left-color:#5D36FF;
-  border-right-color:#5D36FF;
+  background:rgba(93,54,255,.16);
+  border-color:rgba(120,80,255,.32);
+  border-left-color:#7452FA;
+  border-right-color:#7452FA;
+  box-shadow:none;
 }
 .caf-note-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
 .caf-note-ttl{font-size:9px;font-weight:800;letter-spacing:.55px;text-transform:uppercase;color:var(--ct);transition:color .25s}
@@ -1950,6 +2043,82 @@ html[data-theme="dark"] .caf-note-banner{
 .caf-note-body{font-size:10px;color:var(--cm);line-height:1.45;margin:0;transition:color .25s}
 .caf-note-body strong{font-weight:700;color:var(--ct)}
 .caf-note-action{font-size:10px;font-weight:700;color:#5D36FF;margin:3px 0 0;line-height:1.45}
+.caf-note-em{color:#5D36FF;font-weight:800}
+html[data-theme="dark"] .caf-note-em{color:#B9A6FF}
+.caf-drawer-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0);pointer-events:none;transition:background .25s}
+.caf-drawer-overlay.hidden{display:none}
+.caf-drawer-overlay.open{background:rgba(0,0,0,.38);pointer-events:auto}
+.caf-drawer{position:absolute;top:0;right:0;height:100%;width:420px;max-width:92vw;background:var(--cb);border-left:1px solid var(--cd);box-shadow:-8px 0 28px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .28s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden}
+.caf-drawer-overlay.open .caf-drawer{transform:translateX(0)}
+.caf-drawer-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--cd)}
+.caf-drawer-title{font-size:13px;font-weight:800;color:var(--ct);line-height:1.3}
+.caf-drawer-close{background:var(--cg);border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--cm);font-size:13px;flex:none}
+.caf-drawer-close:hover{background:var(--cd);color:var(--ct)}
+.caf-drawer-body{padding:12px 16px;overflow-y:auto;flex:1}
+.caf-dr-field{padding:5px 0}
+.caf-dr-lbl{font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#1C0C6E;margin-bottom:3px}
+html[data-theme="dark"] .caf-dr-lbl{color:#B9A6FF}
+.caf-dr-val{font-size:12px;color:var(--ct);line-height:1.4;word-break:break-word;background:#F4F2FE;border:1px solid #E4DEFB;border-radius:8px;padding:7px 10px}
+html[data-theme="dark"] .caf-dr-val{background:rgba(120,80,255,.08);border-color:rgba(120,80,255,.25)}
+.caf-dr-empty{color:var(--cm)}
+.caf-drawer::before{content:'';position:absolute;inset:0;background:var(--tj-bg,none) center/cover no-repeat;opacity:.06;pointer-events:none;z-index:0}
+html[data-theme="dark"] .caf-drawer::before{opacity:.05}
+.caf-drawer-hd,.caf-drawer-body,.caf-drawer-foot{position:relative;z-index:1}
+.caf-drawer-foot{padding:11px 16px;border-top:1px solid var(--cd);background:var(--cb)}
+.caf-dr-req{width:100%;background:linear-gradient(140deg,#5D36FF,#4820E8);color:#fff;border:none;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:box-shadow .15s,transform .1s}
+.caf-dr-req:hover{box-shadow:0 4px 14px rgba(93,54,255,.4)}
+.caf-dr-req:active{transform:scale(.98)}
+.caf-data-row{cursor:default}
+@media(prefers-reduced-motion:reduce){.caf-drawer,.caf-drawer-overlay{transition:none}}
+@media(max-width:560px){.caf-drawer{width:100%;max-width:100%}}
+.caf-teams-msg{font-size:11.5px;color:var(--ct);line-height:1.5;margin:0 0 9px}
+/* ── v140 (E2): Case Surveys CSAT ── */
+.sv-upload-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.sv-upload-bar:empty{display:none}
+.surv-bar-note{font-size:9px;color:var(--cm)}
+.surv-btn{font-size:10px;font-weight:700;border-radius:7px;padding:5px 11px;cursor:pointer;border:1px solid var(--cd);background:var(--ch);color:var(--ct);transition:background .15s}
+.surv-btn:hover{background:var(--cg)}
+.surv-btn-primary{background:linear-gradient(140deg,#5D36FF,#4820E8);color:#fff;border:none}
+.surv-btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.surv-panel{margin-top:10px;border-top:1px dashed var(--cd);padding-top:10px}
+.surv-panel-hd{font-size:11px;font-weight:800;color:var(--ct);margin-bottom:7px}
+.surv-panel-sub{font-size:9px;font-weight:600;color:var(--cm)}
+.surv-row{margin-bottom:7px}
+.surv-file{font-size:10px;color:var(--ct)}
+.surv-status{font-size:9.5px;color:var(--cm);line-height:1.5;margin-bottom:6px;min-height:14px}
+.surv-status-err{color:#BB0000}
+html[data-theme="dark"] .surv-status-err{color:#FF9A8A}
+.surv-actions{display:flex;gap:8px;margin-top:8px}
+.surv-tiles{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+.surv-tile{flex:1 1 0;min-width:84px;background:var(--ch);border-radius:9px;border-top:2px solid #5B7388;padding:8px 9px;text-align:center}
+.surv-tile-lbl{font-size:8.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--cm);margin-bottom:3px}
+.surv-tile-val{font-size:18px;font-weight:800;color:var(--ct);line-height:1.1}
+.surv-tile-unit{font-size:10px;font-weight:600;color:var(--cm)}
+.surv-tile.surv-rate-hi{background:#E6F7EC;border-top-color:#1E7A43}
+.surv-tile.surv-rate-hi .surv-tile-lbl,.surv-tile.surv-rate-hi .surv-tile-val,.surv-tile.surv-rate-hi .surv-tile-unit{color:#1E7A43}
+.surv-tile.surv-rate-mid{background:#FFF3DC;border-top-color:#9A6B00}
+.surv-tile.surv-rate-mid .surv-tile-lbl,.surv-tile.surv-rate-mid .surv-tile-val,.surv-tile.surv-rate-mid .surv-tile-unit{color:#9A6B00}
+.surv-tile.surv-rate-lo{background:#FCE8E8;border-top-color:#B42318}
+.surv-tile.surv-rate-lo .surv-tile-lbl,.surv-tile.surv-rate-lo .surv-tile-val,.surv-tile.surv-rate-lo .surv-tile-unit{color:#B42318}
+.surv-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-top:3px}
+.surv-tbl th{background:var(--ch);color:var(--ct);font-weight:700;font-size:8px;letter-spacing:.3px;text-transform:uppercase;padding:4px 6px;border-bottom:1.5px solid var(--cd);text-align:center}
+.surv-tbl td{padding:4px 6px;border-bottom:1px solid var(--rb);color:var(--ct);text-align:center}
+.surv-td-name{text-align:left;font-weight:600}
+.surv-pct{font-weight:700;border-radius:7px;padding:1px 6px}
+.surv-pct-hi{background:#E6F7EC;color:#1E7A43}
+.surv-pct-mid{background:#FFF3DC;color:#9A6B00}
+.surv-pct-lo{background:#FCE8E8;color:#B42318}
+.surv-search{width:100%;box-sizing:border-box;font-size:10px;padding:5px 8px;border:1px solid var(--cd);border-radius:7px;background:var(--cb);color:var(--ct);margin:4px 0 6px}
+.surv-cmt-wrap{max-height:230px;overflow-y:auto;border:1px solid var(--rb);border-radius:8px}
+.surv-cmt-tbl td{text-align:left}
+.surv-cmt-txt{line-height:1.4;word-break:break-word}
+.surv-cmt-rating{text-align:center;font-weight:700}
+.surv-cmt-empty{color:var(--cm);font-style:italic}
+.surv-pv-head{font-size:10.5px;font-weight:800;color:var(--ct);margin:4px 0 4px}
+.surv-pv-sub{font-size:9px;font-weight:600;color:var(--cm)}
+.surv-pv-ex{font-size:9px;color:var(--cm);line-height:1.5;margin-bottom:6px}
+.surv-empty{font-size:10.5px;color:var(--cm);line-height:1.5;padding:16px 10px;text-align:center}
+.surv-meta{font-size:8.5px;color:var(--cm);margin-top:7px;line-height:1.4}
 .caf-search::placeholder{color:var(--cm)}
 
 /* ── CSS Member tiles ───────────────────────────────────────────────────── */
@@ -2161,6 +2330,8 @@ html[data-theme="dark"] .caf-tb-email{background:#3D2000;color:#FFB366}
 .caf-dlg-validation{font-size:9.5px;color:#BB0000;margin-bottom:8px;
   display:none}
 .caf-dlg-validation.visible{display:block}
+.caf-send-error{font-size:9.5px;color:#BB0000;background:rgba(210,10,10,.06);border:1px solid rgba(210,10,10,.3);border-radius:7px;padding:7px 10px;margin:4px 0 0;line-height:1.5}
+html[data-theme="dark"] .caf-send-error{color:#FF9A8A;background:rgba(210,10,10,.14)}
 .caf-dlg-foot{display:flex;align-items:center;justify-content:flex-end;
   gap:8px;padding:12px 20px;border-top:1px solid var(--cd);
   flex-shrink:0;transition:border-color .25s}
@@ -2709,18 +2880,23 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
   <!-- ── Header ───────────────────────────────────────────────────────── -->
   <header class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-top-row">
     <img class="hdr-logo"
       src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjgiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9Ii4xNSIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjU0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlQ8L3RleHQ+PC9zdmc+"
       id="hdr-logo-img" alt="Team Josh">
     <div class="hdr-divider"></div>
     <span class="hdr-title">Team Josh Executive Dashboard</span>
     <span class="hdr-sub">&mdash; <span id="hdr-month"></span></span>
-    <div class="hdr-spacer"></div>
-    <div class="hdr-meta">
-      <strong id="hdr-version"></strong><br>Data as of <span id="hdr-date"></span>
-      <span id="last-refresh" class="last-refresh"></span>
-      <span id="hdr-user"    class="hdr-user visible">Created &amp; Maintained by: Josh Nacional</span>
-    </div>
+      </div><!-- /hdr-top-row -->
+      <!-- v145 (E6): metadata lives in the left column so the toolbar can center across the full header -->
+      <div class="hdr-meta-bar" id="hdr-meta-bar">
+        <span class="hmb-item"><strong id="hdr-version"></strong></span>
+        <span class="hmb-item">Data as of <span id="hdr-date"></span></span>
+        <span id="last-refresh" class="last-refresh"></span>
+        <span id="hdr-user" class="hdr-user visible">Created &amp; Maintained by: Josh Nacional</span>
+      </div>
+    </div><!-- /hdr-left -->
     <!-- Sign In button (visible only when not authenticated) -->
     <button class="hdr-btn btn-signin" id="btnSignIn"
             onclick="signIn()" title="Sign in with Microsoft 365">
@@ -2838,8 +3014,8 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
     <!-- ═══ TOUCH BASE (col 2, top) ═════════════════════════════════════ -->
     <div class="card">
-      <div class="card-accent" style="background:#5D36FF"></div>
-      <div class="card-head">Touch Base</div>
+      <div class="card-accent" style="background:#2A7DE1"></div>
+      <div class="card-head card-head-flex">Touch Base<button class="mgmt-head-btn" id="tb-mgr-btn" style="display:none" onclick="tbMgrOpen()">Manage Touch Base</button></div>
       <div class="card-body">
         <div class="sec-hdr">Touch Base Emails</div>
         <div class="tb-email-row">
@@ -2858,10 +3034,12 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
     </div>
 
     <!-- ═══ CASE SURVEYS (col 3, top) ══════════════════════════════════ -->
-    <div class="card">
+    <div class="card" data-tour="surveys">
       <div class="card-accent" style="background:#5B7388"></div>
-      <div class="card-head">Case Surveys</div>
+      <div class="card-head card-head-flex">Case Surveys<button class="mgmt-head-btn" id="sv-mgr-btn" style="display:none" onclick="survOpenPanel()">Upload Survey Data</button></div>
       <div class="card-body">
+        <div id="sv-upload-bar" class="sv-upload-bar"></div>
+        <div id="sv-legacy-view">
         <div class="sec-hdr">Month-on-Month Comparison &mdash; <span id="sv-months"></span></div>
         <table class="sv-table">
           <thead>
@@ -2877,13 +3055,27 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
         <div class="card-divider"></div>
         <div class="sec-hdr">Surveys Received &mdash; <span id="sv-month-rank"></span> Ranking</div>
         <div class="chart-wrap h160"><canvas id="chartSvRank"></canvas></div>
+        </div><!-- /sv-legacy-view -->
+        <div id="sv-csat-view" style="display:none"></div>
+        <div id="surv-panel" class="surv-panel" style="display:none">
+          <div class="surv-panel-hd">Upload Survey Data <span class="surv-panel-sub">(Salesforce survey export &mdash; Josh only)</span></div>
+          <div class="surv-row">
+            <input type="file" id="surv-file" accept=".xlsx" class="surv-file" onchange="survUploadFile(event)">
+          </div>
+          <div id="surv-status" class="surv-status"></div>
+          <div id="surv-preview" class="surv-preview"></div>
+          <div class="surv-actions">
+            <button class="surv-btn surv-btn-primary" id="surv-approve-btn" onclick="survConfirm()" disabled>Approve &amp; Publish</button>
+            <button class="surv-btn surv-btn-sec" onclick="survClosePanel()">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- ═══ QUALITY (col 2, bottom) ═════════════════════════════════════ -->
     <div class="card">
-      <div class="card-accent" style="background:#7858FF"></div>
-      <div class="card-head">Quality</div>
+      <div class="card-accent" style="background:#C9951D"></div>
+      <div class="card-head card-head-flex">Quality<button class="mgmt-head-btn" id="qual-mgr-btn" style="display:none" onclick="qualMgrOpen()">Manage Quality Scores</button></div>
       <div class="card-body">
         <div id="q-note" class="q-note"></div>
         <div class="sec-hdr">Individual Quality Ranking</div>
@@ -2901,7 +3093,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
     <!-- ═══ PFTC (col 3, bottom) ════════════════════════════════════════ -->
     <div class="card">
       <div class="card-accent" style="background:#2CE0BF"></div>
-      <div class="card-head card-head-flex">PFTC<a class="pftc-submit-btn" href="https://apps.powerapps.com/play/e/default-42f7676c-f455-423c-82f6-dc2d99791af7/a/b155cf60-acc2-404e-bd21-1fe2b6ec7b3b?tenantId=42f7676c-f455-423c-82f6-dc2d99791af7&amp;hint=3c79c752-b305-4a2a-8b29-ffabeeba75c4&amp;sourcetime=1780625787333" target="_blank" rel="noopener noreferrer" data-tip="Open PFTC Submission Form"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Submit PFTC</a></div>
+      <div class="card-head card-head-flex">PFTC<span class="ch-btns"><button class="mgmt-head-btn" id="pftc-mgr-btn" style="display:none" onclick="pftcMgrOpen()">Manage PFTC</button><a class="mgmt-head-btn pftc-submit-link" href="https://apps.powerapps.com/play/e/default-42f7676c-f455-423c-82f6-dc2d99791af7/a/b155cf60-acc2-404e-bd21-1fe2b6ec7b3b?tenantId=42f7676c-f455-423c-82f6-dc2d99791af7&amp;hint=3c79c752-b305-4a2a-8b29-ffabeeba75c4&amp;sourcetime=1780625787333" target="_blank" rel="noopener noreferrer" data-tip="Open PFTC Submission Form (opens in a new tab)"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Submit PFTC</a></span></div>
       <div class="card-body">
         <div class="sec-hdr">PFTC Leaderboard</div>
         <div class="chart-wrap h200"><canvas id="chartPftc"></canvas></div>
@@ -3033,7 +3225,8 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
         <button class="lp-nav-btn" onclick="lpPrevMonth()" title="Previous month">&#8249;</button>
         <span class="lp-month-label" id="lp-month-label"></span>
         <button class="lp-nav-btn" onclick="lpNextMonth()" title="Next month">&#8250;</button>
-        <button class="lp-today-btn" onclick="lpGoToday()">Today</button>
+        <button class="lp-today-btn lp-pulse-btn" onclick="lpGoToday()" title="Return to the current date and month."><svg class="lp-hb" viewBox="0 0 36 16" aria-hidden="true"><polyline points="0,8 7,8 10,3 14,13 18,5 21,8 36,8"></polyline></svg><span>Today</span></button>
+        <button class="lp-today-btn lp-addevent-btn lp-pulse-btn" onclick="lpOpenEventForm()" title="Add a team event, task, or out-of-office coordination entry."><svg class="lp-hb" viewBox="0 0 36 16" aria-hidden="true"><polyline points="0,8 7,8 10,3 14,13 18,5 21,8 36,8"></polyline></svg><span>+ Event / Task</span></button>
         <div class="lp-header-right">
           <div class="lp-guide-banner">
             <div class="lp-guide-top">
@@ -3041,7 +3234,8 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
               <span class="lp-guide-sep">&mdash;</span>
               <span class="lp-guide-vis">Team Visibility</span>
             </div>
-            <p class="lp-guide-body">Official leaves must still be filed via the <strong class="lp-guide-fiori">SAP Fiori Leave Tool</strong>.</p>
+            <p class="lp-guide-body">Need to file an official leave? Click here to submit your request through the SAP Fiori Leave Tool. Official leaves must still be filed through SAP Fiori &mdash; not merely recorded in this planner.</p>
+            <a class="lp-fiori-link lp-pulse-btn" href="https://sapit-home-prod-004.launchpad.cfapps.eu10.hana.ondemand.com/site#leaverequest-create" target="_blank" rel="noopener noreferrer" title="Open the SAP Fiori Leave Tool in a new tab"><svg class="lp-hb" viewBox="0 0 36 16" aria-hidden="true"><polyline points="0,8 7,8 10,3 14,13 18,5 21,8 36,8"></polyline></svg><span>Click here &mdash; SAP Fiori Leave Tool ↗</span></a>
             <p class="lp-guide-action">Click any calendar date to add an entry to this planner.</p>
           </div>
         </div>
@@ -3089,8 +3283,9 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
       <!-- v86: Internal reference note — repositioned below member tiles -->
       <div class="caf-note-banner">
-        <div class="caf-note-top"><span class="caf-note-ttl">Client Assignment File</span><span class="caf-note-sep">&mdash;</span><span class="caf-note-sub">Internal Reference</span></div>
-        <p class="caf-note-body">For any changes to our <strong>INTERNAL</strong> Client Assignment File reference, please click <strong>Request Update</strong> and complete the necessary actions.</p>
+        <div class="caf-note-top"><span class="caf-note-ttl">Client Assignment File</span><span class="caf-note-sep">&mdash;</span><span class="caf-note-sub">Quick Guide</span></div>
+        <p class="caf-note-body"><strong class="caf-note-em">Double-click</strong> any client row to view the complete client information.</p>
+        <p class="caf-note-action">For client information changes or updates, click <strong class="caf-note-em">Request Update</strong> to access the Client Status Monitoring Form in Microsoft Teams.</p>
       </div>
 
       <!-- ── Team Summary cards ─────────────────────────────────────────── -->
@@ -3140,6 +3335,37 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       </div>
     </div>
   </div><!-- /caf-tmpl-overlay -->
+
+  <!-- v140 (E3): Client detail drawer (double-click a CAF row) -->
+  <div id="caf-drawer-overlay" class="caf-drawer-overlay hidden" onclick="if(event.target===this)cafCloseDrawer()">
+    <aside class="caf-drawer" role="dialog" aria-label="Client details">
+      <div class="caf-drawer-hd">
+        <span class="caf-drawer-title" id="caf-dr-title">Client Details</span>
+        <button class="caf-drawer-close" onclick="cafCloseDrawer()" title="Close">&#x2715;</button>
+      </div>
+      <div class="caf-drawer-body" id="caf-dr-body"></div>
+      <div class="caf-drawer-foot"><button class="caf-dr-req" onclick="cafTeamsRedirect()">Request Update</button></div>
+    </aside>
+  </div>
+
+  <!-- v140 (E3): Request Update -> Teams redirect confirmation -->
+  <div id="caf-teams-overlay" class="caf-dlg-overlay hidden" onclick="if(event.target===this)cafCloseTeams()">
+    <div class="caf-dlg" style="max-width:450px">
+      <div class="caf-dlg-hd">
+        <span class="caf-dlg-title">Redirecting to Client Status Monitoring Form</span>
+        <button class="caf-dlg-close" onclick="cafCloseTeams()">&#x2715;</button>
+      </div>
+      <div class="caf-dlg-body">
+        <p class="caf-teams-msg">Client information updates are now managed by CS Experts through the Client Status Monitoring Form in Microsoft Teams.</p>
+        <p class="caf-teams-msg">You will be redirected to the designated Teams channel, where you can submit or follow up on the required client updates.</p>
+        <p class="caf-teams-msg"><strong>Do you want to continue?</strong></p>
+      </div>
+      <div class="caf-dlg-foot">
+        <button class="caf-dlg-cancel" onclick="cafCloseTeams()">Cancel</button>
+        <button class="caf-dlg-primary" onclick="cafTeamsGo()">OK, Continue</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ eLEARNING COMPLIANCE TAB ════════════════════════════════════════ -->
   <div id="section-el" class="tab-section hidden">
@@ -3305,6 +3531,36 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
     </div>
   </div>
 
+  <!-- v139: Add Event / Task dialog (informational entries, NOT leave) -->
+  <div id="lp-event-overlay" class="lp-dialog-overlay hidden" onclick="if(event.target===this)lpCloseEventForm()">
+    <div class="lp-dialog">
+      <div class="lp-dialog-head">
+        <span id="lp-event-title">Add Event / Task</span>
+        <button class="lp-dialog-close" onclick="lpCloseEventForm()">&#x2715;</button>
+      </div>
+      <div class="lp-dialog-body">
+        <div class="lp-field">
+          <label>Event / Task Title</label>
+          <input type="text" id="lp-ev-title" placeholder="e.g. Team Josh Christmas Party">
+        </div>
+        <div class="lp-field">
+          <label>Start Date</label>
+          <input type="date" id="lp-ev-start">
+        </div>
+        <div class="lp-field">
+          <label>End Date (optional)</label>
+          <input type="date" id="lp-ev-end">
+        </div>
+        <div class="lp-ev-note">Events &amp; tasks are informational only &mdash; they are not counted as leave and do not affect leave summaries or Case Productivity.</div>
+      </div>
+      <div class="lp-dialog-footer">
+        <button class="lp-btn-primary" id="lp-ev-save-btn" onclick="lpSaveEvent()">Save</button>
+        <button class="lp-btn-danger" id="lp-ev-del-btn" onclick="lpDeleteEvent()" style="display:none">Delete</button>
+        <button class="lp-btn-secondary" onclick="lpCloseEventForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- View Leave Details -->
   <div id="lp-view-overlay" class="lp-dialog-overlay hidden"
        onclick="lpOverlayClick(event,'view')">
@@ -3463,8 +3719,96 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       <div class="wl-status-txt" id="wl-status-txt">Initializing&hellip;</div>
     </div>
 
+    <!-- v146 (E1): optional, ephemeral daily mood check-in (nothing is recorded) -->
+    <div class="mood-panel" id="mood-panel" style="display:none">
+      <div class="mood-q" id="mood-q">How are you feeling today?</div>
+      <div class="mood-scale" id="mood-scale">
+        <button class="mood-opt" type="button" onclick="_moodPick(1)" title="Not feeling great"><span class="mood-emoji">😔</span><span class="mood-lbl">Not feeling great</span></button>
+        <button class="mood-opt" type="button" onclick="_moodPick(2)" title="A little low"><span class="mood-emoji">😕</span><span class="mood-lbl">A little low</span></button>
+        <button class="mood-opt" type="button" onclick="_moodPick(3)" title="Just okay"><span class="mood-emoji">😐</span><span class="mood-lbl">Just okay</span></button>
+        <button class="mood-opt" type="button" onclick="_moodPick(4)" title="Feeling good"><span class="mood-emoji">🙂</span><span class="mood-lbl">Feeling good</span></button>
+        <button class="mood-opt" type="button" onclick="_moodPick(5)" title="Feeling great"><span class="mood-emoji">😄</span><span class="mood-lbl">Feeling great</span></button>
+      </div>
+      <div class="mood-msg" id="mood-msg" style="display:none"></div>
+      <div class="mood-privacy">Your response is not recorded. This is just a little moment for yourself.</div>
+      <div class="mood-actions">
+        <button class="mood-replay" id="mood-replay" type="button" style="display:none" onclick="_moodReplay()">↻ Replay</button>
+        <button class="mood-skip" id="mood-skip" type="button" onclick="_moodDone(true)">Skip</button>
+        <button class="mood-continue" id="mood-continue" type="button" style="display:none" onclick="_moodDone(false)">Continue to Dashboard →</button>
+      </div>
+    </div>
+
   </div><!-- /wl-dialog -->
 
+</div>
+
+<!-- v147 (E2): Quality Score Manager (Josh-only) -->
+<div id="qual-mgr-overlay" class="lp-dialog-overlay hidden" onclick="if(event.target===this)qualMgrClose()">
+  <div class="lp-dialog mgmt-dialog">
+    <div class="lp-dialog-head"><span>Manage Quality Scores</span><button class="lp-dialog-close" onclick="qualMgrClose()">&#x2715;</button></div>
+    <div class="lp-dialog-body" id="qual-mgr-body">
+      <div class="mgmt-row"><label>Reporting Month</label><input type="month" id="qual-m-month" onchange="qualMgrMonthChange()"></div>
+      <div class="mgmt-row"><label>CSS Pseudocode</label><select id="qual-m-pseudo-sel" onchange="qualPseudoSelChange()"></select><input type="text" id="qual-m-pseudo-other" placeholder="Type a new pseudocode (e.g. Support 0999)" style="display:none;margin-top:6px"></div>
+      <div class="mgmt-grid5">
+        <div><label>Review 1 (%)</label><input type="number" id="qual-m-s1" min="0" max="100" step="0.01" oninput="qualMgrCalcAvg()"></div>
+        <div><label>Review 2 (%)</label><input type="number" id="qual-m-s2" min="0" max="100" step="0.01" oninput="qualMgrCalcAvg()"></div>
+        <div><label>Review 3 (%)</label><input type="number" id="qual-m-s3" min="0" max="100" step="0.01" oninput="qualMgrCalcAvg()"></div>
+        <div><label>Review 4 (%)</label><input type="number" id="qual-m-s4" min="0" max="100" step="0.01" oninput="qualMgrCalcAvg()"></div>
+        <div><label>Review 5 (%)</label><input type="number" id="qual-m-s5" min="0" max="100" step="0.01" oninput="qualMgrCalcAvg()"></div>
+      </div>
+      <div class="mgmt-avg" id="qual-m-avg">Average: —</div>
+      <div id="qual-mgr-status" class="mgmt-status"></div>
+      <div class="mgmt-list" id="qual-mgr-list"></div>
+    </div>
+    <div class="lp-dialog-footer">
+      <button class="lp-btn-primary" id="qual-save-btn" onclick="qualMgrSave()">Save Entry</button>
+      <button class="lp-btn-secondary" onclick="qualMgrClose()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- v147 (E4): PFTC Manager (Josh-only) -->
+<div id="pftc-mgr-overlay" class="lp-dialog-overlay hidden" onclick="if(event.target===this)pftcMgrClose()">
+  <div class="lp-dialog mgmt-dialog">
+    <div class="lp-dialog-head"><span>Manage PFTC</span><button class="lp-dialog-close" onclick="pftcMgrClose()">&#x2715;</button></div>
+    <div class="lp-dialog-body" id="pftc-mgr-body">
+      <div class="mgmt-row"><label>Reporting Month</label><input type="month" id="pftc-m-month" onchange="pftcMgrMonthChange()"></div>
+      <div class="mgmt-row"><label>CSS Member</label><select id="pftc-m-name"></select></div>
+      <div class="mgmt-grid5" style="grid-template-columns:1fr 1fr">
+        <div><label>Appreciate (1 pt each)</label><input type="number" id="pftc-m-app" min="0" step="1" oninput="pftcMgrCalc()"></div>
+        <div><label>Commendation (10 pts each)</label><input type="number" id="pftc-m-comm" min="0" step="1" oninput="pftcMgrCalc()"></div>
+      </div>
+      <div class="mgmt-avg" id="pftc-m-total">Total points: 0</div>
+      <div id="pftc-mgr-status" class="mgmt-status"></div>
+      <div class="mgmt-list" id="pftc-mgr-list"></div>
+    </div>
+    <div class="lp-dialog-footer">
+      <button class="lp-btn-primary" id="pftc-save-btn" onclick="pftcMgrSave()">Save Entry</button>
+      <button class="lp-btn-secondary" onclick="pftcMgrClose()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- v147 (E3): Touch Base Manager (Josh-only) -->
+<div id="tb-mgr-overlay" class="lp-dialog-overlay hidden" onclick="if(event.target===this)tbMgrClose()">
+  <div class="lp-dialog mgmt-dialog">
+    <div class="lp-dialog-head"><span>Manage Touch Base</span><button class="lp-dialog-close" onclick="tbMgrClose()">&#x2715;</button></div>
+    <div class="lp-dialog-body" id="tb-mgr-body">
+      <div class="mgmt-row"><label>Reporting Month</label><input type="month" id="tb-m-month" onchange="tbMgrMonthChange()"></div>
+      <div class="mgmt-row"><label>CSS Member</label><select id="tb-m-css" onchange="tbMgrCssChange()"></select></div>
+      <div class="mgmt-grid5" style="grid-template-columns:1fr 1fr">
+        <div><label>Monthly Email Target</label><input type="number" id="tb-m-etarget" min="0" step="1"></div>
+        <div><label>Email Actual Count</label><select id="tb-m-eactual"></select></div>
+      </div>
+      <div class="mgmt-grid5" style="grid-template-columns:1fr 1fr">
+        <div><label>Monthly Call Target</label><input type="number" id="tb-m-ctarget" min="0" step="1"></div>
+        <div><label>Call Actual Count</label><select id="tb-m-cactual"></select></div>
+      </div>
+      <div id="tb-mgr-status" class="mgmt-status"></div>
+      <div class="mgmt-list" id="tb-mgr-list"></div>
+    </div>
+    <div class="lp-dialog-footer"><button class="lp-btn-primary" id="tb-save-btn" onclick="tbMgrSave()">Save</button><button class="lp-btn-secondary" onclick="tbMgrClose()">Close</button></div>
+  </div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════════
@@ -4126,7 +4470,7 @@ function _wlGetVoices() {
   });
 }
 
-async function _wlSpeak() {
+async function _wlSpeak(text) {
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
 
@@ -4176,7 +4520,7 @@ async function _wlSpeak() {
   }
 
   return new Promise(resolve => {
-    const utt = new SpeechSynthesisUtterance('Welcome to Team Josh Executive Dashboard.');
+    const utt = new SpeechSynthesisUtterance(text || 'Welcome to Team Josh Executive Dashboard.');
     if (chosen) {
       utt.voice  = chosen;        /* explicit user choice — natural pitch */
       utt.rate   = 0.87;
@@ -4393,6 +4737,7 @@ async function _welcomeAndLoad() {
     const dataPromise = loadAndBuild();
     await _wlRunSequence();
     await dataPromise;            /* ensure full dashboard is ready before reveal */
+    try { await _moodCheckin(); } catch(e) { console.warn('[Mood] check-in skipped:', e && e.message); }  /* v146 (E1): optional ephemeral step */
   } catch(e) {
     console.error('[Welcome] Load error during welcome:', e);
     showToast('Dashboard load failed: ' + (e.message || 'unknown error'));
@@ -4441,6 +4786,349 @@ async function _hideWelcomeOverlay(immediate) {
 
   /* Reset dialog for any future re-use */
   if (dialog) { dialog.style.opacity = ''; dialog.style.transform = ''; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   v146 (E1) — EPHEMERAL DAILY MOOD CHECK-IN
+   Optional, warm, NOT recorded anywhere (no OneDrive/JSON/Excel/localStorage/
+   performance records). The selected rating lives only in a local variable and
+   is discarded on completion. Reuses the existing Choose Voice voice via _wlSpeak.
+════════════════════════════════════════════════════════════════════════════ */
+const _MOOD_MSGS = {
+  1: [
+    "Rough days happen, and they don't define you. Be as kind to yourself today as you'd be to a teammate.",
+    "You showed up, and that already counts for something. Take it one small step at a time.",
+    "It's okay to not be okay. Breathe, go gently, and let today be enough.",
+    "Heavy days pass. You don't have to carry everything at once \u2014 just the next small thing."
+  ],
+  2: [
+    "A quiet, low day is still a valid one. Go easy, and let small wins find you.",
+    "You don't need to feel your best to do your best. Start light, and be patient with yourself.",
+    "Some days ask for less hustle and more kindness. Give yourself a little of both.",
+    "Low energy isn't failure \u2014 it's a signal to slow down. The team has your back."
+  ],
+  3: [
+    "Okay is a perfectly good place to start. Small steady steps add up more than you think.",
+    "Steady is underrated. A calm, ordinary day is its own kind of progress.",
+    "Not every day needs to be remarkable \u2014 showing up steadily is what builds momentum.",
+    "You're right where you need to be. Pick one small thing to feel good about today."
+  ],
+  4: [
+    "Love that energy \u2014 ride it! A good mood is a great time to tackle something you've been putting off.",
+    "Feeling good looks great on you. Share a little of that with the team today.",
+    "Nice \u2014 momentum is on your side. Let's make today count.",
+    "That's the spirit. Keep doing what's working and enjoy the good stretch."
+  ],
+  5: [
+    "Amazing! Days like this are worth celebrating \u2014 go make them count.",
+    "You're on fire today! Channel that energy and let it lift the whole team.",
+    "Fantastic! Confidence like this is contagious \u2014 pass it on.",
+    "Love to see it! Soak it in, stay grateful, and keep that momentum rolling."
+  ]
+};
+let _moodLast = {};
+let _moodResolve = null;
+let _moodCurrentText = '';
+
+function _moodPickMsg(r){
+  var arr = _MOOD_MSGS[r] || []; if (!arr.length) return '';
+  var idx = Math.floor(Math.random() * arr.length);
+  if (arr.length > 1 && _moodLast[r] === idx) idx = (idx + 1) % arr.length;
+  _moodLast[r] = idx;
+  return arr[idx];
+}
+function _moodPick(r){
+  var scale = document.getElementById('mood-scale'); if (scale) scale.style.display = 'none';
+  var msg = _moodPickMsg(r);
+  _moodCurrentText = msg;
+  var m = document.getElementById('mood-msg'); if (m) { m.textContent = msg; m.style.display = 'block'; }
+  var rep = document.getElementById('mood-replay'); if (rep) rep.style.display = '';
+  var cont = document.getElementById('mood-continue'); if (cont) cont.style.display = '';
+  var skip = document.getElementById('mood-skip'); if (skip) skip.style.display = 'none';
+  try { _wlSpeak('I have a little quote that might brighten your day. ' + msg); } catch(_) {}
+}
+function _moodReplay(){ if (_moodCurrentText) { try { _wlSpeak(_moodCurrentText); } catch(_) {} } }
+function _moodDone(){
+  var p = document.getElementById('mood-panel'); if (p) p.style.display = 'none';
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch(_) {}
+  _moodCurrentText = '';
+  var r = _moodResolve; _moodResolve = null; if (r) r();
+}
+function _moodCheckin(){
+  return new Promise(function(resolve){
+    var p = document.getElementById('mood-panel');
+    if (!p) { resolve(); return; }
+    _moodResolve = resolve;
+    var scale = document.getElementById('mood-scale'); if (scale) scale.style.display = '';
+    var m = document.getElementById('mood-msg'); if (m) { m.style.display = 'none'; m.textContent = ''; }
+    var rep = document.getElementById('mood-replay'); if (rep) rep.style.display = 'none';
+    var cont = document.getElementById('mood-continue'); if (cont) cont.style.display = 'none';
+    var skip = document.getElementById('mood-skip'); if (skip) skip.style.display = '';
+    p.style.display = 'block'; p.scrollTop = 0;
+    try { _wlSpeak('How are you feeling today?'); } catch(_) {}
+  });
+}
+
+/* v147: re-derive current-month managed objects and re-render the existing graphs */
+function _mgmtEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function _mgmtLiveRefresh(){
+  try{
+    var D=_lastDashboardData; if(!D) return;
+    var m=(typeof _reportingMonth!=='undefined')?_reportingMonth:null; if(!m) return;
+    if(D._raw_qlVals!==undefined) D.quality = qualForMonth(m, parseQuality(D._raw_qlVals, m));
+    if(typeof _rawPfVals!=='undefined' && _rawPfVals) D.pftc = pftcForMonth(m, parsePFTC(_rawPfVals, m));
+    if(D._raw_tbVals!==undefined) D.touch_base = tbForMonth(m, parseTouchBase(D._raw_tbVals, m));
+    D.axis_limits = computeAxisLimits({ case_productivity:D.case_productivity, touch_base:D.touch_base, surveys:D.surveys, quality:D.quality, pftc:D.pftc, irt_ort:D.irt_ort });
+    _lastDashboardData=D; buildDashboard(D);
+  }catch(e){ console.warn('[Mgmt] live refresh failed:', e&&e.message); }
+}
+
+/* ── E2: Quality Score Manager (pseudocodes only; avg of valid 0-100 reviews) ── */
+function qualMgrStatus(msg,err){ var s=document.getElementById('qual-mgr-status'); if(s){ s.textContent=msg; s.className='mgmt-status'+(err?' mgmt-status-err':''); } }
+var QUAL_PSEUDOS=['Support 0018','Support 0138','Support 0055','Support 0284','Support 0281','Support 0263','Support 0458'];
+function qualPseudoSelChange(){ var sel=document.getElementById('qual-m-pseudo-sel'), o=document.getElementById('qual-m-pseudo-other'); if(!sel||!o) return; var other=(sel.value==='__other__'); o.style.display=other?'':'none'; if(other) o.focus(); }
+function qualGetPseudo(){ var sel=document.getElementById('qual-m-pseudo-sel'), o=document.getElementById('qual-m-pseudo-other'); if(!sel) return ''; return (sel.value==='__other__') ? ((o&&o.value||'').trim()) : sel.value; }
+function qualMgrCalcAvg(){
+  var sc=[]; for(var i=1;i<=5;i++){ var v=document.getElementById('qual-m-s'+i).value; if(v!==''){ var n=Number(v); if(!isNaN(n)&&n>=0&&n<=100) sc.push(n); } }
+  var el=document.getElementById('qual-m-avg');
+  if(el) el.textContent = sc.length ? ('Average: '+(sc.reduce(function(a,b){return a+b;},0)/sc.length).toFixed(2)+'%') : 'Average: \u2014 (no valid scores)';
+}
+function qualMgrClearForm(){ var sel=document.getElementById('qual-m-pseudo-sel'); if(sel) sel.selectedIndex=0; var o=document.getElementById('qual-m-pseudo-other'); if(o){ o.value=''; o.style.display='none'; } for(var i=1;i<=5;i++){ var x=document.getElementById('qual-m-s'+i); if(x) x.value=''; } qualMgrCalcAvg(); }
+function qualMgrRenderList(month){
+  var el=document.getElementById('qual-mgr-list'); if(!el) return;
+  var snap=_qualStore&&_qualStore.months&&_qualStore.months[month];
+  var rows=(snap&&snap.rows)?snap.rows:[];
+  if(!rows.length){ el.innerHTML='<div class="mgmt-empty">No dashboard-managed scores for '+_mgmtEsc(month||'(no month)')+' yet.</div>'; return; }
+  el.innerHTML=rows.map(function(r){
+    var sc=(r.scores||[]).map(Number).filter(function(x){return !isNaN(x)&&x>=0&&x<=100;});
+    var avg=sc.length?(sc.reduce(function(a,b){return a+b;},0)/sc.length):null;
+    var p=_mgmtEsc(r.pseudo);
+    return '<div class="mgmt-li"><div class="mgmt-li-main"><strong>'+p+'</strong> \u00b7 '+sc.length+' review(s) \u00b7 avg '+(avg==null?'n/a':avg.toFixed(2)+'%')+'</div>'+
+      '<button class="mgmt-li-act" onclick="qualMgrEdit(\''+p.replace(/'/g,"\\'")+'\')">Edit</button>'+
+      '<button class="mgmt-li-act mgmt-li-del" onclick="qualMgrDelete(\''+p.replace(/'/g,"\\'")+'\')">Delete</button></div>';
+  }).join('');
+}
+function qualMgrEdit(pseudo){
+  var month=document.getElementById('qual-m-month').value;
+  var snap=_qualStore&&_qualStore.months&&_qualStore.months[month]; if(!snap) return;
+  var r=(snap.rows||[]).find(function(x){ return (x.pseudo||'').toLowerCase()===pseudo.toLowerCase(); }); if(!r) return;
+  (function(ps){ var sel=document.getElementById('qual-m-pseudo-sel'), o=document.getElementById('qual-m-pseudo-other');
+    if(QUAL_PSEUDOS.indexOf(ps)>=0){ if(sel) sel.value=ps; if(o){ o.style.display='none'; o.value=''; } }
+    else { if(sel) sel.value='__other__'; if(o){ o.style.display=''; o.value=ps; } } })(r.pseudo);
+  for(var i=1;i<=5;i++){ document.getElementById('qual-m-s'+i).value=(r.scores&&r.scores[i-1]!=null)?r.scores[i-1]:''; }
+  qualMgrCalcAvg();
+}
+async function qualMgrOpen(){
+  if(!_isJoshUser()) return;
+  var ov=document.getElementById('qual-mgr-overlay'); if(!ov) return;
+  var sel=document.getElementById('qual-m-pseudo-sel');
+  if(sel){ sel.innerHTML=QUAL_PSEUDOS.map(function(x){return '<option value="'+x+'">'+x+'</option>';}).join('')+'<option value="__other__">Other (type a new pseudocode)</option>'; }
+  var mo=document.getElementById('qual-m-month'); if(mo && !mo.value) mo.value=(typeof _reportingMonth!=='undefined'?_reportingMonth:'');
+  qualMgrClearForm(); qualMgrStatus('',false);
+  ov.classList.remove('hidden');
+  var body=document.getElementById('qual-mgr-body'); if(body) body.scrollTop=0;
+  try{ var token=await getToken(); await _mgmtEnsureStores(token); }catch(e){}
+  qualMgrRenderList(mo?mo.value:'');
+}
+function qualMgrClose(){ var ov=document.getElementById('qual-mgr-overlay'); if(ov) ov.classList.add('hidden'); }
+function qualMgrMonthChange(){ var mo=document.getElementById('qual-m-month'); qualMgrClearForm(); qualMgrRenderList(mo?mo.value:''); }
+async function qualMgrSave(){
+  if(!_isJoshUser()){ qualMgrStatus('Not authorized.',true); return; }
+  var month=document.getElementById('qual-m-month').value;
+  var pseudo=qualGetPseudo();
+  if(!month){ qualMgrStatus('Please choose a reporting month.',true); return; }
+  if(!pseudo){ qualMgrStatus('Please enter a CSS pseudocode.',true); return; }
+  var scores=[]; for(var i=1;i<=5;i++){ var v=document.getElementById('qual-m-s'+i).value; if(v!==''){ var n=Number(v); if(isNaN(n)||n<0||n>100){ qualMgrStatus('Review '+i+' must be between 0 and 100.',true); return; } scores.push(Math.round(n*100)/100); } }
+  var btn=document.getElementById('qual-save-btn'); if(btn){ btn.disabled=true; btn.textContent='Saving\u2026'; }
+  try{
+    var token=await getToken(); await _mgmtEnsureStores(token);
+    var snap=(_qualStore.months&&_qualStore.months[month])?JSON.parse(JSON.stringify(_qualStore.months[month])):{ reportingMonth:month, rows:[] };
+    if(!snap.rows) snap.rows=[];
+    var idx=snap.rows.findIndex(function(r){ return (r.pseudo||'').toLowerCase()===pseudo.toLowerCase(); });
+    var row={ pseudo:pseudo, scores:scores };
+    if(idx>=0) snap.rows[idx]=row; else snap.rows.push(row);
+    snap.updatedBy=(TK.name()||TK.email()||'Josh'); snap.updatedAt=new Date().toISOString();
+    _qualStore=await _mgmtSaveMonth(token, QUAL_FILE, month, snap);
+    qualMgrStatus('Saved '+pseudo+' for '+month+'.',false);
+    qualMgrClearForm(); qualMgrRenderList(month); _mgmtLiveRefresh();
+  }catch(e){ console.error('[Qual] save',e); qualMgrStatus('Save failed: '+(e&&e.message||'error'),true); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='Save Entry'; } }
+}
+async function qualMgrDelete(pseudo){
+  if(!_isJoshUser()) return;
+  var month=document.getElementById('qual-m-month').value; if(!month) return;
+  try{
+    var token=await getToken(); await _mgmtEnsureStores(token);
+    var snap=(_qualStore.months&&_qualStore.months[month])?JSON.parse(JSON.stringify(_qualStore.months[month])):null;
+    if(!snap||!snap.rows) return;
+    snap.rows=snap.rows.filter(function(r){ return (r.pseudo||'').toLowerCase()!==pseudo.toLowerCase(); });
+    snap.updatedBy=(TK.name()||TK.email()||'Josh'); snap.updatedAt=new Date().toISOString();
+    _qualStore=await _mgmtSaveMonth(token, QUAL_FILE, month, snap);
+    qualMgrStatus('Removed '+pseudo+'.',false); qualMgrRenderList(month); _mgmtLiveRefresh();
+  }catch(e){ console.error('[Qual] delete',e); qualMgrStatus('Delete failed: '+(e&&e.message||'error'),true); }
+}
+
+/* ── E4: PFTC Manager (unchanged 1pt Appreciate + 10pt Commendation) ── */
+function pftcMgrStatus(msg,err){ var s=document.getElementById('pftc-mgr-status'); if(s){ s.textContent=msg; s.className='mgmt-status'+(err?' mgmt-status-err':''); } }
+function pftcMgrCalc(){ var a=Math.round(Number(document.getElementById('pftc-m-app').value)||0), c=Math.round(Number(document.getElementById('pftc-m-comm').value)||0); var el=document.getElementById('pftc-m-total'); if(el) el.textContent='Total points: '+(a+c*10); }
+function pftcMgrClearForm(){ document.getElementById('pftc-m-app').value=''; document.getElementById('pftc-m-comm').value=''; pftcMgrCalc(); }
+function pftcMgrRenderList(month){
+  var el=document.getElementById('pftc-mgr-list'); if(!el) return;
+  var snap=_pftcStore&&_pftcStore.months&&_pftcStore.months[month];
+  var rows=(snap&&snap.rows)?snap.rows:[];
+  if(!rows.length){ el.innerHTML='<div class="mgmt-empty">No dashboard-managed PFTC for '+_mgmtEsc(month||'(no month)')+' yet.</div>'; return; }
+  el.innerHTML=rows.map(function(r){
+    var a=Math.round(Number(r.appreciate)||0), c=Math.round(Number(r.commendation)||0); var nm=_mgmtEsc(r.name);
+    return '<div class="mgmt-li"><div class="mgmt-li-main"><strong>'+nm+'</strong> \u00b7 '+a+' appreciate, '+c+' commendation \u00b7 '+(a+c*10)+' pts</div>'+
+      '<button class="mgmt-li-act" onclick="pftcMgrEdit(\''+nm.replace(/'/g,"\\'")+'\')">Edit</button>'+
+      '<button class="mgmt-li-act mgmt-li-del" onclick="pftcMgrDelete(\''+nm.replace(/'/g,"\\'")+'\')">Delete</button></div>';
+  }).join('');
+}
+function pftcMgrEdit(name){
+  var month=document.getElementById('pftc-m-month').value;
+  var snap=_pftcStore&&_pftcStore.months&&_pftcStore.months[month]; if(!snap) return;
+  var r=(snap.rows||[]).find(function(x){ return (x.name||'')===name; }); if(!r) return;
+  var sel=document.getElementById('pftc-m-name'); if(sel) sel.value=r.name;
+  document.getElementById('pftc-m-app').value=(r.appreciate!=null?r.appreciate:''); document.getElementById('pftc-m-comm').value=(r.commendation!=null?r.commendation:''); pftcMgrCalc();
+}
+async function pftcMgrOpen(){
+  if(!_isJoshUser()) return;
+  var ov=document.getElementById('pftc-mgr-overlay'); if(!ov) return;
+  var sel=document.getElementById('pftc-m-name');
+  if(sel){ var mem=(typeof _WL_MEMBERS!=='undefined'?_WL_MEMBERS:['Josh','Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']); sel.innerHTML=mem.map(function(x){return '<option value="'+x+'">'+x+'</option>';}).join(''); }
+  var mo=document.getElementById('pftc-m-month'); if(mo && !mo.value) mo.value=(typeof _reportingMonth!=='undefined'?_reportingMonth:'');
+  pftcMgrClearForm(); pftcMgrStatus('',false);
+  ov.classList.remove('hidden');
+  var body=document.getElementById('pftc-mgr-body'); if(body) body.scrollTop=0;
+  try{ var token=await getToken(); await _mgmtEnsureStores(token); }catch(e){}
+  pftcMgrRenderList(mo?mo.value:'');
+}
+function pftcMgrClose(){ var ov=document.getElementById('pftc-mgr-overlay'); if(ov) ov.classList.add('hidden'); }
+function pftcMgrMonthChange(){ var mo=document.getElementById('pftc-m-month'); pftcMgrRenderList(mo?mo.value:''); }
+async function pftcMgrSave(){
+  if(!_isJoshUser()){ pftcMgrStatus('Not authorized.',true); return; }
+  var month=document.getElementById('pftc-m-month').value;
+  var name=document.getElementById('pftc-m-name').value;
+  if(!month){ pftcMgrStatus('Please choose a reporting month.',true); return; }
+  if(!name){ pftcMgrStatus('Please select a CSS member.',true); return; }
+  var app=document.getElementById('pftc-m-app').value, comm=document.getElementById('pftc-m-comm').value;
+  var a=app===''?0:Number(app), c=comm===''?0:Number(comm);
+  if(isNaN(a)||a<0||isNaN(c)||c<0){ pftcMgrStatus('Counts must be zero or more.',true); return; }
+  var btn=document.getElementById('pftc-save-btn'); if(btn){ btn.disabled=true; btn.textContent='Saving\u2026'; }
+  try{
+    var token=await getToken(); await _mgmtEnsureStores(token);
+    var snap=(_pftcStore.months&&_pftcStore.months[month])?JSON.parse(JSON.stringify(_pftcStore.months[month])):{ reportingMonth:month, rows:[] };
+    if(!snap.rows) snap.rows=[];
+    var idx=snap.rows.findIndex(function(r){ return (r.name||'')===name; });
+    var row={ name:name, appreciate:Math.round(a), commendation:Math.round(c) };
+    if(idx>=0) snap.rows[idx]=row; else snap.rows.push(row);
+    snap.updatedBy=(TK.name()||TK.email()||'Josh'); snap.updatedAt=new Date().toISOString();
+    _pftcStore=await _mgmtSaveMonth(token, PFTC_FILE, month, snap);
+    pftcMgrStatus('Saved '+name+' for '+month+'.',false);
+    pftcMgrClearForm(); pftcMgrRenderList(month); _mgmtLiveRefresh();
+  }catch(e){ console.error('[PFTC] save',e); pftcMgrStatus('Save failed: '+(e&&e.message||'error'),true); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='Save Entry'; } }
+}
+async function pftcMgrDelete(name){
+  if(!_isJoshUser()) return;
+  var month=document.getElementById('pftc-m-month').value; if(!month) return;
+  try{
+    var token=await getToken(); await _mgmtEnsureStores(token);
+    var snap=(_pftcStore.months&&_pftcStore.months[month])?JSON.parse(JSON.stringify(_pftcStore.months[month])):null;
+    if(!snap||!snap.rows) return;
+    snap.rows=snap.rows.filter(function(r){ return (r.name||'')!==name; });
+    snap.updatedBy=(TK.name()||TK.email()||'Josh'); snap.updatedAt=new Date().toISOString();
+    _pftcStore=await _mgmtSaveMonth(token, PFTC_FILE, month, snap);
+    pftcMgrStatus('Removed '+name+'.',false); pftcMgrRenderList(month); _mgmtLiveRefresh();
+  }catch(e){ console.error('[PFTC] delete',e); pftcMgrStatus('Delete failed: '+(e&&e.message||'error'),true); }
+}
+
+/* ── E3 (simplified v148): Touch Base Manager — per-member monthly targets + actual counts.
+   Client-level interaction tracking and the CAF dependency were removed per Josh's request. ── */
+function tbMgrStatus(msg,err){ var s=document.getElementById('tb-mgr-status'); if(s){ s.textContent=msg; s.className='mgmt-status'+(err?' mgmt-status-err':''); } }
+function _tbCountOptions(sel, cur){
+  if(!sel) return; var html=''; for(var i=0;i<=500;i++){ html+='<option value="'+i+'">'+i+'</option>'; }
+  sel.innerHTML=html;
+  sel.value=(cur!=null && cur!=='' && !isNaN(Number(cur))) ? String(Math.max(0,Math.min(500,Math.round(Number(cur))))) : '0';
+}
+function _tbSnapFor(month){ return (_tbStore.months&&_tbStore.months[month])?JSON.parse(JSON.stringify(_tbStore.months[month])):{ reportingMonth:month, rows:[] }; }
+function tbMgrLoadMember(){
+  var month=(document.getElementById('tb-m-month')||{}).value||''; var css=(document.getElementById('tb-m-css')||{}).value||'';
+  var snap=_tbStore&&_tbStore.months&&_tbStore.months[month];
+  var row=null; if(snap&&snap.rows) row=snap.rows.find(function(r){ return r.name===css; });
+  var et=document.getElementById('tb-m-etarget'), ct=document.getElementById('tb-m-ctarget');
+  if(et) et.value=(row&&row.emailTarget!=null)?row.emailTarget:'';
+  if(ct) ct.value=(row&&row.callTarget!=null)?row.callTarget:'';
+  _tbCountOptions(document.getElementById('tb-m-eactual'), row?row.emailActual:0);
+  _tbCountOptions(document.getElementById('tb-m-cactual'), row?row.callActual:0);
+}
+function tbMgrCssChange(){ tbMgrLoadMember(); }
+function tbMgrMonthChange(){ tbMgrLoadMember(); tbMgrRenderList(); }
+function tbMgrRenderList(){
+  var el=document.getElementById('tb-mgr-list'); if(!el) return;
+  var month=(document.getElementById('tb-m-month')||{}).value||'';
+  var snap=_tbStore&&_tbStore.months&&_tbStore.months[month];
+  var rows=(snap&&snap.rows)?snap.rows.slice():[];
+  if(!rows.length){ el.innerHTML='<div class="mgmt-empty">No dashboard-managed Touch Base for '+_mgmtEsc(month||'(no month)')+' yet.</div>'; return; }
+  rows.sort(function(a,b){ return String(a.name).localeCompare(String(b.name)); });
+  el.innerHTML=rows.map(function(r){
+    var nm=_mgmtEsc(r.name);
+    var ea=(r.emailActual!=null?r.emailActual:0), et=(r.emailTarget!=null?r.emailTarget:'\u2014');
+    var ca=(r.callActual!=null?r.callActual:0), ct=(r.callTarget!=null?r.callTarget:'\u2014');
+    return '<div class="mgmt-li"><div class="mgmt-li-main"><strong>'+nm+'</strong> \u00b7 Emails '+ea+'/'+et+' \u00b7 Calls '+ca+'/'+ct+'</div>'+
+      '<button class="mgmt-li-act" onclick="tbMgrEdit(\''+nm.replace(/'/g,"\\'")+'\')">Edit</button>'+
+      '<button class="mgmt-li-act mgmt-li-del" onclick="tbMgrDelete(\''+nm.replace(/'/g,"\\'")+'\')">Delete</button></div>';
+  }).join('');
+}
+function tbMgrEdit(name){ var sel=document.getElementById('tb-m-css'); if(sel) sel.value=name; tbMgrLoadMember(); tbMgrStatus('Editing '+name+' \u2014 update the values and click Save.',false); var body=document.getElementById('tb-mgr-body'); if(body) body.scrollTop=0; }
+async function tbMgrOpen(){
+  if(!_isJoshUser()) return;
+  var ov=document.getElementById('tb-mgr-overlay'); if(!ov) return;
+  var sel=document.getElementById('tb-m-css');
+  if(sel){ var mem=(typeof CAF_CSS!=='undefined'?CAF_CSS:['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']); sel.innerHTML=mem.map(function(x){return '<option value="'+x+'">'+x+'</option>';}).join(''); }
+  var mo=document.getElementById('tb-m-month'); if(mo && !mo.value) mo.value=(typeof _reportingMonth!=='undefined'?_reportingMonth:'');
+  tbMgrStatus('',false);
+  ov.classList.remove('hidden');
+  var body=document.getElementById('tb-mgr-body'); if(body) body.scrollTop=0;
+  try{ var token=await getToken(); await _mgmtEnsureStores(token); }catch(e){}
+  tbMgrLoadMember(); tbMgrRenderList();
+}
+function tbMgrClose(){ var ov=document.getElementById('tb-mgr-overlay'); if(ov) ov.classList.add('hidden'); }
+async function tbMgrSave(){
+  if(!_isJoshUser()){ tbMgrStatus('Not authorized.',true); return; }
+  var month=document.getElementById('tb-m-month').value, css=document.getElementById('tb-m-css').value;
+  if(!month){ tbMgrStatus('Please choose a reporting month.',true); return; }
+  if(!css){ tbMgrStatus('Please select a CSS member.',true); return; }
+  var etv=document.getElementById('tb-m-etarget').value, ctv=document.getElementById('tb-m-ctarget').value;
+  if(etv!=='' && (isNaN(Number(etv))||Number(etv)<0)){ tbMgrStatus('Email target must be zero or more.',true); return; }
+  if(ctv!=='' && (isNaN(Number(ctv))||Number(ctv)<0)){ tbMgrStatus('Call target must be zero or more.',true); return; }
+  var ea=Math.round(Number(document.getElementById('tb-m-eactual').value)||0);
+  var ca=Math.round(Number(document.getElementById('tb-m-cactual').value)||0);
+  var btn=document.getElementById('tb-save-btn'); if(btn){ btn.disabled=true; btn.textContent='Saving\u2026'; }
+  try{
+    var token=await getToken(); await _mgmtEnsureStores(token);
+    var snap=_tbSnapFor(month); if(!snap.rows) snap.rows=[];
+    var idx=snap.rows.findIndex(function(r){ return r.name===css; });
+    var row={ name:css, emailTarget:(etv===''?null:Math.round(Number(etv))), emailActual:ea, callTarget:(ctv===''?null:Math.round(Number(ctv))), callActual:ca };
+    if(idx>=0) snap.rows[idx]=row; else snap.rows.push(row);
+    snap.updatedBy=(TK.name()||TK.email()||'Josh'); snap.updatedAt=new Date().toISOString();
+    _tbStore=await _mgmtSaveMonth(token, TB_FILE, month, snap);
+    tbMgrStatus('Saved '+css+' for '+month+'.',false);
+    tbMgrRenderList(); _mgmtLiveRefresh();
+  }catch(e){ console.error('[TB] save',e); tbMgrStatus('Save failed: '+(e&&e.message||'error'),true); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='Save'; } }
+}
+async function tbMgrDelete(name){
+  if(!_isJoshUser()) return;
+  var month=document.getElementById('tb-m-month').value; if(!month) return;
+  try{
+    var token=await getToken(); await _mgmtEnsureStores(token);
+    var snap=_tbSnapFor(month); if(!snap.rows) return;
+    snap.rows=snap.rows.filter(function(r){ return r.name!==name; });
+    snap.updatedBy=(TK.name()||TK.email()||'Josh'); snap.updatedAt=new Date().toISOString();
+    _tbStore=await _mgmtSaveMonth(token, TB_FILE, month, snap);
+    tbMgrStatus('Removed '+name+'.',false); tbMgrRenderList(); _mgmtLiveRefresh();
+  }catch(e){ console.error('[TB] delete',e); tbMgrStatus('Delete failed: '+(e&&e.message||'error'),true); }
 }
 
 async function initAuth() {
@@ -4580,7 +5268,13 @@ var WHATS_NEW_RELEASES = [
       { n:4, title:'Choose Voice', tab:'performance', target:'[data-tour="choose-voice"]',
         text:'New in Dashboard Tools: Choose Voice \u2014 pick the voice used for the welcome announcement.' },
       { n:5, title:'Utilization & Hours Monitoring', tab:'performance', target:'[data-tour="uhm"]',
-        text:'Introducing Utilization & Hours Monitoring! View team utilization, paid hours, productive and non-productive hours, and unaccounted hours by Line of Business.' }
+        text:'Introducing Utilization & Hours Monitoring! View team utilization, paid hours, productive and non-productive hours, and unaccounted hours by Line of Business.' },
+      { n:6, title:'Case Surveys & CSAT', tab:'performance', target:'[data-tour="surveys"]',
+        text:'The new Case Surveys section gives you better visibility into customer feedback — monthly survey count, average CSAT score and CSAT score rating, per-CSS results, and searchable survey comments.' },
+      { n:7, title:'Leave Planner — Calendar Improvements', tab:'leave', target:'#tab-btn-leave',
+        text:'The Leave Planner calendar now uses softer pastel leave colors, clearer hover highlighting, and more noticeable Today and + Event / Task buttons (with a gentle heartbeat animation and hover tooltips). There’s also a handy clickable SAP Fiori Leave Tool link — official leave requests must still be filed through SAP Fiori.' },
+      { n:8, title:'Daily Mood Check-in', target:null,
+        text:'Say hello on the welcome page! Pick how you’re feeling today and receive a little motivational message. It’s just for you — your response is not recorded.' }
     ]
   }
 ];
@@ -4656,6 +5350,8 @@ function _wnTourShow(retry){
   var total=_wnActive.items.length;
   var it=_wnActive.items[_wnStep];
   if(!it){ wnTourDone(); return; }
+  /* v149: announcement-only items (no target) appear in the modal list but are skipped in the spotlight tour */
+  if(!it.target){ if(_wnStep<total-1){ _wnStep++; _wnTourShow(0); return; } wnTourDone(); return; }
   /* Switch to the step's tab FIRST (e.g. eLearning Compliance for step 3) */
   if(it.tab){ try{ switchTab(it.tab); }catch(_){} }
   var el=document.querySelector(it.target);
@@ -6319,7 +7015,45 @@ function sfComputeIrtOrt(cssRecords, clientRecords, nameMap) {
      filesUsed     — [ { name, type, cases } ]
 
    Returns { members: [...], ignored: [...], totalWeekdays }                */
-function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap, reportDate, monthKey, filesUsed) {
+/* v140 (E4): compute Case-Productivity leave-day deductions from Leave Planner
+   entries over [periodStart, periodEnd]. Rules: full-day leave = 1.0/weekday;
+   Half-day VL = 0.5/weekday; Holiday Leave on a weekday = 1.0 (only because an
+   entry exists); Training & Event/Task = 0; weekends = 0. Overlapping entries
+   never double-count (per member+date we keep the MAX weight). Keyed by the
+   planner display name, which equals the Case-Productivity display name. */
+function cpPlannerLeaveDeductions(entries, periodStart, periodEnd) {
+  var perMemberDate = {};
+  (entries || []).forEach(function(lv) {
+    if (!lv || lv.kind === 'event') return;            /* events/tasks are never leave */
+    if (!lv.startDate || !lv.endDate)   return;
+    if (lv.leaveType === 'Training')    return;        /* training is not a leave deduction */
+    var name = lv.name; if (!name) return;
+    var weight = (lv.leaveType === 'Half-day VL') ? 0.5 : 1.0;
+    var s = new Date(lv.startDate + 'T00:00:00');
+    var e = new Date(lv.endDate   + 'T00:00:00');
+    var cs = s > periodStart ? s : periodStart;
+    var ce = e < periodEnd   ? e : periodEnd;
+    var cur = new Date(cs);
+    while (cur <= ce) {
+      var dow = cur.getDay();
+      if (dow !== 0 && dow !== 6) {                      /* weekdays only */
+        var ds = cur.getFullYear() + '-' + String(cur.getMonth()+1).padStart(2,'0') + '-' + String(cur.getDate()).padStart(2,'0');
+        if (!perMemberDate[name]) perMemberDate[name] = {};
+        if (!perMemberDate[name][ds] || weight > perMemberDate[name][ds]) perMemberDate[name][ds] = weight;
+      }
+      cur.setDate(cur.getDate() + 1);
+    }
+  });
+  var map = {};
+  Object.keys(perMemberDate).forEach(function(name) {
+    var sum = 0;
+    Object.keys(perMemberDate[name]).forEach(function(d) { sum += perMemberDate[name][d]; });
+    map[name] = sum;
+  });
+  return map;
+}
+
+function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap, reportDate, monthKey, filesUsed, plannerActive, plannerEntries) {
   var result  = {};   /* dashName → accum */
   var ignored = {};   /* sfName → count (for diagnostics) */
 
@@ -6410,6 +7144,17 @@ function sfComputeCaseProductivity(cssRecords, clientRecords, nameMap, leaveMap,
   }
 
   /* ── Build per-member output ─────────────────────────────────────── */
+  /* v140 (E4): Nov-2026-onward uses the Leave Planner as the leave source;
+     earlier months keep the Excel-derived leave map. Diagnostic (console only). */
+  if (plannerActive) {
+    var _pMap = cpPlannerLeaveDeductions(plannerEntries, periodStart, periodEnd);
+    leaveMap = _pMap;
+    console.log('[CP-SF] LEAVE SOURCE = Leave Planner (team-josh-leaves.json) for ' + monthKey +
+                ' \u2014 deductions: ' + JSON.stringify(_pMap));
+  } else {
+    console.log('[CP-SF] LEAVE SOURCE = Excel workbook (Team Josh Dashboard Data.xlsx) for ' + monthKey);
+  }
+
   var members = [];
   Object.keys(result).forEach(function(dn) {
     var m = result[dn];
@@ -6786,8 +7531,18 @@ async function sfFetchData(token, config, leaveMap, reportingMonthOverride, rawC
   }
 
   /* 11. Compute Case Productivity */
+  var _plannerActive = (monthKey >= '2026-11');
+  if (_plannerActive) {
+    try {
+      if (!lpDataFolderId) await lpResolveDataFolder(token);
+      await lpReadLeavesFile(token);
+    } catch (e) {
+      console.warn('[CP-SF] Leave Planner load failed; planner deductions may be empty for ' + monthKey + ':', e && e.message);
+    }
+  }
   var cpResult = sfComputeCaseProductivity(
-    cssRecords, clientRecords, nameMap, effectiveLeaveMap, reportDate, monthKey, filesUsed
+    cssRecords, clientRecords, nameMap, effectiveLeaveMap, reportDate, monthKey, filesUsed,
+    _plannerActive, (typeof lpLeaves !== 'undefined' ? lpLeaves : [])
   );
 
   PERF.sf.process = PERF.now() - _tProc0;   /* v109: SF parse + compute (block parse, selection, IRT/ORT + CP compute) */
@@ -6998,13 +7753,20 @@ async function fetchDashboardData(token, reportingMonthOverride) {
   var _tPL0 = PERF.now();
   const rptMonth    = _reportingMonth;
   const rptPrevMonth = prevMonthStr(rptMonth);
-  const touch_base  = parseTouchBase(tbVals, rptMonth);
+  let   touch_base  = parseTouchBase(tbVals, rptMonth);
   const surveys     = parseSurveys(svVals, config, rptMonth, rptPrevMonth);
   /* v81: Quality filtered by reporting month */
-  const quality     = parseQuality(qlVals, rptMonth);
-  _cachedQuality = quality;
+  let   quality     = parseQuality(qlVals, rptMonth);
   /* v82: PFTC filtered by reporting month */
-  const pftc        = parsePFTC(pfVals, rptMonth);
+  let   pftc        = parsePFTC(pfVals, rptMonth);
+  /* v147 (E2/E3/E4): Nov-2026-onward override from dashboard-managed JSON (same graph shapes) */
+  try {
+    await _mgmtEnsureStores(token);
+    touch_base = tbForMonth(rptMonth, touch_base);
+    quality    = qualForMonth(rptMonth, quality);
+    pftc       = pftcForMonth(rptMonth, pftc);
+  } catch(e){ console.warn('[Mgmt] store override skipped:', e && e.message); }
+  _cachedQuality = quality;
   _cachedPftc = pftc;
 
   /* v82: re-parse leave_map for the selected reporting month (not just Config month) */
@@ -8993,6 +9755,7 @@ function buildDashboard(D) {
   renderCpTable(p.cpA);
   try{ uhmRenderDisplay(); }catch(e){}   /* v129: utilization snapshot for selected month */
   renderSvTable(p.svRaw, p.cfgForSv);
+  try{ survRenderDisplay(); }catch(e){}   /* v140 (E2): CSAT view for Nov-2026+ */
   renderQualityNote(p.ql);
   renderFooter(p.cfg);
   renderIrtOrt(p);
@@ -9068,6 +9831,7 @@ async function onReportingMonthChange() {
   /* ── Re-run SF pipeline for the new month ────────────────────────── */
   try {
     destroyAll();
+    try { await _mgmtEnsureStores(t); } catch(e){ console.warn('[Mgmt] ensure stores:', e && e.message); }
     var sfResult = await sfFetchData(t, D.config, D._raw_leaveMap || {}, _reportingMonth, _rawCpVals);
 
     /* Build new D with updated SF data */
@@ -9085,7 +9849,7 @@ async function onReportingMonthChange() {
     D.sf_violation_details = sfResult.violationDetails || [];
 
     /* ── Re-parse Touch Base for selected month ───────────────────── */
-    D.touch_base = parseTouchBase(D._raw_tbVals, _reportingMonth);
+    D.touch_base = tbForMonth(_reportingMonth, parseTouchBase(D._raw_tbVals, _reportingMonth));
 
     /* ── Re-parse Surveys for selected + previous month ───────────── */
     var pMon = rptMon > 1 ? rptMon - 1 : 12;
@@ -9102,12 +9866,12 @@ async function onReportingMonthChange() {
 
     /* v81: Re-parse Quality for selected month */
     if (D._raw_qlVals) {
-      D.quality = parseQuality(D._raw_qlVals, _reportingMonth);
+      D.quality = qualForMonth(_reportingMonth, parseQuality(D._raw_qlVals, _reportingMonth));
     }
 
     /* v82: Re-parse PFTC for selected month */
     if (_rawPfVals) {
-      D.pftc = parsePFTC(_rawPfVals, _reportingMonth);
+      D.pftc = pftcForMonth(_reportingMonth, parsePFTC(_rawPfVals, _reportingMonth));
     }
 
     /* Update config month/year for header display */
@@ -9241,6 +10005,7 @@ async function loadAndBuild(token) {
   iosLoad(t).catch(e => console.warn('[IOS] Snapshot load failed:', e && e.message));
   /* v129: load the manual Utilization snapshots — non-blocking, non-fatal */
   uhmLoad(t).catch(e => console.warn('[UHM] Snapshot load failed:', e && e.message));
+  survLoad(t).catch(e => console.warn('[SURV] Snapshot load failed:', e && e.message));
 }
 
 /* Refresh button handler */
@@ -9307,18 +10072,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 const LP_DATA_FILE = 'team-josh-leaves.json';
 
 const LP_META = {
-  'Vacation Leave':            { bg:'#5D36FF', fg:'#FFFFFF', abbr:'VL'    },
-  'Sick Leave':                { bg:'#BB0000', fg:'#FFFFFF', abbr:'SL'    },
-  'Solo Parent Leave':         { bg:'#7B2FBE', fg:'#FFFFFF', abbr:'SPL'   },
-  'Maternity/Paternity Leave': { bg:'#C0197D', fg:'#FFFFFF', abbr:'ML/PL' },
-  'Unpaid Leave':              { bg:'#6D7990', fg:'#FFFFFF', abbr:'UL'    },
-  'Bereavement Leave':         { bg:'#3D4F5D', fg:'#FFFFFF', abbr:'BL'    },
-  'Holiday Leave':             { bg:'#107E3E', fg:'#FFFFFF', abbr:'HL'    },
-  'Half-day VL':               { bg:'#71B9FF', fg:'#1C0C6E', abbr:'HDVL'  },
-  'Carers Leave':              { bg:'#049F9A', fg:'#FFFFFF', abbr:'CL'    },
-  'Emergency Leave':           { bg:'#E76500', fg:'#FFFFFF', abbr:'EL'    },
-  'Other':                     { bg:'#2CE0BF', fg:'#1D2329', abbr:null    },
-  'Training':                  { bg:'#0070F2', fg:'#FFFFFF', abbr:'TR'    }
+  'Vacation Leave':            { bg:'#E7E0FF', fg:'#4327B8', abbr:'VL'    },
+  'Sick Leave':                { bg:'#FCE0E0', fg:'#B42318', abbr:'SL'    },
+  'Solo Parent Leave':         { bg:'#EFE0FA', fg:'#6A23A8', abbr:'SPL'   },
+  'Maternity/Paternity Leave': { bg:'#FBDCEE', fg:'#A8186E', abbr:'ML/PL' },
+  'Unpaid Leave':              { bg:'#E7EBF1', fg:'#52607A', abbr:'UL'    },
+  'Bereavement Leave':         { bg:'#E1E7EC', fg:'#3D4F5D', abbr:'BL'    },
+  'Holiday Leave':             { bg:'#DFF3E6', fg:'#1E7A43', abbr:'HL'    },
+  'Half-day VL':               { bg:'#DCECFF', fg:'#1C5FA8', abbr:'HDVL'  },
+  'Carers Leave':              { bg:'#D7F2F1', fg:'#06756F', abbr:'CL'    },
+  'Emergency Leave':           { bg:'#FDE6D3', fg:'#B44E00', abbr:'EL'    },
+  'Other':                     { bg:'#D6F7F0', fg:'#0A7D6B', abbr:null    },
+  'Training':                  { bg:'#DBEAFE', fg:'#0A59C0', abbr:'TR'    }
 };
 
 function lpGetMeta(leaveType, customType) {
@@ -9742,6 +10507,30 @@ function lpRenderCalendar() {
 
     cell.appendChild(entriesDiv);
 
+    /* v139: event/task pills — visually distinct; excluded from all leave math */
+    var dayEvents = lpEventsForDate(dateStr);
+    if (dayEvents.length) {
+      var evDiv = document.createElement('div');
+      evDiv.className = 'lp-day-events';
+      dayEvents.slice(0, 3).forEach(function(ev) {
+        var ep = document.createElement('div');
+        ep.className = 'lp-event-pill';
+        ep.textContent = '\u2691 ' + ev.title;
+        ep.title = ev.title + (ev.startDate !== ev.endDate ? ' (' + lpFmtDate(ev.startDate) + ' \u2013 ' + lpFmtDate(ev.endDate) + ')' : '');
+        ep.addEventListener('click', function(e){ e.stopPropagation(); lpOpenEventForm(null, ev.id); });
+        evDiv.appendChild(ep);
+      });
+      var evOver = dayEvents.length - 3;
+      if (evOver > 0) {
+        var em = document.createElement('div');
+        em.className = 'lp-event-pill lp-event-more';
+        em.textContent = '+' + evOver + ' more';
+        em.addEventListener('click', function(e){ e.stopPropagation(); lpOpenEventForm(null, dayEvents[3].id); });
+        evDiv.appendChild(em);
+      }
+      cell.appendChild(evDiv);
+    }
+
     /* Click empty space in current-month cell → add leave */
     if (!isOther) {
       cell.addEventListener('click', () => lpOpenAddDialog(dateStr));
@@ -9761,7 +10550,7 @@ function lpLeavesForDate(dateStr) {
   const dow = new Date(dateStr + 'T00:00:00').getDay(); /* 0=Sun, 6=Sat */
   if (dow === 0 || dow === 6) return [];
   return lpLeaves.filter(lv =>
-    lv.startDate && lv.endDate &&
+    lv.startDate && lv.endDate && lv.kind !== 'event' &&
     lv.startDate <= dateStr && lv.endDate >= dateStr
   );
 }
@@ -9806,7 +10595,7 @@ function lpRenderMonthSummary() {
                     String(mEnd.getDate()).padStart(2,'0');
 
   const overlapping = lpLeaves.filter(lv =>
-    lv.startDate && lv.endDate &&
+    lv.startDate && lv.endDate && lv.kind !== 'event' &&
     lv.startDate <= mEndStr && lv.endDate >= mStartStr
   );
 
@@ -10164,6 +10953,64 @@ async function lpSaveLeave() {
 /* ════════════════════════════════════════════════════════════════════════════
    VIEW DIALOG
 ════════════════════════════════════════════════════════════════════════════ */
+/* v139: EVENT / TASK entries — informational only, NEVER counted as leave */
+let lpEventEditId = null;
+function lpEventsForDate(dateStr){
+  return lpLeaves.filter(function(lv){ return lv && lv.kind === 'event' && lv.startDate && lv.endDate && lv.startDate <= dateStr && lv.endDate >= dateStr; });
+}
+function lpOpenEventForm(dateStr, editId){
+  if (!lpDataFolderId) { showToast('Leave Planner is still loading \u2014 please wait a moment and try again.'); return; }
+  lpEventEditId = editId || null;
+  var t=document.getElementById('lp-ev-title'), s=document.getElementById('lp-ev-start'), e=document.getElementById('lp-ev-end');
+  var del=document.getElementById('lp-ev-del-btn'), ttl=document.getElementById('lp-event-title');
+  if (editId) {
+    var ev=lpLeaves.find(function(l){ return l.id===editId; });
+    if (ev) { if(t)t.value=ev.title||''; if(s)s.value=ev.startDate||''; if(e)e.value=(ev.endDate && ev.endDate!==ev.startDate)?ev.endDate:''; }
+    if (del) del.style.display=''; if (ttl) ttl.textContent='Edit Event / Task';
+  } else {
+    if(t)t.value=''; if(s)s.value=dateStr||''; if(e)e.value=''; if(del)del.style.display='none'; if(ttl)ttl.textContent='Add Event / Task';
+  }
+  var ov=document.getElementById('lp-event-overlay'); if(ov) ov.classList.remove('hidden');
+}
+function lpCloseEventForm(){ var ov=document.getElementById('lp-event-overlay'); if(ov) ov.classList.add('hidden'); lpEventEditId=null; }
+async function lpSaveEvent(){
+  if (!lpDataFolderId) { showToast('Leave Planner is still loading \u2014 please try again.'); return; }
+  var title=(document.getElementById('lp-ev-title').value||'').trim();
+  var s=document.getElementById('lp-ev-start').value;
+  var e=document.getElementById('lp-ev-end').value;
+  if (!title) { showToast('Please enter an event / task title.'); return; }
+  if (!s)     { showToast('Please select a start date.'); return; }
+  var endDate = e || s;
+  if (endDate < s) { showToast('End date cannot be before start date.'); return; }
+  var btn=document.getElementById('lp-ev-save-btn'); if(btn){ btn.disabled=true; btn.textContent=lpEventEditId?'Updating\u2026':'Saving\u2026'; }
+  var wasEdit = !!lpEventEditId;
+  try{
+    var token=await getToken();
+    if (wasEdit) {
+      var idx=lpLeaves.findIndex(function(l){ return l.id===lpEventEditId; });
+      if (idx>=0) lpLeaves[idx]=Object.assign({}, lpLeaves[idx], { kind:'event', title:title, startDate:s, endDate:endDate });
+    } else {
+      lpLeaves.push({ id:lpNewId(), kind:'event', title:title, startDate:s, endDate:endDate, addedBy:(TK.name()||'Dashboard User'), addedAt:new Date().toISOString() });
+    }
+    await lpWriteLeavesFile(token);
+    showToast(wasEdit?'Event / task updated.':'Event / task saved.');
+    lpCloseEventForm(); lpRenderCalendar();
+  }catch(err){ console.error('[LP] Event save error:', err); showToast('Save failed: '+(err&&err.message||'error')); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='Save'; } }
+}
+async function lpDeleteEvent(){
+  if (!lpEventEditId) return;
+  var id=lpEventEditId;
+  var btn=document.getElementById('lp-ev-del-btn'); if(btn){ btn.disabled=true; btn.textContent='Deleting\u2026'; }
+  try{
+    var token=await getToken();
+    lpLeaves = lpLeaves.filter(function(l){ return l.id!==id; });
+    await lpWriteLeavesFile(token);
+    showToast('Event / task deleted.');
+    lpCloseEventForm(); lpRenderCalendar();
+  }catch(err){ console.error('[LP] Event delete error:', err); showToast('Delete failed: '+(err&&err.message||'error')); if(btn){ btn.disabled=false; btn.textContent='Delete'; } }
+}
+
 function lpOpenView(id) {
   const lv = lpLeaves.find(l => l.id === id);
   if (!lv) return;
@@ -10768,7 +11615,7 @@ function cafRenderTable(rows) {
   /* ── Data rows ── */
   const dataRows = sorted.length
     ? sorted.map((r, i) =>
-        '<tr>' +
+        '<tr class="caf-data-row" data-row="' + i + '" title="Double-click to view full client details">' +
           cols.map(c => '<td>' + cafCellHtml(c, r) + '</td>').join('') +
           '<td class="caf-td-action">' +
             '<button class="caf-req-btn" data-row="' + i + '">Request Update</button>' +
@@ -10834,8 +11681,14 @@ function cafRenderTable(rows) {
     tbody.addEventListener('click', e => {
       const btn = e.target.closest('.caf-req-btn');
       if (!btn) return;
-      const idx = parseInt(btn.dataset.row, 10);
-      cafOpenRequestUpdate(idx);
+      cafTeamsRedirect();                 /* v140 (E3): redirect to Teams, no email */
+    });
+    /* v140 (E3): double-click a row to open the client detail drawer */
+    tbody.addEventListener('dblclick', e => {
+      if (e.target.closest('.caf-req-btn') || e.target.closest('input')) return;
+      const tr = e.target.closest('tr.caf-data-row');
+      if (!tr) return;
+      cafOpenDrawer(parseInt(tr.dataset.row, 10));
     });
   }
 
@@ -11033,6 +11886,9 @@ let cafReqRow             = null;  /* the specific CAF record being updated     
 let cafReqSelectedIndices = [];    /* column indices saved for Back navigation     */
 let cafReqHtml            = '';    /* generated HTML email content (ClipboardItem) */
 let cafReqPlain           = '';    /* plain-text fallback for clipboard            */
+let cafReqSubject         = '';    /* v139: email subject for direct send          */
+let cafReqEmailBody       = '';    /* v139: email HTML body (greeting onward)      */
+let _cafSending           = false; /* v139: in-flight guard (prevents dup sends)   */
 
 /* ── Open field-selection dialog for the row at the given display index ──
    idx >= 0  →  fresh open (sets cafReqRow, resets selection)
@@ -11211,6 +12067,10 @@ function cafGenerateTemplate() {
     '</table>' +
     '<p style="margin:10px 0 0;font-family:Arial,sans-serif;font-size:13px">Thank you.</p>';
 
+  /* v139: store subject + clean HTML body (greeting onward) for direct send */
+  cafReqSubject   = emailSubject;
+  cafReqEmailBody = cafReqHtml.replace(/^[\s\S]*?(<p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px">Hello,)/, '$1');
+
   /* ── Plain-text fallback ── */
   cafReqPlain =
     'Email Subject: ' + emailSubject + '\n\n' +
@@ -11233,9 +12093,10 @@ function cafGenerateTemplate() {
 
   document.getElementById('caf-tmpl-body').innerHTML =
     '<div class="caf-tmpl-guide">' +
-      'Click <strong>Copy Email Template</strong> below, paste into a new email, ' +
-      'fill in the <em>Updated Information</em> column, then send to ' +
-      '<a href="mailto:Josh.Nacional@sap.com">Josh.Nacional@sap.com</a>.' +
+      'Review the request below, then click <strong>Send Email to Josh</strong>. It will be sent ' +
+      'directly to <strong>Josh.Nacional@sap.com</strong> from your signed-in account' +
+      (((typeof TK!=='undefined' && TK.email && TK.email()) ? (' (' + cafEsc(TK.email()) + ')') : '')) + '. ' +
+      'Leave the <em>Updated Information</em> column for Josh to complete.' +
     '</div>' +
     '<div class="caf-tmpl-subject-wrap">' +
       '<div class="caf-tmpl-subject-lbl">Email Subject</div>' +
@@ -11257,17 +12118,19 @@ function cafGenerateTemplate() {
       '</table>' +
       '<div class="caf-tmpl-para caf-tmpl-closing">Thank you.</div>' +
     '</div>' +
+    '<div class="caf-send-error" id="caf-send-error" style="display:none"></div>' +
     '<div class="caf-tmpl-actions">' +
       '<button class="caf-dlg-cancel" id="caf-back-btn">\u2190 Back</button>' +
       '<div class="caf-tmpl-actions-right">' +
-        '<button class="caf-copy-btn" id="caf-copy-btn">Copy Email Template</button>' +
+        '<button class="caf-copy-btn" id="caf-send-btn">Send Email to Josh</button>' +
         '<button class="caf-dlg-primary" id="caf-done-btn">Done</button>' +
       '</div>' +
     '</div>';
 
   /* Attach handlers */
+  _cafSending = false;
   document.getElementById('caf-back-btn').addEventListener('click', cafGoBack);
-  document.getElementById('caf-copy-btn').addEventListener('click', cafCopyTemplate);
+  document.getElementById('caf-send-btn').addEventListener('click', cafSendEmail);
   document.getElementById('caf-done-btn').addEventListener('click', cafDoneReq);
 
   /* Show template; hide field-selection (no state clear) */
@@ -11353,6 +12216,40 @@ function cafCopyFallback(text, cb) {
   try { document.execCommand('copy'); cb(); } catch(e) {}
   document.body.removeChild(ta);
 }
+
+/* v140 (E3): The CAF-specific email generation/sending workflow has been REMOVED.
+   Request Update now redirects to the Client Status Monitoring Form in Microsoft
+   Teams. This former sender is kept as a defensive no-op and NEVER calls Microsoft
+   Graph /me/sendMail. (The dashboard's other email/Teams notification builders are
+   unaffected.) */
+function cafSendEmail(){ cafTeamsRedirect(); }
+
+/* v140 (E3): client detail drawer + Teams redirect */
+var CAF_TEAMS_URL = 'https://teams.microsoft.com/l/channel/19%3A97b30e91958f40ceb7241db45e09d89a%40thread.tacv2/Client%20Status%20Monitoring%20Form?groupId=17b94001-08be-4681-a986-d7edaa80d763&tenantId=42f7676c-f455-423c-82f6-dc2d99791af7';
+function cafOpenDrawer(idx){
+  if (!cafParsed || !cafCurrentRows) return;
+  var row = cafCurrentRows[idx]; if (!row) return;
+  var cols = cafParsed.displayCols || [];
+  var acct = cafParsed.acctCol ? (row[cafParsed.acctCol] || '') : '';
+  var titleEl = document.getElementById('caf-dr-title');
+  if (titleEl) titleEl.textContent = acct || 'Client Details';
+  var bodyEl = document.getElementById('caf-dr-body');
+  if (bodyEl) bodyEl.innerHTML = cols.map(function(c){
+    var v = row[c.key]; v = (v == null ? '' : String(v));
+    return '<div class="caf-dr-field"><div class="caf-dr-lbl">' + cafEsc(c.label) + '</div>' +
+           '<div class="caf-dr-val">' + (v ? cafEsc(v) : '<span class="caf-dr-empty">\u2014</span>') + '</div></div>';
+  }).join('');
+  var ov = document.getElementById('caf-drawer-overlay');
+  if (ov) { ov.classList.remove('hidden'); if(bodyEl) bodyEl.scrollTop=0; requestAnimationFrame(function(){ ov.classList.add('open'); if(bodyEl) bodyEl.scrollTop=0; }); }
+}
+function cafCloseDrawer(){
+  var ov = document.getElementById('caf-drawer-overlay'); if (!ov) return;
+  ov.classList.remove('open');
+  setTimeout(function(){ ov.classList.add('hidden'); }, 280);
+}
+function cafTeamsRedirect(){ var ov = document.getElementById('caf-teams-overlay'); if (ov) ov.classList.remove('hidden'); }
+function cafCloseTeams(){ var ov = document.getElementById('caf-teams-overlay'); if (ov) ov.classList.add('hidden'); }
+function cafTeamsGo(){ window.open(CAF_TEAMS_URL, '_blank', 'noopener'); cafCloseTeams(); }
 
 /* ════════════════════════════════════════════════════════════════════════════
    SECTION 24 — eLEARNING COMPLIANCE
@@ -12716,6 +13613,316 @@ async function uhmLoad(token){
   }catch(e){ console.warn('[UHM] snapshot load failed (non-fatal):', e&&e.message); uhmRenderDisplay(); }
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   v140 (E2) — CASE SURVEYS: CSAT + COMMENTS
+   Nov-2026-onward uses an uploaded Salesforce survey export (Josh-only upload);
+   Oct-2026 and earlier keep the existing month-on-month comparison. Original
+   .xlsx preserved in OneDrive "Case Survey Dump"; processed, per-month data in
+   team-josh-surveys.json. Workbook read via the existing Graph workbook API.
+════════════════════════════════════════════════════════════════════════════ */
+var SURV_FILE = 'team-josh-surveys.json';
+var SURV_DUMP_NAME = 'Case Survey Dump';
+var _survStore = { schema:1, months:{} };
+var _survDraft = null;
+var _survArchived = null;   /* v141 (E2-A): verified Case Survey Dump item */
+var survDumpFolderId = null;
+
+function survEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function survMonthLabel(ym){ if(!ym||ym.length<7) return ym||''; var mo=parseInt(ym.slice(5,7),10); return (MONTH_NAMES[mo-1]||ym)+' '+ym.slice(0,4); }
+function survSetStatus(msg,isErr){ var s=document.getElementById('surv-status'); if(s){ s.textContent=msg; s.className='surv-status'+(isErr?' surv-status-err':''); } }
+function survFmtDate(raw){
+  if(raw==null||raw==='') return '';
+  if(typeof raw==='number'){ try{ var d=excelSerialToDate(raw); return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear(); }catch(_){ return String(raw); } }
+  return String(raw).trim();
+}
+
+function survParse(values){
+  var res={ records:[], excludedInvalid:0, excludedDup:0, subtotalRows:0, period:'', mismatch:'' };
+  if(!values || !values.length){ res.mismatch='Empty worksheet.'; return res; }
+  var hi=-1, cols={};
+  for(var r=0;r<values.length;r++){
+    var row=values[r]||[];
+    var norm=row.map(function(c){ return (c==null?'':String(c)).replace(/\s+/g,' ').trim(); });
+    var hasOwner=norm.some(function(c){ return /case owner/i.test(c) && /full name/i.test(c); });
+    var hasRating=norm.some(function(c){ return /case resolved easily/i.test(c) && !/comment/i.test(c); });
+    if(hasOwner && hasRating){
+      hi=r;
+      norm.forEach(function(c,ci){ var lc=c.toLowerCase();
+        if(/case owner/.test(lc) && /full name/.test(lc)) { if(cols.owner==null) cols.owner=ci; }
+        else if(/case number/.test(lc)) { if(cols.caseNum==null) cols.caseNum=ci; }
+        else if(/survey sent date/.test(lc)) { if(cols.date==null) cols.date=ci; }
+        else if(/survey response/.test(lc)) { if(cols.resp==null) cols.resp=ci; }
+        else if(/survey contact/.test(lc)) { if(cols.contact==null) cols.contact=ci; }
+        else if(/account name/.test(lc)) { if(cols.account==null) cols.account=ci; }
+        else if(/case resolved easily/.test(lc) && /comment/.test(lc)) { cols.comment=ci; }
+        else if(/case resolved easily/.test(lc)) { if(cols.rating==null) cols.rating=ci; }
+        else if(/created by/.test(lc)) { if(cols.createdBy==null) cols.createdBy=ci; }
+      });
+      break;
+    }
+  }
+  if(hi<0 || cols.owner==null || cols.rating==null || cols.resp==null){
+    res.mismatch='Could not locate the expected columns (Case Owner: Full Name, Case Resolved Easily, Survey Response). The Salesforce export structure may have changed.';
+    return res;
+  }
+  for(var r2=0;r2<hi;r2++){
+    var line=(values[r2]||[]).map(function(c){ return c==null?'':String(c); }).join(' ');
+    var m=line.match(/\((\d{1,2})\/(\d{1,2})\/(\d{4})\s+to\s+(\d{1,2})\/(\d{1,2})\/(\d{4})\)/);
+    if(m){ res.period=m[3]+'-'+String(parseInt(m[1],10)).padStart(2,'0'); break; }
+  }
+  var seen={}, lastOwner='';
+  for(var i=hi+1;i<values.length;i++){
+    var drow=values[i]||[];
+    var ownerCell=(drow[cols.owner]==null?'':String(drow[cols.owner])).replace(/\s+/g,' ').trim();
+    var ownerClean=ownerCell.replace(/[\u2191\u2193\u2b06\u2b07]/g,'').trim();
+    if(/^(subtotal|total|grand total|count)$/i.test(ownerClean)){ res.subtotalRows++; continue; }
+    if(ownerClean) lastOwner=ownerClean;
+    var resp=(drow[cols.resp]==null?'':String(drow[cols.resp])).trim();
+    var caseNum=(cols.caseNum!=null && drow[cols.caseNum]!=null)?String(drow[cols.caseNum]).trim():'';
+    if(!resp && !caseNum) continue;
+    if(!lastOwner) continue;
+    var dedupKey=resp || ('CN:'+caseNum);
+    if(seen[dedupKey]){ res.excludedDup++; continue; }
+    var rn=parseInt(String(drow[cols.rating]==null?'':drow[cols.rating]).trim(),10);
+    if(isNaN(rn) || rn<1 || rn>5){ res.excludedInvalid++; seen[dedupKey]=true; continue; }
+    seen[dedupKey]=true;
+    res.records.push({
+      owner:lastOwner, caseNumber:caseNum, response:resp,
+      account:(cols.account!=null&&drow[cols.account]!=null)?String(drow[cols.account]).trim():'',
+      contact:(cols.contact!=null&&drow[cols.contact]!=null)?String(drow[cols.contact]).trim():'',
+      rating:rn,
+      comment:(cols.comment!=null&&drow[cols.comment]!=null)?String(drow[cols.comment]).trim():'',
+      date:survFmtDate(cols.date!=null?drow[cols.date]:'')
+    });
+  }
+  if(!res.period && res.records.length){
+    var mm=String(res.records[0].date||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(mm) res.period=mm[3]+'-'+String(parseInt(mm[1],10)).padStart(2,'0');
+  }
+  return res;
+}
+
+function survComputeSnapshot(pr, reportingMonth, fileName, nameMap){
+  nameMap=nameMap||{};
+  var byMember={};
+  pr.records.forEach(function(rec){
+    var canon=nameMap[(rec.owner||'').toLowerCase()] || rec.owner;
+    rec._canon=canon;
+    if(!byMember[canon]) byMember[canon]={ name:canon, count:0, sum:0, sat:0 };
+    byMember[canon].count++; byMember[canon].sum+=rec.rating; if(rec.rating>=4) byMember[canon].sat++;
+  });
+  var members=Object.keys(byMember).map(function(k){ var m=byMember[k];
+    return { name:m.name, count:m.count, avgCsat:Math.round((m.sum/m.count)*100)/100, csatPct:Math.round((m.sat/m.count)*1000)/10 }; });
+  members.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  var tc=pr.records.length, ts=0, tsat=0;
+  pr.records.forEach(function(r){ ts+=r.rating; if(r.rating>=4) tsat++; });
+  var comments=pr.records.map(function(r){ return { member:r._canon, date:r.date, account:r.account, caseNumber:r.caseNumber, rating:r.rating, comment:r.comment, response:r.response }; });
+  return {
+    reportingMonth:reportingMonth, uploadedAt:new Date().toISOString(),
+    uploadedBy:(TK.name()||TK.email()||'Josh Nacional'), fileName:fileName||'', sourcePeriod:pr.period||'',
+    totals:{ count:tc, avgCsat: tc?Math.round((ts/tc)*100)/100:0, csatPct: tc?Math.round((tsat/tc)*1000)/10:0 },
+    members:members, comments:comments,
+    excluded:{ invalidRating:pr.excludedInvalid, duplicates:pr.excludedDup, subtotalRows:pr.subtotalRows }
+  };
+}
+
+async function survResolveDumpFolder(token){
+  if(survDumpFolderId) return;
+  if(!lpDataFolderId) await lpResolveDataFolder(token);
+  var kids=await graphGet('/drives/'+excelDriveId+'/items/'+lpDataFolderId+'/children?$select=id,name,folder', token);
+  var hit=((kids&&kids.value)||[]).find(function(c){ return c.folder && String(c.name).trim().toLowerCase()===SURV_DUMP_NAME.toLowerCase(); });
+  if(!hit) throw new Error('OneDrive folder "'+SURV_DUMP_NAME+'" not found next to Salesforce Exports.');
+  survDumpFolderId=hit.id;
+  console.log('[SURV] Dump folder resolved:', survDumpFolderId);
+}
+
+async function survReadUploadedValues(token, itemId){
+  var wl=await graphGet('/drives/'+excelDriveId+'/items/'+itemId+'/workbook/worksheets?$select=name', token);
+  var names=((wl&&wl.value)||[]).map(function(w){ return w.name; });
+  var sheet=names.find(function(n){ return /survey/i.test(n); }) || names[0];
+  if(!sheet) throw new Error('No worksheet found in the uploaded workbook.');
+  var enc=encodeURIComponent(sheet);
+  var ur=await graphGet('/drives/'+excelDriveId+'/items/'+itemId+'/workbook/worksheets/'+enc+'/usedRange(valuesOnly=true)', token);
+  return (ur&&ur.values)?ur.values:[];
+}
+
+/* v141 (E2-A): collision-safe filename for the Case Survey Dump archive. */
+async function survUniqueName(token, dumpId, name){
+  function exists(nm){
+    return graphGet('/drives/'+excelDriveId+'/items/'+dumpId+':/'+encodeURIComponent(nm), token)
+      .then(function(){ return true; }).catch(function(){ return false; });
+  }
+  if(!(await exists(name))) return name;
+  var dot=name.lastIndexOf('.');
+  var base=dot>0?name.slice(0,dot):name;
+  var ext=dot>0?name.slice(dot):'';
+  var stamp=new Date().toISOString().replace(/[:T]/g,'-').slice(0,19);
+  return base+' ('+stamp+')'+ext;
+}
+
+async function survUploadFile(ev){
+  if(!_isJoshUser()){ survSetStatus('Not authorized \u2014 survey upload is restricted to Josh Nacional.', true); return; }
+  var f=ev.target.files && ev.target.files[0]; if(!f) return;
+  _survDraft=null; _survArchived=null;
+  var ab=document.getElementById('surv-approve-btn'); if(ab) ab.disabled=true;
+  var pv=document.getElementById('surv-preview'); if(pv) pv.innerHTML='';
+  survSetStatus('Uploading workbook to Case Survey Dump\u2026', false);
+  try{
+    var token=await getToken();
+    if(!excelDriveId || !excelItemId) await resolveExcelFile(token);
+    if(!lpDataFolderId) await lpResolveDataFolder(token);
+    await survResolveDumpFolder(token);
+    var buf=await f.arrayBuffer();
+    var finalName=await survUniqueName(token, survDumpFolderId, f.name);
+    var putUrl='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+survDumpFolderId+':/'+encodeURIComponent(finalName)+':/content';
+    var up=await fetch(putUrl,{ method:'PUT', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/octet-stream' }, body:buf });
+    if(!up.ok){ var et=''; try{ et=await up.text(); }catch(_){ } throw new Error('Upload to Case Survey Dump failed: HTTP '+up.status+(et?(' \u2014 '+et.slice(0,160)):'')); }
+    var item=await up.json();
+    /* v141 (E2-A): VERIFY the item truly resides in Case Survey Dump before claiming archival */
+    var verified=await graphGet('/drives/'+excelDriveId+'/items/'+item.id+'?$select=id,name,size,webUrl,parentReference', token);
+    if(!verified || !verified.parentReference || verified.parentReference.id!==survDumpFolderId){
+      throw new Error('Upload could not be verified in the Case Survey Dump folder \u2014 nothing was archived. Please retry.');
+    }
+    _survArchived={ id:verified.id, name:verified.name, webUrl:verified.webUrl||'', size:verified.size||0 };
+    console.log('[SURV] Archived to Case Survey Dump:', verified.name, '('+(verified.size||0)+' bytes) id='+verified.id+' parent='+verified.parentReference.id);
+    survSetStatus('Archived \u201C'+verified.name+'\u201D to Case Survey Dump ('+(verified.size||0)+' bytes). Reading workbook\u2026', false);
+    var values=await survReadUploadedValues(token, verified.id);
+    var pr=survParse(values);
+    if(pr.mismatch){ survSetStatus(pr.mismatch+' The original workbook was archived to Case Survey Dump as \u201C'+verified.name+'\u201D.', true); return; }
+    if(!pr.records.length){ survSetStatus('No valid survey responses (ratings 1\u20135) found. Excluded '+pr.excludedInvalid+' invalid, '+pr.excludedDup+' duplicate. Original archived to Case Survey Dump as \u201C'+verified.name+'\u201D.', true); return; }
+    var rm=pr.period || (typeof _reportingMonth!=='undefined'?_reportingMonth:'');
+    var nameMap=(_lastDashboardData && _lastDashboardData.config && _lastDashboardData.config.sf_name_map)?_lastDashboardData.config.sf_name_map:{};
+    _survDraft=survComputeSnapshot(pr, rm, verified.name, nameMap);
+    survRenderPreview(_survDraft);
+    survSetStatus('Archived to Case Survey Dump as \u201C'+verified.name+'\u201D. Parsed '+_survDraft.totals.count+' valid response(s) for '+survMonthLabel(rm)+'. Review below, then Approve & Publish.', false);
+    if(ab) ab.disabled=false;
+  }catch(e){ console.error('[SURV] upload error:', e); survSetStatus('Error: '+(e&&e.message||'failed')+' \u2014 nothing was archived; please retry.', true); }
+}
+
+function survRenderPreview(snap){
+  var el=document.getElementById('surv-preview'); if(!el) return;
+  var ex=snap.excluded||{};
+  var memRows=snap.members.map(function(m){ return '<tr><td class="surv-td-name">'+survEsc(m.name)+'</td><td>'+m.count+'</td><td>'+m.avgCsat.toFixed(2)+'</td><td>'+m.csatPct.toFixed(2)+'%</td></tr>'; }).join('');
+  el.innerHTML=
+    '<div class="surv-pv-head">Preview \u2014 '+survMonthLabel(snap.reportingMonth)+' <span class="surv-pv-sub">(period in workbook: '+(snap.sourcePeriod||'n/a')+')</span></div>'+
+    '<div class="surv-pv-ex">Valid responses: <strong>'+snap.totals.count+'</strong> &nbsp;|&nbsp; Overall Avg CSAT: <strong>'+snap.totals.avgCsat.toFixed(2)+' / 5</strong> &nbsp;|&nbsp; CSAT Rating: <strong>'+snap.totals.csatPct.toFixed(2)+'%</strong><br>Excluded: '+(ex.invalidRating||0)+' invalid rating, '+(ex.duplicates||0)+' duplicate, '+(ex.subtotalRows||0)+' subtotal/total row(s)</div>'+
+    '<table class="surv-tbl"><thead><tr><th>CSS Member</th><th>Responses</th><th>Avg CSAT</th><th>CSAT %</th></tr></thead><tbody>'+memRows+'</tbody></table>';
+}
+
+async function _survSaveMonth(snap){
+  if(!_isJoshUser()) throw new Error('Not authorized: survey save is restricted to Josh Nacional.');
+  var token=await getToken();
+  if(!excelDriveId || !excelItemId) throw new Error('dashboard data not fully loaded yet \u2014 let it finish, then retry');
+  if(!lpDataFolderId) await lpResolveDataFolder(token);
+  var base='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+SURV_FILE;
+  var store={ schema:1, months:{} };
+  try{ var gr=await fetch(base+':/content',{ headers:{ 'Authorization':'Bearer '+token } });
+    if(gr.ok){ var d=await gr.json(); if(d&&d.months) store=d; } }catch(_){ }
+  if(!store.months) store.months={};
+  store.months[snap.reportingMonth]=snap;
+  var resp=await fetch(base+':/content',{ method:'PUT', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/octet-stream' }, body:JSON.stringify(store,null,2) });
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  _survStore=store;
+}
+
+async function survConfirm(){
+  if(!_isJoshUser()){ survSetStatus('Not authorized.', true); return; }
+  if(!_survDraft){ survSetStatus('Nothing to publish \u2014 upload a workbook first.', true); return; }
+  var ab=document.getElementById('surv-approve-btn'); if(ab){ ab.disabled=true; ab.textContent='Publishing\u2026'; }
+  try{
+    await _survSaveMonth(_survDraft);
+    var lbl=survMonthLabel(_survDraft.reportingMonth);
+    _survDraft=null;
+    survClosePanel();
+    survRenderDisplay();
+    survSetStatus('Published survey data for '+lbl+'.', false);
+  }catch(e){ console.error('[SURV] publish error:', e); survSetStatus('Publish failed: '+(e&&e.message||'error'), true); if(ab) ab.disabled=false; }
+  finally{ if(ab){ ab.textContent='Approve & Publish'; } }
+}
+
+async function survLoad(token){
+  try{
+    if(!excelDriveId || !excelItemId){ survRenderDisplay(); return; }
+    if(!lpDataFolderId) await lpResolveDataFolder(token);
+    var url='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+SURV_FILE+':/content';
+    var resp=await fetch(url,{ headers:{ 'Authorization':'Bearer '+token } });
+    if(resp.status===404){ _survStore={ schema:1, months:{} }; survRenderDisplay(); return; }
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    var data=await resp.json();
+    _survStore=(data&&data.months)?data:{ schema:1, months:{} };
+    survRenderDisplay();
+  }catch(e){ console.warn('[SURV] load failed (non-fatal):', e&&e.message); survRenderDisplay(); }
+}
+
+function survOpenPanel(){
+  if(!_isJoshUser()) return;
+  _survDraft=null;
+  var p=document.getElementById('surv-panel'); if(p) p.style.display='block';
+  var pv=document.getElementById('surv-preview'); if(pv) pv.innerHTML='';
+  var ab=document.getElementById('surv-approve-btn'); if(ab) ab.disabled=true;
+  var fi=document.getElementById('surv-file'); if(fi) fi.value='';
+  survSetStatus('Choose the Salesforce survey .xlsx export to upload.', false);
+}
+function survClosePanel(){ var p=document.getElementById('surv-panel'); if(p) p.style.display='none'; }
+
+function survPctCls(p){ return (p>=90)?'surv-pct-hi':((p>=80)?'surv-pct-mid':'surv-pct-lo'); }
+function survTileRateCls(p){ return (p>=90)?'surv-rate-hi':((p>=80)?'surv-rate-mid':'surv-rate-lo'); }
+function survBuildCsatHtml(snap){
+  var t=snap.totals||{ count:0, avgCsat:0, csatPct:0 };
+  var tiles='<div class="surv-tiles">'+
+    '<div class="surv-tile"><div class="surv-tile-lbl">Survey Count</div><div class="surv-tile-val">'+t.count+'</div></div>'+
+    '<div class="surv-tile"><div class="surv-tile-lbl">Average CSAT</div><div class="surv-tile-val">'+(t.avgCsat||0).toFixed(2)+' <span class="surv-tile-unit">/ 5</span></div></div>'+
+    '<div class="surv-tile surv-tile-rate '+survTileRateCls(t.csatPct||0)+'"><div class="surv-tile-lbl">CSAT Score Rating</div><div class="surv-tile-val">'+(t.csatPct||0).toFixed(2)+'%</div></div>'+
+    '</div>';
+  var memRows=(snap.members||[]).map(function(m){
+    var cls=survPctCls(m.csatPct);
+    return '<tr><td class="surv-td-name">'+survEsc(m.name)+'</td><td>'+m.count+'</td><td>'+m.avgCsat.toFixed(2)+'</td><td><span class="surv-pct '+cls+'">'+m.csatPct.toFixed(2)+'%</span></td></tr>';
+  }).join('');
+  var perCss='<div class="sec-hdr">Per CSS \u2014 '+survMonthLabel(snap.reportingMonth)+'</div>'+
+    '<table class="surv-tbl"><thead><tr><th>CSS Member</th><th>Responses</th><th>Avg CSAT</th><th>CSAT %</th></tr></thead><tbody>'+memRows+'</tbody></table>';
+  var cmtRows=(snap.comments||[]).map(function(c){
+    var cm=(c.comment && c.comment.trim())? survEsc(c.comment) : '<span class="surv-cmt-empty">(no comment)</span>';
+    var key=((c.member||'')+' '+(c.account||'')+' '+(c.caseNumber||'')+' '+(c.comment||'')).toLowerCase();
+    return '<tr class="surv-cmt-row" data-k="'+survEsc(key)+'"><td>'+survEsc(c.member||'')+'</td><td>'+survEsc(c.date||'')+'</td><td>'+survEsc(c.account||'')+'</td><td>'+survEsc(c.caseNumber||'')+'</td><td class="surv-cmt-rating">'+c.rating+'</td><td class="surv-cmt-txt">'+cm+'</td></tr>';
+  }).join('');
+  var comments='<div class="sec-hdr" style="margin-top:9px">Survey Comments</div>'+
+    '<input type="text" id="surv-search" class="surv-search" placeholder="Search comments (member, client, case, text)\u2026">'+
+    '<div class="surv-cmt-wrap"><table class="surv-tbl surv-cmt-tbl"><thead><tr><th>Member</th><th>Date</th><th>Client</th><th>Case</th><th>Rating</th><th>Comment</th></tr></thead><tbody id="surv-cmt-body">'+cmtRows+'</tbody></table></div>';
+  var meta='<div class="surv-meta">Source: uploaded Salesforce survey export'+(snap.fileName?(' \u2014 '+survEsc(snap.fileName)):'')+(snap.uploadedBy?(' \u2014 by '+survEsc(snap.uploadedBy)):'')+'</div>';
+  return tiles+perCss+comments+meta;
+}
+function survWireSearch(){
+  var inp=document.getElementById('surv-search'); if(!inp) return;
+  inp.addEventListener('input', function(){
+    var q=(inp.value||'').toLowerCase().trim();
+    document.querySelectorAll('#surv-cmt-body .surv-cmt-row').forEach(function(tr){
+      tr.style.display=(!q || (tr.getAttribute('data-k')||'').indexOf(q)>=0)?'':'none';
+    });
+  });
+}
+
+/* reporting-month-aware view switch (Nov-2026 boundary) */
+function survRenderDisplay(){
+  var selMonth=(typeof _reportingMonth!=='undefined' && _reportingMonth)?_reportingMonth:'';
+  var bar=document.getElementById('sv-upload-bar');
+  if(bar){ bar.innerHTML=''; }   /* v149: Upload control moved to the Case Surveys header (sv-mgr-btn) */
+  var legacy=document.getElementById('sv-legacy-view');
+  var csat=document.getElementById('sv-csat-view');
+  var snap=(selMonth>='2026-11' && _survStore && _survStore.months)?_survStore.months[selMonth]:null;
+  if(selMonth>='2026-11'){
+    if(legacy) legacy.style.display='none';
+    if(csat){ csat.style.display='block';
+      if(snap){ csat.innerHTML=survBuildCsatHtml(snap); survWireSearch(); }
+      else { csat.innerHTML='<div class="surv-empty">No survey data uploaded for '+survMonthLabel(selMonth)+' yet.'+(_isJoshUser()?' Use <strong>Upload Survey Data</strong> above.':'')+'</div>'; }
+    }
+    console.log('[SURV] view = CSAT (Leave/Nov-boundary) for '+selMonth+' \u2014 snapshot '+(snap?'present':'absent'));
+  } else {
+    if(legacy) legacy.style.display='';
+    if(csat){ csat.style.display='none'; csat.innerHTML=''; }
+    console.log('[SURV] view = legacy month-on-month (Excel) for '+selMonth);
+  }
+}
+
 /* ── aggregates (only when accurately computable; weighted % disclosed) ──── */
 function _uhmAggregate(snap){
   var rows=[]; (snap.groups||[]).forEach(function(g){ (g.rows||[]).forEach(function(r){ rows.push(r.metrics||{}); }); });
@@ -12787,9 +13994,99 @@ function uhmRenderDisplay(){
 
 var JOSH_EMAIL = 'josh.nacional@sap.com';
 function _isJoshUser(){ try{ return (TK.email()||'').trim().toLowerCase()===JOSH_EMAIL; }catch(e){ return false; } }
+/* ════════════════════════════════════════════════════════════════════════════
+   v147 (E2/E3/E4) — DASHBOARD-MANAGED MONTHLY DATA (November 2026 onward)
+   Josh-only writes to month-keyed JSON in the Team Josh Dashboard Data folder.
+   These override the Excel-parsed objects ONLY for months >= 2026-11, feeding the
+   EXISTING Quality / PFTC / Touch Base graphs unchanged. Oct-2026 & earlier keep Excel.
+════════════════════════════════════════════════════════════════════════════ */
+var QUAL_FILE='team-josh-quality.json', PFTC_FILE='team-josh-pftc.json', TB_FILE='team-josh-touchbase.json';
+var _qualStore=null, _pftcStore=null, _tbStore=null;
+function _mgmtActiveMonth(m){ return String(m) >= '2026-11'; }
+async function _mgmtReadJson(token, file){
+  if(!excelDriveId || !excelItemId) return { schema:1, months:{} };
+  if(!lpDataFolderId) await lpResolveDataFolder(token);
+  var url='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+file+':/content';
+  var resp=await fetch(url,{ headers:{ 'Authorization':'Bearer '+token } });
+  if(resp.status===404) return { schema:1, months:{} };
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  var d=await resp.json(); return (d&&d.months)?d:{ schema:1, months:{} };
+}
+async function _mgmtEnsureStores(token){
+  if(_qualStore===null){ try{ _qualStore=await _mgmtReadJson(token,QUAL_FILE); }catch(e){ console.warn('[Qual-mgmt] load:',e&&e.message); _qualStore={schema:1,months:{}}; } }
+  if(_pftcStore===null){ try{ _pftcStore=await _mgmtReadJson(token,PFTC_FILE); }catch(e){ console.warn('[PFTC-mgmt] load:',e&&e.message); _pftcStore={schema:1,months:{}}; } }
+  if(_tbStore===null){ try{ _tbStore=await _mgmtReadJson(token,TB_FILE); }catch(e){ console.warn('[TB-mgmt] load:',e&&e.message); _tbStore={schema:1,months:{}}; } }
+}
+async function _mgmtSaveMonth(token, file, month, snap){
+  if(!_isJoshUser()) throw new Error('Not authorized: management writes are restricted to Josh Nacional.');
+  if(!excelDriveId || !excelItemId) throw new Error('dashboard data not fully loaded yet \u2014 let it finish, then retry');
+  if(!lpDataFolderId) await lpResolveDataFolder(token);
+  var base='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+file;
+  var store={ schema:1, months:{} };
+  try{ var gr=await fetch(base+':/content',{ headers:{ 'Authorization':'Bearer '+token } }); if(gr.ok){ var d=await gr.json(); if(d&&d.months) store=d; } }catch(_){ }
+  if(!store.months) store.months={};
+  if(snap===null) delete store.months[month]; else store.months[month]=snap;
+  var resp=await fetch(base+':/content',{ method:'PUT', headers:{ 'Authorization':'Bearer '+token, 'Content-Type':'application/octet-stream' }, body:JSON.stringify(store,null,2) });
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  return store;
+}
+function qualFromStore(month){
+  if(!_qualStore || !_qualStore.months) return null;
+  var snap=_qualStore.months[month]; if(!snap || !snap.rows || !snap.rows.length) return null;
+  var raw=snap.rows.map(function(r){
+    var scores=(r.scores||[]).map(Number).filter(function(x){ return !isNaN(x) && x>=0 && x<=100; });
+    var avg = scores.length ? (scores.reduce(function(a,b){return a+b;},0)/scores.length) : null;
+    return { name:r.pseudo, pseudo:r.pseudo, rating:(avg==null?null:avg/100), pct:(avg==null?0:Math.round(avg*10)/10), month:month };
+  });
+  var all_null = raw.length===0 || raw.every(function(r){ return r.rating===null; });
+  var partial_null = !all_null && raw.some(function(r){ return r.rating===null; });
+  var sorted = raw.slice().sort(function(a,b){ return (b.rating==null?-1:b.rating)-(a.rating==null?-1:a.rating); });
+  return { raw:raw, sorted:sorted, all_null:all_null, partial_null:partial_null, availableMonths:Object.keys(_qualStore.months).sort() };
+}
+function qualForMonth(month, excelObj){ if(_mgmtActiveMonth(month)){ var s=qualFromStore(month); if(s) return s; } return excelObj; }
+function pftcFromStore(month){
+  if(!_pftcStore || !_pftcStore.months) return null;
+  var snap=_pftcStore.months[month]; if(!snap || !snap.rows || !snap.rows.length) return null;
+  var raw=snap.rows.map(function(r){
+    var app=Math.round(Number(r.appreciate)||0), comm=Math.round(Number(r.commendation)||0);
+    return { name:r.name, appreciate:app, commendation:comm, total:app+comm*10, month:month };
+  });
+  var sorted=raw.slice().sort(function(a,b){ return b.total-a.total; });
+  return { raw:raw, sorted:sorted, availableMonths:Object.keys(_pftcStore.months).sort() };
+}
+function pftcForMonth(month, excelObj){ if(_mgmtActiveMonth(month)){ var s=pftcFromStore(month); if(s) return s; } return excelObj; }
+function tbFromStore(month){
+  if(!_tbStore || !_tbStore.months) return null;
+  var snap=_tbStore.months[month]; if(!snap) return null;
+  var raw=[];
+  if(snap.rows && snap.rows.length){
+    /* v148 simplified structure: per-member targets + actual counts */
+    raw=snap.rows.map(function(r){
+      return { name:r.name,
+        emails:(r.emailActual!=null?Math.round(Number(r.emailActual)):0),
+        calls:(r.callActual!=null?Math.round(Number(r.callActual)):0),
+        target:(r.emailTarget!=null && String(r.emailTarget).trim()!=='' ? Math.round(Number(r.emailTarget)) : null),
+        call_target:(r.callTarget!=null && String(r.callTarget).trim()!=='' ? Math.round(Number(r.callTarget)) : null) };
+    });
+  } else {
+    /* back-compat: aggregate any earlier client-level interaction records, if present */
+    var inter=snap.interactions||[]; var tg=snap.targets||{};
+    if(inter.length || Object.keys(tg).length){
+      var agg={}; inter.forEach(function(it){ var n=it.css; if(!n) return; if(!agg[n]) agg[n]={emails:0,calls:0}; if(it.type==='Email') agg[n].emails++; else if(it.type==='Call') agg[n].calls++; });
+      var names={}; Object.keys(agg).forEach(function(n){ names[n]=1; }); Object.keys(tg).forEach(function(n){ names[n]=1; });
+      raw=Object.keys(names).map(function(n){ var t=tg[n]; return { name:n, emails:(agg[n]?agg[n].emails:0), calls:(agg[n]?agg[n].calls:0), target:(t!=null&&String(t).trim()!==''?Math.round(Number(t)):null) }; });
+    }
+  }
+  if(!raw.length) return null;
+  var emails_sorted=raw.slice().sort(function(a,b){ return b.emails-a.emails; });
+  var calls_sorted=raw.slice().sort(function(a,b){ return b.calls-a.calls; });
+  return { raw:raw, emails_sorted:emails_sorted, calls_sorted:calls_sorted, availableMonths:Object.keys(_tbStore.months).sort() };
+}
+function tbForMonth(month, excelObj){ if(_mgmtActiveMonth(month)){ var s=tbFromStore(month); if(s) return s; } return excelObj; }
+
 function _applyUpdateGate(){
   var josh=_isJoshUser();
-  [['ios-update-btn','ios-update-note'],['elab-update-btn','elab-update-note'],['uhm-update-btn','uhm-update-note']].forEach(function(pr){
+  [['ios-update-btn','ios-update-note'],['elab-update-btn','elab-update-note'],['uhm-update-btn','uhm-update-note'],['qual-mgr-btn',null],['pftc-mgr-btn',null],['tb-mgr-btn',null],['sv-mgr-btn',null]].forEach(function(pr){
     var b=document.getElementById(pr[0]), n=document.getElementById(pr[1]);
     if(b) b.style.display = josh?'':'none';
     if(n) n.style.display = josh?'none':'';
