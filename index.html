@@ -2517,6 +2517,133 @@ html[data-theme="dark"] .elab-issue{color:#FFB366}
 .el-backtop.show{opacity:1;visibility:visible;transform:translateY(0)}
 .el-backtop:hover{filter:brightness(1.1)}
 .el-backtop svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+/* == v155: Peer Appreciation Victor -- purple/lavender premium refinement == */
+.pa-wrap{max-width:1200px;margin:0 auto;padding:6px 4px 30px}
+.pa-member-wrap{max-width:1060px;margin:0 auto}
+.pa-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.pa-col{min-width:0}
+.pa-col-head{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#fff;padding:7px 16px;border-radius:22px;margin:0 0 12px;box-shadow:0 3px 10px rgba(93,54,255,.28)}
+.pa-col-head svg{width:16px;height:16px;fill:#fff}
+.pa-col-head span{font-weight:600;opacity:.85;font-size:11px}
+.pa-col-head-mem{background:linear-gradient(135deg,#6B2FD6,#8A4BEF)}
+.pa-col-head-adm{background:linear-gradient(135deg,#4B2AA8,#6B46E0)}
+.pa-card{background:#fff;border:1px solid #E6DEFF;border-radius:16px;padding:16px 18px;margin:0 0 14px;box-shadow:0 2px 12px rgba(93,54,255,.07)}
+.pa-hero{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#4B1FA8 0%,#6B2FD6 52%,#7E3BE0 100%);border:1px solid #6B2FD6;border-radius:18px;padding:20px 22px;margin:0 0 14px;box-shadow:0 8px 24px rgba(75,31,168,.3)}
+.pa-hero-laurel{flex:none;width:62px;height:92px}
+.pa-hero-txt{flex:1;min-width:0;z-index:1}
+.pa-hero-title{font-size:25px;font-weight:800;color:#fff;letter-spacing:.3px;font-family:Georgia,'Times New Roman',serif;text-shadow:0 2px 8px rgba(0,0,0,.22);line-height:1.1}
+.pa-hero-sub{font-size:12px;color:#EADBFF;margin-top:7px;line-height:1.5;max-width:580px}
+.pa-hero-trophy{flex:none;width:92px;height:92px;position:relative}
+.pa-hero-trophy-svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+.pa-hero-trophy .pa-spark{opacity:.9;animation:paSpark 3s ease-in-out infinite}
+.pa-hero-trophy .pa-spark.s1{width:12px;height:12px;top:-2px;right:-2px}
+.pa-hero-trophy .pa-spark.s2{width:9px;height:9px;bottom:8px;left:-6px;animation-delay:1.3s}
+.pa-rules{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.pa-rule{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:#4A3B8A;background:#fff;border:1px solid #E1D8FB;border-radius:22px;padding:5px 13px;box-shadow:0 1px 4px rgba(93,54,255,.06)}
+.pa-rule b{color:#5D36FF}
+.pa-rule svg{width:13px;height:13px;flex:none}
+.pa-member-grid{display:grid;grid-template-columns:1.22fr 1fr;gap:14px;align-items:start}
+.pa-mg-col{min-width:0}
+.pa-sec-title{font-size:13px;font-weight:800;color:#2E1F6B;margin:0 0 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pa-sec-title svg{width:15px;height:15px;flex:none;fill:#6B2FD6}
+.pa-sub{font-size:11px;color:#6B5CA5;margin:-4px 0 12px;line-height:1.45}
+.pa-field{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.pa-field label{font-size:9.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#6B5CA5}
+.pa-field select,.pa-field input,.pa-field textarea{font-size:12px;padding:9px 11px;border:1px solid #DDD2F7;border-radius:10px;background:#fff;color:#2E1F6B;font-family:inherit;width:100%;box-sizing:border-box}
+.pa-field textarea{resize:vertical;min-height:52px}
+.pa-field select:focus,.pa-field input:focus,.pa-field textarea:focus{outline:none;border-color:#7452FA;box-shadow:0 0 0 3px rgba(116,82,250,.18)}
+.pa-field :disabled{background:#F6F3FF;color:#8B7EC0;cursor:not-allowed}
+.pa-nom{border:1px solid #E6DEFF;border-radius:13px;padding:13px;margin-bottom:12px;background:linear-gradient(180deg,#FBF9FF,#F6F2FF)}
+.pa-nom.p2{border-left:3px solid #F2B134}
+.pa-nom.p1{border-left:3px solid #B9A6F5}
+.pa-nom-h{font-size:11.5px;font-weight:800;color:#4A3B8A;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.pa-nom-h svg{width:15px;height:15px;flex:none}
+.pa-pts{font-size:9px;font-weight:800;color:#fff;background:linear-gradient(135deg,#F2B134,#E0A32E);border-radius:20px;padding:3px 10px;letter-spacing:.2px;white-space:nowrap}
+.pa-pts.pts-1{background:linear-gradient(135deg,#8A6BF0,#6B46E0)}
+.pa-btn{font-size:12px;font-weight:700;border:none;border-radius:11px;padding:10px 20px;cursor:pointer;background:linear-gradient(135deg,#6B2FD6,#8A4BEF);color:#fff;box-shadow:0 3px 12px rgba(107,47,214,.3);transition:filter .15s,transform .1s;display:inline-flex;align-items:center;gap:7px}
+.pa-btn:hover{filter:brightness(1.08)} .pa-btn:active{transform:scale(.98)} .pa-btn:disabled{opacity:.5;cursor:not-allowed}
+.pa-btn svg{width:14px;height:14px;fill:#fff;flex:none}
+.pa-btn-sec{background:#F1ECFF;color:#5D36FF;border:1px solid #DDD2F7;box-shadow:none}
+.pa-btn-sec svg{fill:#5D36FF}
+.pa-btn-gold{background:linear-gradient(135deg,#F2B134,#E0A32E);box-shadow:0 3px 12px rgba(224,163,46,.35)}
+.pa-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.pa-status{font-size:10.5px;color:#6B5CA5;margin-bottom:2px;line-height:1.4}
+.pa-msg{font-size:10.5px;margin:7px 0 0;min-height:13px;line-height:1.4}
+.pa-msg-ok{color:#1E7A43} .pa-msg-err{color:#B42318}
+.pa-preview-note{font-size:10px;color:#8B7EC0;font-style:italic;background:#F6F3FF;border:1px dashed #DDD2F7;border-radius:9px;padding:9px 11px;margin-top:4px}
+.pa-entry{border:1px solid #E6DEFF;border-radius:13px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.pa-entry-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.pa-entry-id{font-size:11.5px;font-weight:800;color:#2E1F6B}
+.pa-entry-badge{font-size:8.5px;font-weight:800;color:#1E7A43;background:#E3F5EA;border:1px solid #BFE6CC;border-radius:20px;padding:2px 9px}
+.pa-entry-date{font-size:9px;color:#9488BE;margin-left:auto}
+.pa-entry-row{display:flex;align-items:flex-start;gap:9px;font-size:11.5px;color:#3A2F72;margin-bottom:6px}
+.pa-entry-pts{flex:none;font-size:8.5px;font-weight:800;color:#fff;border-radius:7px;padding:3px 8px;margin-top:1px;white-space:nowrap}
+.pa-entry-pts.p2{background:linear-gradient(135deg,#F2B134,#E0A32E)} .pa-entry-pts.p1{background:linear-gradient(135deg,#8A6BF0,#6B46E0)}
+.pa-entry-nom{font-weight:800;color:#2E1F6B} .pa-entry-cmt{color:#6B5CA5;font-style:italic;margin-top:2px}
+.pa-entry-edit{color:#5D36FF;font-weight:700;text-decoration:none;font-size:10.5px}
+.pa-empty{font-size:11px;color:#8B7EC0;font-style:italic;padding:12px 2px}
+.pa-mystery{position:relative;overflow:hidden;text-align:center;background:linear-gradient(135deg,#4B1FA8 0%,#6B2FD6 55%,#8A4BEF 100%);border:1px solid #6B2FD6;border-radius:18px;padding:22px 18px 26px;box-shadow:0 8px 24px rgba(75,31,168,.28)}
+.pa-mystery-h{font-size:17px;font-weight:800;color:#fff;margin-bottom:6px;font-family:Georgia,serif;line-height:1.3;text-shadow:0 2px 6px rgba(0,0,0,.18)}
+.pa-myst-stage{position:relative;height:200px;margin:8px auto 2px;max-width:320px}
+.pa-myst-laurel{position:absolute;bottom:8px;width:56px;height:94px}
+.pa-myst-laurel.l{left:6px}
+.pa-myst-laurel.r{right:6px;transform:scaleX(-1)}
+.pa-myst-cup{position:absolute;left:50%;top:40px;width:120px;height:130px;animation:paFloat 3.4s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.pa-qbadge{position:absolute;left:50%;top:58px;transform:translateX(-50%);width:76px;height:76px;border-radius:50%;background:radial-gradient(circle at 50% 38%,#FFE9B8,#F2B134 70%,#E0A32E);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#6B2FD6;font-family:Georgia,serif;animation:paFloat 3.4s ease-in-out infinite,paGlow 2.6s ease-in-out infinite;z-index:2}
+.pa-mystery-sub{font-size:10.5px;color:#E7D9FF;margin-top:12px;line-height:1.5;max-width:300px;margin-left:auto;margin-right:auto}
+.pa-spark{position:absolute;opacity:0;animation:paSpark 3s ease-in-out infinite;pointer-events:none}
+.pa-spark svg{width:100%;height:100%;fill:#FFD66B;filter:drop-shadow(0 0 3px rgba(255,214,107,.7))}
+.pa-myst-stage .pa-spark.s1{width:16px;height:16px;top:4%;left:30%;animation-delay:.2s}
+.pa-myst-stage .pa-spark.s2{width:12px;height:12px;top:12%;right:28%;animation-delay:1.0s}
+.pa-myst-stage .pa-spark.s3{width:14px;height:14px;bottom:32%;left:14%;animation-delay:1.7s}
+.pa-myst-stage .pa-spark.s4{width:10px;height:10px;bottom:28%;right:16%;animation-delay:.6s}
+.pa-myst-stage .pa-spark.s5{width:12px;height:12px;top:42%;right:6%;animation-delay:2.1s}
+@keyframes paFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-9px)}}
+@keyframes paGlow{0%,100%{box-shadow:0 0 12px 2px rgba(242,177,52,.45)}50%{box-shadow:0 0 26px 8px rgba(242,177,52,.78)}}
+@keyframes paSpark{0%,100%{opacity:0;transform:scale(.5)}45%{opacity:1;transform:scale(1.15)}}
+.pa-showcase{display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;justify-content:center}
+.pa-sc-card{position:relative;flex:1 1 230px;background:linear-gradient(135deg,#FBF7FF,#F3ECFF);border:1px solid #E6DEFF;border-radius:16px;padding:18px 16px 16px;text-align:center;overflow:visible}
+.pa-sc-victor{flex:1 1 300px;background:linear-gradient(135deg,#FFF6E6,#FDEFD6);border:1px solid #F0D9A8}
+.pa-sc-ribbon{display:inline-block;font-size:10.5px;font-weight:800;color:#7A4E12;background:linear-gradient(135deg,#F7D27A,#E9B34B);border:1px solid #E0A32E;border-radius:7px;padding:5px 14px;margin-bottom:12px;box-shadow:0 2px 6px rgba(224,163,46,.3)}
+.pa-sc-colabel{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;color:#5D36FF;background:#EEE9FF;border:1px solid #DDD2F7;border-radius:20px;padding:3px 11px;margin-bottom:12px}
+.pa-sc-colabel svg{width:13px;height:13px}
+.pa-photo-wrap{position:relative;width:104px;height:104px;margin:0 auto 10px}
+.pa-sc-co .pa-photo-wrap{width:80px;height:80px}
+.pa-photo-laurel{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:70px;opacity:.95}
+.pa-photo-laurel.l{left:-18px}
+.pa-photo-laurel.r{right:-18px;transform:translateY(-50%) scaleX(-1)}
+.pa-photo{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid #E0A32E;box-shadow:0 4px 16px rgba(201,128,29,.4);position:relative;z-index:1;background:#EEE9FF;box-sizing:border-box}
+.pa-photo-fb{display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#fff;background:linear-gradient(135deg,#8A4BEF,#6B2FD6)}
+.pa-sc-name{font-size:19px;font-weight:800;color:#2E1F6B;font-family:Georgia,serif}
+.pa-sc-victor .pa-sc-name{font-size:22px;color:#7A4E12}
+.pa-sc-co .pa-sc-name{font-size:17px}
+.pa-sc-msg{font-size:10.5px;color:#8A6B3A;font-style:italic;margin-top:5px;line-height:1.45}
+.pa-sc-foot{font-size:10px;color:#8B7EC0;text-align:center;margin-top:12px;font-style:italic}
+.pa-ov{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.pa-ov-tile{flex:1 1 118px;min-width:102px;background:linear-gradient(180deg,#FBF9FF,#F4F0FF);border:1px solid #E6DEFF;border-top:2px solid #6B2FD6;border-radius:11px;padding:9px 10px;text-align:center}
+.pa-ov-lbl{font-size:8px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#6B5CA5;line-height:1.3}
+.pa-ov-val{font-size:19px;font-weight:800;color:#2E1F6B;line-height:1.1;margin-top:3px}
+.pa-ov-val.ok{color:#2C7A43}
+.pa-tbl{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:4px}
+.pa-tbl th{background:#F1ECFF;color:#4A3B8A;font-weight:800;font-size:8.5px;letter-spacing:.3px;text-transform:uppercase;padding:7px 8px;border-bottom:1.5px solid #DDD2F7;text-align:left}
+.pa-tbl td{padding:7px 8px;border-bottom:1px solid #EFE9FD;color:#3A2F72;vertical-align:top}
+.pa-lb-rank{font-weight:800;color:#6B2FD6}
+.pa-lb-pic{width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:center top;vertical-align:middle;margin-right:6px;border:1.5px solid #C9A2F0}
+.pa-lb-top td{background:#FBF6FF}
+.pa-search{width:100%;box-sizing:border-box;font-size:11px;padding:8px 11px;border:1px solid #DDD2F7;border-radius:10px;margin:2px 0 8px;background:#fff;color:#2E1F6B}
+.pa-tbl-wrap{max-height:300px;overflow:auto;border:1px solid #EFE9FD;border-radius:11px}
+.pa-admin-badge{font-size:9px;font-weight:800;color:#fff;background:#6B2FD6;border-radius:20px;padding:2px 9px}
+.pa-note{font-size:9px;color:#9488BE;line-height:1.5;margin-top:8px}
+.pa-cblist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.pa-cb{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#3A2F72;background:#F6F3FF;border:1px solid #DDD2F7;border-radius:20px;padding:5px 11px;cursor:pointer}
+.pa-cb input{accent-color:#6B2FD6;margin:0;cursor:pointer}
+.pa-reveal-state{display:inline-flex;align-items:center;gap:6px}
+.pa-subtabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.pa-subtab{font-size:10.5px;font-weight:700;color:#6B5CA5;background:#F4F0FF;border:1px solid #E6DEFF;border-radius:9px;padding:6px 12px;cursor:pointer}
+.pa-subtab.active{color:#fff;background:linear-gradient(135deg,#6B2FD6,#8A4BEF);border-color:#6B2FD6}
+@media(max-width:980px){.pa-admin-grid{grid-template-columns:1fr}.pa-member-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.pa-myst-cup,.pa-qbadge,.pa-spark{animation:none!important}.pa-spark{opacity:.6}}
+@media(max-width:640px){.pa-ov-tile{flex:1 1 44%}.pa-hero{flex-wrap:wrap}.pa-hero-title{font-size:21px}.pa-hero-trophy{display:none}}
 
 /* ── Member profile photos — shared by .caf-tile and .el-tile ──────────────
    54 × 54 px circular crop; photo zooms inside on tile hover.
@@ -2892,7 +3019,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       <!-- v145 (E6): metadata lives in the left column so the toolbar can center across the full header -->
       <div class="hdr-meta-bar" id="hdr-meta-bar">
         <span class="hmb-item"><strong id="hdr-version"></strong></span>
-        <span class="hmb-item">Data as of <span id="hdr-date"></span></span>
+        <span id="hdr-date" hidden></span>   <!-- v152: data-date metadata retained for renderHeader/refresh; "Data as of" display removed, consolidated into Last refreshed -->
         <span id="last-refresh" class="last-refresh"></span>
         <span id="hdr-user" class="hdr-user visible">Created &amp; Maintained by: Josh Nacional</span>
       </div>
@@ -2956,6 +3083,10 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
     <button class="tab-btn" id="tab-btn-el" onclick="switchTab('el')">
       <img class="tab-icon" id="tab-icon-el" src="" alt="" aria-hidden="true">
       <span>eLearning Compliance</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-peer" onclick="switchTab('peer')">
+      <img class="tab-icon" id="tab-icon-peer" src="" alt="" aria-hidden="true">
+      <span>Peer Appreciation</span>
     </button>
   </nav>
 
@@ -3458,6 +3589,13 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 
     </div><!-- /el-container -->
   </div><!-- /section-el -->
+
+  <!-- ══ PEER APPRECIATION TAB ════════════════════════════════════════ -->
+  <div id="section-peer" class="tab-section hidden">
+    <div class="pa-wrap">
+      <div id="pa-body"><div class="pa-empty">Loading&hellip;</div></div>
+    </div>
+  </div>
 
   <!-- ══ LEAVE PLANNER DIALOGS ════════════════════════════════════════ -->
 
@@ -5131,6 +5269,341 @@ async function tbMgrDelete(name){
   }catch(e){ console.error('[TB] delete',e); tbMgrStatus('Delete failed: '+(e&&e.message||'error'),true); }
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   v153 — PEER APPRECIATION VICTOR (monthly peer recognition)
+   Shared month-keyed JSON (team-josh-peer-appreciation.json) in the existing
+   Team Josh Dashboard Data folder, via existing delegated Graph. Member View is
+   filtered to the authenticated user's own entries; Admin View (Josh via
+   _isJoshUser) shows everything. NOTE: this is VISUAL privacy only — the shared
+   file is technically readable/writable by any authenticated member via Graph.
+════════════════════════════════════════════════════════════════════════════ */
+var PA_FILE = 'team-josh-peer-appreciation.json';
+/* v154 fix: lazy roster accessors — reference the existing rosters at CALL time (after their
+   const declarations have executed), never at top-level (which caused a TDZ ReferenceError). */
+function _paRoster(){ return (typeof _WL_MEMBERS!=='undefined' && _WL_MEMBERS) ? _WL_MEMBERS.slice() : ['Josh','Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']; }
+function _paEligible(){ return (typeof CAF_CSS!=='undefined' && CAF_CSS) ? CAF_CSS.slice() : ['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']; }
+var _paStore=null, _paLoaded=false, _paEditId=null, _paBusy=false, _paAdminMonth=null;
+
+function _paEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function _paFmt(iso){ if(!iso) return ''; try{ return new Date(iso).toLocaleString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true}); }catch(e){ return String(iso); } }
+function _paIsAdmin(){ try{ return _isJoshUser(); }catch(e){ return false; } }
+function _paSelfEmail(){ try{ return (TK.email()||'').trim().toLowerCase(); }catch(e){ return ''; } }
+function _paSelfName(){ try{ return TK.name()||TK.email()||'Member'; }catch(e){ return 'Member'; } }
+function _paSelfMember(){
+  try{ if(_isJoshUser()) return 'Josh'; }catch(e){}
+  var nm=''; try{ nm=(TK.name()||'').toLowerCase(); }catch(e){}
+  var roster=_paRoster();
+  for(var i=0;i<roster.length;i++){ var r=roster[i].toLowerCase(); if(nm && (nm===r || nm.split(/\s+/).indexOf(r)>=0 || nm.indexOf(r)>=0)) return roster[i]; }
+  try{ var map=(_lastDashboardData&&_lastDashboardData.config&&_lastDashboardData.config.sf_name_map)||{}; var mapped=map[nm]; if(mapped && roster.indexOf(mapped)>=0) return mapped; }catch(e){}
+  return '';
+}
+/* ── Manila-based monthly cycle ── */
+function _paManilaParts(d){
+  d=d||new Date();
+  try{ var f=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    var o={}; f.formatToParts(d).forEach(function(p){ if(p.type!=='literal') o[p.type]=p.value; }); return o;
+  }catch(e){ return { year:String(d.getFullYear()), month:String(d.getMonth()+1).padStart(2,'0'), day:String(d.getDate()).padStart(2,'0') }; }
+}
+function _paCurrentCycle(){ var p=_paManilaParts(); return p.year+'-'+p.month; }
+function _paCycleStatus(cycle){ var cur=_paCurrentCycle(); if(cycle===cur) return 'Open'; if(cycle<cur) return 'Closed'; return 'Not Yet Open'; }
+function _paCycleLabel(cycle){ var mo=parseInt(cycle.slice(5,7),10); return (MONTH_NAMES[mo-1]||cycle)+' '+cycle.slice(0,4); }
+function _paCycleEndLabel(cycle){ var y=parseInt(cycle.slice(0,4),10), mo=parseInt(cycle.slice(5,7),10); var last=new Date(Date.UTC(y,mo,0)).getUTCDate(); return (MONTH_NAMES[mo-1]||'')+' '+last+', '+y+' 11:59 PM (Manila)'; }
+
+/* ── shared JSON store ── */
+async function _paReadStore(token){
+  if(!excelDriveId||!excelItemId) return {schema:1,months:{}};
+  if(!lpDataFolderId) await lpResolveDataFolder(token);
+  var url='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+PA_FILE+':/content';
+  var resp=await fetch(url,{headers:{'Authorization':'Bearer '+token}});
+  if(resp.status===404) return {schema:1,months:{}};
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  var d=await resp.json(); return (d&&d.months)?d:{schema:1,months:{}};
+}
+async function _paWriteStore(token,store){
+  var url='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+PA_FILE+':/content';
+  var resp=await fetch(url,{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/octet-stream'},body:JSON.stringify(store,null,2)});
+  if(!resp.ok) throw new Error('HTTP '+resp.status);
+}
+async function paLoad(token){ try{ _paStore=await _paReadStore(token); _paLoaded=true; }catch(e){ console.warn('[PA] load failed:',e&&e.message); _paStore=_paStore||{schema:1,months:{}}; } }
+async function paOnTabShow(){
+  var body=document.getElementById('pa-body');
+  if(!(typeof TK!=='undefined' && TK.hasAny && TK.hasAny())){ if(body) body.innerHTML='<div class="pa-card"><div class="pa-empty">Please sign in on the Performance Dashboard tab first to use Peer Appreciation.</div></div>'; return; }
+  if(body) body.innerHTML='<div class="pa-card"><div class="pa-empty">Loading\u2026</div></div>';
+  try{ var t=await getToken(); await paLoad(t); }catch(e){ console.warn('[PA] tab load',e&&e.message); }
+  paRender();
+}
+
+/* ── calculations ── */
+function _paEntries(cycle){ var mo=_paStore&&_paStore.months&&_paStore.months[cycle]; return (mo&&mo.entries)?mo.entries:[]; }
+function _paLeaderboard(cycle){
+  var entries=_paEntries(cycle); var pts={},two={},one={};
+  entries.forEach(function(e){ if(e.n2){ pts[e.n2]=(pts[e.n2]||0)+2; two[e.n2]=(two[e.n2]||0)+1; } if(e.n1){ pts[e.n1]=(pts[e.n1]||0)+1; one[e.n1]=(one[e.n1]||0)+1; } });
+  var rows=Object.keys(pts).map(function(n){ return {name:n,points:pts[n],two:two[n]||0,one:one[n]||0}; });
+  rows.sort(function(a,b){ return b.points-a.points || b.two-a.two || a.name.localeCompare(b.name); });
+  var rank=0,prev=null; rows.forEach(function(r,i){ if(prev===null||r.points<prev){ rank=i+1; prev=r.points; } r.rank=rank; });
+  return rows;
+}
+function _paStats(cycle){
+  var entries=_paEntries(cycle); var voters={};
+  entries.forEach(function(e){ voters[e.voterMember||('@'+(e.voter||'?'))]=1; });
+  var unique=Object.keys(voters).length; var noms=0; entries.forEach(function(e){ if(e.n2) noms++; if(e.n1) noms++; });
+  var eligible=_paEligible().length;
+  return { eligible:eligible, unique:unique, notSubmitted:Math.max(0,eligible-unique), participation:(eligible?Math.round(unique/eligible*1000)/10:0), totalEntries:entries.length, totalNoms:noms };
+}
+
+/* ── render dispatch ── */
+function paRender(){ var body=document.getElementById('pa-body'); if(!body) return;
+  if(_paIsAdmin()){
+    body.innerHTML='<div class="pa-admin-grid">'+
+      '<div class="pa-col"><div class="pa-col-head pa-col-head-mem">'+_paUsers()+'Member View <span>(Preview)</span></div>'+paMemberColumn(true)+'</div>'+
+      '<div class="pa-col"><div class="pa-col-head pa-col-head-adm">'+_paShield()+'Admin View <span>(Josh only)</span></div>'+paAdminColumn()+'</div>'+
+    '</div>';
+  } else {
+    body.innerHTML='<div class="pa-member-wrap">'+paMemberColumn(false)+'</div>';
+  }
+}
+
+/* ── MEMBER VIEW (own entries only) ── */
+function paNomOptions(selfName, selected){
+  var o='<option value="">\u2014 Select a teammate \u2014</option>';
+  _paRoster().forEach(function(m){ if(m===selfName) return; o+='<option value="'+_paEsc(m)+'"'+(m===selected?' selected':'')+'>'+_paEsc(m)+'</option>'; });
+  return o;
+}
+function paFormHtml(selfName, preview){
+  var e=(!preview&&_paEditId)?_paEntries(_paCurrentCycle()).find(function(x){return x.id===_paEditId;}):null;
+  var n2=e?e.n2:'', c2=e?e.c2:'', n1=e?e.n1:'', c1=e?e.c1:'';
+  var dis=preview?' disabled':'';
+  var st2='<svg viewBox="0 0 24 24"><path fill="#F2B134" d="M12 2l2.2 6.4L21 11l-6.8 2.6L12 22l-2.2-8.4L3 11l6.8-2.6z"/></svg>';
+  var st1='<svg viewBox="0 0 24 24"><path fill="none" stroke="#8A6BF0" stroke-width="2" d="M12 3l2 6 6 .3-4.8 3.7L18 19l-6-3.5L6 19l1.8-6L3 9.3 9 9z"/></svg>';
+  return '<div class="pa-card"><div class="pa-sec-title">'+_paPencil()+(e?'Edit Appreciation Entry':'Cast Your Votes')+'</div>'+
+    '<div class="pa-sub">Share an appreciation moment and recognize teammates who made a difference.</div>'+
+    '<div class="pa-nom p2"><div class="pa-nom-h">'+st2+'Your Top Appreciation <span class="pa-pts">2 points</span></div>'+
+      '<div class="pa-field"><label>Teammate</label><select id="pa-n2"'+dis+'>'+paNomOptions(selfName,n2)+'</select></div>'+
+      '<div class="pa-field"><label>Why? (short &amp; friendly)</label><textarea id="pa-c2" maxlength="280"'+dis+' placeholder="e.g. Jumped in on a tough case and saved the day.">'+_paEsc(c2)+'</textarea></div></div>'+
+    '<div class="pa-nom p1"><div class="pa-nom-h">'+st1+'Another Appreciation <span class="pa-pts pts-1">1 point</span></div>'+
+      '<div class="pa-field"><label>Teammate</label><select id="pa-n1"'+dis+'>'+paNomOptions(selfName,n1)+'</select></div>'+
+      '<div class="pa-field"><label>Why? (short &amp; friendly)</label><textarea id="pa-c1" maxlength="280"'+dis+' placeholder="e.g. Covered my clients during my OOO.">'+_paEsc(c1)+'</textarea></div></div>'+
+    (preview
+      ? '<div class="pa-preview-note">Preview of what CSS members see. Submitting is disabled in the Admin preview.</div>'
+      : '<div id="pa-form-msg" class="pa-msg"></div><div class="pa-actions"><button class="pa-btn" id="pa-submit-btn" onclick="paSubmit()">'+_paPlane()+(e?'Update Entry':'Submit Appreciation')+'</button>'+(e?'<button class="pa-btn pa-btn-sec" onclick="paCancelEdit()">Cancel Edit</button>':'')+'</div>')+
+  '</div>';
+}
+function paMyEntriesHtml(mine, open){
+  if(!mine.length) return '<div class="pa-empty">You haven\u2019t submitted any appreciation yet'+(open?' \u2014 use the form to recognize a teammate!':'.')+'</div>';
+  return mine.slice().sort(function(a,b){ return String(b.created).localeCompare(String(a.created)); }).map(function(e,i){
+    var badge=open?'<span class="pa-entry-badge">Editable</span>':'<span class="pa-entry-badge" style="color:#6B5CA5;background:#EFE9FD;border-color:#DDD2F7">Final</span>';
+    return '<div class="pa-entry">'+
+      '<div class="pa-entry-hd"><span class="pa-entry-id">Entry #'+(i+1)+'</span>'+badge+'<span class="pa-entry-date">Submitted '+_paEsc(_paFmt(e.created))+(e.updated&&e.updated!==e.created?' \u00b7 Updated '+_paEsc(_paFmt(e.updated)):'')+'</span></div>'+
+      '<div class="pa-entry-row"><span class="pa-entry-pts p2">2 pts</span><div><span class="pa-entry-nom">'+_paEsc(e.n2)+'</span><div class="pa-entry-cmt">\u201C'+_paEsc(e.c2)+'\u201D</div></div></div>'+
+      '<div class="pa-entry-row"><span class="pa-entry-pts p1">1 pt</span><div><span class="pa-entry-nom">'+_paEsc(e.n1)+'</span><div class="pa-entry-cmt">\u201C'+_paEsc(e.c1)+'\u201D</div></div></div>'+
+      (open?('<div style="text-align:right"><a class="pa-entry-edit" href="#" onclick="paEditEntry(\''+_paEsc(e.id)+'\');return false;">\u270E Edit</a></div>'):'')+
+    '</div>';
+  }).join('');
+}
+/* -- v155 native SVG graphics + award/mystery/showcase -- */
+function _paSpark(c){ return '<span class="pa-spark '+c+'"><svg viewBox="0 0 24 24"><path d="M12 2l2.2 6.4L21 11l-6.8 2.6L12 22l-2.2-8.4L3 11l6.8-2.6z"/></svg></span>'; }
+function _paLaurelSvg(cls){
+  var pts=[[30,20,10],[27,32,22],[25,45,34],[25,58,46],[28,71,58],[34,84,70],[43,96,82],[52,106,92]];
+  var leaves='',hi='';
+  for(var k=0;k<pts.length;k++){ var P=pts[k];
+    leaves+='<ellipse cx="'+P[0]+'" cy="'+P[1]+'" rx="5.4" ry="10.2" transform="rotate('+P[2]+' '+P[0]+' '+P[1]+')"/>';
+    if(k%2===0) hi+='<ellipse cx="'+(P[0]+2)+'" cy="'+P[1]+'" rx="2.4" ry="5" transform="rotate('+P[2]+' '+P[0]+' '+P[1]+')"/>';
+  }
+  return '<svg class="'+cls+'" viewBox="0 0 70 120" aria-hidden="true"><path d="M56 116 C 34 100 22 66 26 14" fill="none" stroke="#C9851D" stroke-width="2.6" stroke-linecap="round"/><g fill="#E8B84C">'+leaves+'</g><g fill="#F3CE74">'+hi+'</g></svg>';
+}
+function _paTrophyGold(cls){ return '<svg class="'+cls+'" viewBox="0 0 120 130" aria-hidden="true">'+
+  '<path d="M30 30 C 6 30 6 62 32 66" fill="none" stroke="#E0A32E" stroke-width="7"/>'+
+  '<path d="M90 30 C 114 30 114 62 88 66" fill="none" stroke="#E0A32E" stroke-width="7"/>'+
+  '<path d="M26 18 H94 V40 C94 72 74 90 60 90 C46 90 26 72 26 40 Z" fill="#F2B134" stroke="#D7982C" stroke-width="2"/>'+
+  '<rect x="53" y="90" width="14" height="16" fill="#E0A32E"/><rect x="38" y="106" width="44" height="9" rx="3" fill="#D7982C"/><rect x="32" y="115" width="56" height="10" rx="3" fill="#E0A32E"/>'+
+  '<path d="M60 34l3.2 6.6 7.3.9-5.4 5 1.4 7.2-6.5-3.6-6.5 3.6 1.4-7.2-5.4-5 7.3-.9z" fill="#fff" opacity=".92"/></svg>'; }
+function _paTrophyPurple(cls){ return '<svg class="'+cls+'" viewBox="0 0 120 130" aria-hidden="true">'+
+  '<path d="M30 30 C 6 30 6 62 32 66" fill="none" stroke="#C9851D" stroke-width="7"/>'+
+  '<path d="M90 30 C 114 30 114 62 88 66" fill="none" stroke="#C9851D" stroke-width="7"/>'+
+  '<path d="M26 18 H94 V40 C94 72 74 90 60 90 C46 90 26 72 26 40 Z" fill="#7E3BE0" stroke="#F2B134" stroke-width="3"/>'+
+  '<rect x="53" y="90" width="14" height="16" fill="#C9851D"/><rect x="38" y="106" width="44" height="9" rx="3" fill="#E0A32E"/><rect x="32" y="115" width="56" height="10" rx="3" fill="#F2B134"/></svg>'; }
+function _paTrophyMini(){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#E0A32E" d="M7 4h10v1h3v2a3 3 0 0 1-3 3h-.4A5 5 0 0 1 13 13.9V16h3v2H8v-2h3v-2.1A5 5 0 0 1 7.4 10H7a3 3 0 0 1-3-3V5h3V4zm0 3H6a1 1 0 0 0 1 1V7zm10 0v1a1 1 0 0 0 1-1h-1z"/></svg>'; }
+function _paPencil(){ return '<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'; }
+function _paPlane(){ return '<svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>'; }
+function _paDoc(){ return '<svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6V2zm7 1.5V7h3.5L13 3.5z"/></svg>'; }
+function _paUsers(){ return '<svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.7 0-8 1.3-8 4v3h8v-3c0-1 .4-1.9 1-2.6A13 13 0 0 0 8 13zm8 0c-.4 0-.7 0-1 .1.6.7 1 1.6 1 2.6v3h8v-3c0-2.7-5.3-4-8-4z"/></svg>'; }
+function _paShield(){ return '<svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5l8-3zm-1 13l6-6-1.4-1.4L11 12.2 8.4 9.6 7 11l4 4z"/></svg>'; }
+function _paCal(){ return '<svg viewBox="0 0 24 24"><path d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm12 7v10H5V9h14z"/></svg>'; }
+function _paMegaphone(){ return '<svg viewBox="0 0 24 24"><path d="M3 10v4h3l5 4V6L6 10H3zm13 2a4 4 0 0 0-2-3.5v7A4 4 0 0 0 16 12zm-2-7v2a6 6 0 0 1 0 10v2a8 8 0 0 0 0-14z"/></svg>'; }
+function _paAvatar(name){
+  var pic=(typeof soloPics!=='undefined'&&name&&soloPics[name])?soloPics[name]:'';
+  if(pic) return '<img class="pa-photo" src="'+pic+'" alt="'+_paEsc(name)+'">';
+  var init=(String(name||'?').trim().charAt(0)||'?').toUpperCase();
+  return '<div class="pa-photo pa-photo-fb">'+_paEsc(init)+'</div>';
+}
+function _paWinnerNames(w){ if(!w) return []; if(Array.isArray(w.names)) return w.names.filter(Boolean); return w.name?[w.name]:[]; }
+function paHeroHtml(){
+  return '<div class="pa-hero">'+_paLaurelSvg('pa-hero-laurel')+
+    '<div class="pa-hero-txt"><div class="pa-hero-title">Peer Appreciation Victor</div>'+
+      '<div class="pa-hero-sub">A little thank-you goes a long way. Recognize teammates who helped you this month \u2014 through case assists, OOO support, shared knowledge, client help, or going the extra mile.</div></div>'+
+    '<div class="pa-hero-trophy">'+_paTrophyGold('pa-hero-trophy-svg')+_paSpark('s1')+_paSpark('s2')+'</div></div>';
+}
+function paRulesHtml(){
+  var st2='<svg viewBox="0 0 24 24"><path fill="#F2B134" d="M12 2l2.2 6.4L21 11l-6.8 2.6L12 22l-2.2-8.4L3 11l6.8-2.6z"/></svg>';
+  var st1='<svg viewBox="0 0 24 24"><path fill="none" stroke="#8A6BF0" stroke-width="2" d="M12 3l2 6 6 .3-4.8 3.7L18 19l-6-3.5L6 19l1.8-6L3 9.3 9 9z"/></svg>';
+  return '<div class="pa-rules"><span class="pa-rule">'+st2+'<b>2 points</b> \u2014 your top appreciation</span>'+
+    '<span class="pa-rule">'+st1+'<b>1 point</b> \u2014 another teammate</span>'+
+    '<span class="pa-rule">Submit as many entries as you like</span>'+
+    '<span class="pa-rule">Two different teammates per entry \u00b7 no self-nominations</span></div>';
+}
+function paWinnerShowcaseHtml(cycle){
+  var mo=_paStore&&_paStore.months&&_paStore.months[cycle]; var w=mo&&mo.winner; var names=_paWinnerNames(w);
+  if(!(w&&w.revealed&&names.length)) return '';
+  var victor=names[0], cos=names.slice(1), joint=names.length>1;
+  var h='<div class="pa-showcase"><div class="pa-sc-card pa-sc-victor">'+
+    '<div class="pa-sc-ribbon">This Month\u2019s Peer Appreciation '+(joint?'Victors':'Victor')+'</div>'+
+    '<div class="pa-photo-wrap">'+_paLaurelSvg('pa-photo-laurel l')+_paLaurelSvg('pa-photo-laurel r')+_paAvatar(victor)+'</div>'+
+    '<div class="pa-sc-name">'+_paEsc(victor)+'</div>'+
+    '<div class="pa-sc-msg">Thank you for your outstanding support and for always going the extra mile!</div></div>';
+  cos.forEach(function(nm){
+    h+='<div class="pa-sc-card pa-sc-co"><div class="pa-sc-colabel">'+_paTrophyMini()+'Co-Winner</div>'+
+      '<div class="pa-photo-wrap">'+_paLaurelSvg('pa-photo-laurel l')+_paLaurelSvg('pa-photo-laurel r')+_paAvatar(nm)+'</div>'+
+      '<div class="pa-sc-name">'+_paEsc(nm)+'</div></div>';
+  });
+  return h+'</div>';
+}
+function paMysterySlotHtml(cycle){
+  var show=paWinnerShowcaseHtml(cycle);
+  if(show){
+    var mo=_paStore&&_paStore.months&&_paStore.months[cycle]; var n=_paWinnerNames(mo&&mo.winner).length;
+    return '<div class="pa-card"><div class="pa-sec-title">'+_paTrophyMini()+' Our Peer Appreciation '+(n>1?'Victors':'Victor')+'</div>'+show+
+      '<div class="pa-sc-foot">Revealed by Josh at the RnR. Congratulations!</div></div>';
+  }
+  return '<div class="pa-mystery"><div class="pa-mystery-h">Who Will Be Our Next<br>Peer Appreciation Victor?</div>'+
+    '<div class="pa-myst-stage">'+_paLaurelSvg('pa-myst-laurel l')+_paLaurelSvg('pa-myst-laurel r')+
+      _paTrophyPurple('pa-myst-cup')+'<div class="pa-qbadge">?</div>'+
+      _paSpark('s1')+_paSpark('s2')+_paSpark('s3')+_paSpark('s4')+_paSpark('s5')+'</div>'+
+    '<div class="pa-mystery-sub">The winner stays a mystery until Josh reveals it at the RnR. Keep the appreciation coming!</div></div>';
+}
+function paMemberColumn(preview){
+  var cycle=_paCurrentCycle(); var status=_paCycleStatus(cycle); var open=(status==='Open'); var self=_paSelfMember(); var email=_paSelfEmail();
+  var mine=preview?[]:_paEntries(cycle).filter(function(e){ return (e.voter||'').toLowerCase()===email; });
+  var pill='<span class="pa-pts'+(open?'':' pts-1')+'" style="'+(open?'background:linear-gradient(135deg,#2EA35A,#1E7A43)':'background:linear-gradient(135deg,#9488BE,#6B5CA5)')+'">'+status+'</span>';
+  var h=paHeroHtml()+paRulesHtml();
+  h+='<div class="pa-card"><div class="pa-sec-title">'+_paCal()+'This Month \u00b7 '+_paEsc(_paCycleLabel(cycle))+' '+pill+'</div>'+
+     '<div class="pa-status">'+(open?('Voting is open until '+_paEsc(_paCycleEndLabel(cycle))+'. Submit as many entries as you like.'):'Voting for this cycle is closed. Entries are read-only.')+'</div></div>';
+  h+='<div class="pa-member-grid"><div class="pa-mg-col">';
+  h+= open? paFormHtml(self,preview) : '<div class="pa-card"><div class="pa-sec-title">'+_paPencil()+'Cast Your Votes</div><div class="pa-empty">Voting is closed for this cycle.</div></div>';
+  if(!preview){
+    h+='<div class="pa-card"><div class="pa-sec-title">'+_paDoc()+'My Appreciation <span style="color:#8B7EC0;font-weight:600;font-size:11px">('+mine.length+' '+(mine.length===1?'entry':'entries')+')</span></div>'+paMyEntriesHtml(mine,open)+
+       (open&&mine.length?'<div style="text-align:center;margin-top:6px"><button class="pa-btn pa-btn-sec" onclick="paNewEntry()">+ Submit Another Appreciation</button></div>':'')+'</div>';
+  } else {
+    h+='<div class="pa-card"><div class="pa-sec-title">'+_paDoc()+'My Appreciation</div><div class="pa-empty">Members see and edit their own submitted entries here.</div></div>';
+  }
+  h+='</div><div class="pa-mg-col">'+paMysterySlotHtml(cycle)+'</div></div>';
+  return h;
+}
+function paNewEntry(){ _paEditId=null; paRender(); var f=document.getElementById('pa-n2'); if(f){ try{ f.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} } }
+function paEditEntry(id){ _paEditId=id; paRender(); var f=document.getElementById('pa-n2'); if(f){ try{ f.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} } }
+function paCancelEdit(){ _paEditId=null; paRender(); }
+function paMsg(id,msg,err){ var el=document.getElementById(id); if(el){ el.textContent=msg; el.className='pa-msg'+(err?' pa-msg-err':(msg?' pa-msg-ok':'')); } }
+async function paSubmit(){
+  if(_paBusy) return;
+  var cycle=_paCurrentCycle();
+  if(_paCycleStatus(cycle)!=='Open'){ paMsg('pa-form-msg','Voting is closed for this cycle.',true); return; }
+  var self=_paSelfMember();
+  var n2=(document.getElementById('pa-n2')||{}).value||'', c2=((document.getElementById('pa-c2')||{}).value||'').trim();
+  var n1=(document.getElementById('pa-n1')||{}).value||'', c1=((document.getElementById('pa-c1')||{}).value||'').trim();
+  if(!n2||!n1){ paMsg('pa-form-msg','Please choose both teammates.',true); return; }
+  if(n2===n1){ paMsg('pa-form-msg','Please choose two different teammates.',true); return; }
+  if(self && (n2===self||n1===self)){ paMsg('pa-form-msg','You can\u2019t nominate yourself.',true); return; }
+  if(!c2||!c1){ paMsg('pa-form-msg','Please add a short comment for each appreciation.',true); return; }
+  _paBusy=true; var btn=document.getElementById('pa-submit-btn'); if(btn){ btn.disabled=true; btn.textContent='Saving\u2026'; }
+  try{
+    var token=await getToken(); var now=new Date().toISOString();
+    var store=await _paReadStore(token); if(!store.months) store.months={};
+    var mo=store.months[cycle]||{cycle:cycle,winner:{name:null,revealed:false},entries:[]}; if(!mo.entries) mo.entries=[];
+    if(_paEditId){ var idx=mo.entries.findIndex(function(x){return x.id===_paEditId;});
+      if(idx>=0 && (mo.entries[idx].voter||'').toLowerCase()===_paSelfEmail()){ mo.entries[idx]=Object.assign({},mo.entries[idx],{n2:n2,c2:c2,n1:n1,c1:c1,updated:now}); } else { _paEditId=null; } }
+    if(!_paEditId){ mo.entries.push({ id:'pa'+Date.now().toString(36)+Math.random().toString(36).slice(2,7), voter:_paSelfEmail(), voterName:_paSelfName(), voterMember:self||'', n2:n2,c2:c2,n1:n1,c1:c1, created:now, updated:now }); }
+    store.months[cycle]=mo; await _paWriteStore(token,store); _paStore=store; _paEditId=null;
+    paRender(); paMsg('pa-form-msg','Thank you! Your appreciation was saved.',false);
+  }catch(e){ console.error('[PA] submit',e); paMsg('pa-form-msg','Save failed: '+(e&&e.message||'error'),true); }
+  finally{ _paBusy=false; }
+}
+
+/* ── ADMIN VIEW (Josh only) ── */
+function paOv(l,v,ok){ return '<div class="pa-ov-tile"><div class="pa-ov-lbl">'+_paEsc(l)+'</div><div class="pa-ov-val'+(ok?' ok':'')+'">'+_paEsc(String(v))+'</div></div>'; }
+function paLbHtml(lb){
+  if(!lb.length) return '<div class="pa-empty">No nominations yet.</div>';
+  var rows=lb.map(function(r){ var pic=(typeof soloPics!=='undefined'&&soloPics[r.name])?('<img class="pa-lb-pic" src="'+soloPics[r.name]+'" alt="">'):''; return '<tr class="'+(r.rank===1?'pa-lb-top':'')+'"><td class="pa-lb-rank">#'+r.rank+'</td><td>'+pic+_paEsc(r.name)+'</td><td><b>'+r.points+'</b></td><td>'+r.two+'</td><td>'+r.one+'</td></tr>'; }).join('');
+  return '<table class="pa-tbl"><thead><tr><th>Rank</th><th>Nominee</th><th>Pts</th><th>2-pt</th><th>1-pt</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+function paWinnerHtml(cycle,lb,winner){
+  var names=_paWinnerNames(winner);
+  var top=lb.filter(function(r){return r.rank===1;}).map(function(r){return r.name;});
+  var preset=names.length?names:top;
+  var tie=top.length>1;
+  var cbs=lb.map(function(r){ var ck=preset.indexOf(r.name)>=0?' checked':''; return '<label class="pa-cb"><input type="checkbox" class="pa-winner-cb" value="'+_paEsc(r.name)+'"'+ck+'>'+_paEsc(r.name)+' <span style="color:#8B7EC0">('+r.points+')</span></label>'; }).join('');
+  var tieNote=tie?('<div class="pa-note" style="color:#B9791A">Tie for 1st: '+top.map(_paEsc).join(', ')+'. All tied nominees are pre-selected as joint winners &mdash; adjust if needed.</div>'):'';
+  var state=(winner&&winner.revealed&&names.length)?('<span class="pa-pts" style="background:linear-gradient(135deg,#2EA35A,#1E7A43)">Revealed: '+names.map(_paEsc).join(', ')+'</span>'):'<span class="pa-pts pts-1">Hidden &mdash; members see mystery</span>';
+  var showcase=(winner&&winner.revealed&&names.length)?('<div style="margin-top:12px">'+paWinnerShowcaseHtml(cycle)+'</div>'):'';
+  return '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #DDD2F7"><div class="pa-sec-title" style="font-size:12px">'+_paMegaphone()+'Winner Reveal <span class="pa-reveal-state">'+state+'</span></div>'+tieNote+
+    (cbs?('<div class="pa-cblist">'+cbs+'</div>'):'<div class="pa-empty">No nominees yet.</div>')+
+    '<div class="pa-actions"><button class="pa-btn pa-btn-gold" onclick="paRevealWinner()">'+_paMegaphone()+'Reveal to Members</button><button class="pa-btn pa-btn-sec" onclick="paHideWinner()">Hide</button></div>'+
+    '<div id="pa-winner-msg" class="pa-msg"></div>'+showcase+'</div>';
+}
+function paTrackerHtml(cycle){
+  var entries=_paEntries(cycle); var by={};
+  entries.forEach(function(e){ var k=e.voterMember||('@'+(e.voter||'?')); if(!by[k]) by[k]={name:e.voterMember||e.voterName||e.voter,count:0,latest:'',updated:''}; by[k].count++; if((e.created||'')>by[k].latest) by[k].latest=e.created||''; if((e.updated||'')>by[k].updated) by[k].updated=e.updated||''; });
+  var names={}; _paEligible().forEach(function(m){names[m]=1;}); Object.keys(by).forEach(function(k){ var nm=by[k].name; if(nm) names[nm]=1; });
+  var rows=Object.keys(names).sort().map(function(nm){ var rec=by[nm]; var sub=!!rec;
+    return '<tr data-k="'+_paEsc((nm+(sub?' voted':' not voted')).toLowerCase())+'"><td>'+_paEsc(nm)+'</td><td>'+(sub?'<b style="color:#2C7A43">Yes</b>':'<span style="color:#B42318">No</span>')+'</td><td>'+(rec?rec.count:0)+'</td><td>'+(rec&&rec.latest?_paEsc(_paFmt(rec.latest)):'\u2014')+'</td><td>'+(rec&&rec.updated&&rec.updated!==rec.latest?_paEsc(_paFmt(rec.updated)):'\u2014')+'</td></tr>'; }).join('');
+  return '<input type="text" class="pa-search" placeholder="Search member\u2026" oninput="paTrackerFilter(this)"><div class="pa-tbl-wrap"><table class="pa-tbl"><thead><tr><th>CSS Member</th><th>Voted?</th><th>Entries</th><th>Latest</th><th>Updated</th></tr></thead><tbody id="pa-tracker-body">'+rows+'</tbody></table></div>';
+}
+function paTrackerFilter(inp){ var q=(inp.value||'').toLowerCase().trim(); document.querySelectorAll('#pa-tracker-body tr').forEach(function(tr){ tr.style.display=(!q||(tr.getAttribute('data-k')||'').indexOf(q)>=0)?'':'none'; }); }
+function paDetailsHtml(cycle){
+  var entries=_paEntries(cycle).slice().sort(function(a,b){ return String(b.created).localeCompare(String(a.created)); });
+  if(!entries.length) return '<div class="pa-empty" style="padding:12px">No entries yet.</div>';
+  var rows=entries.map(function(e){
+    var key=((e.voterName||'')+' '+(e.voterMember||'')+' '+(e.n2||'')+' '+(e.n1||'')+' '+(e.c2||'')+' '+(e.c1||'')).toLowerCase();
+    return '<tr data-k="'+_paEsc(key)+'"><td>'+_paEsc(e.id)+'</td><td>'+_paEsc(e.voterMember||e.voterName||e.voter||'')+'</td><td><b>2</b> '+_paEsc(e.n2)+'<div class="pa-entry-cmt">\u201C'+_paEsc(e.c2)+'\u201D</div></td><td><b>1</b> '+_paEsc(e.n1)+'<div class="pa-entry-cmt">\u201C'+_paEsc(e.c1)+'\u201D</div></td><td>'+_paEsc(_paFmt(e.created))+'</td><td>'+(e.updated&&e.updated!==e.created?_paEsc(_paFmt(e.updated)):'\u2014')+'</td></tr>'; }).join('');
+  return '<table class="pa-tbl"><thead><tr><th>Entry ID</th><th>Voter</th><th>2-pt Nominee + Comment</th><th>1-pt Nominee + Comment</th><th>Submitted</th><th>Updated</th></tr></thead><tbody id="pa-details-body">'+rows+'</tbody></table>';
+}
+function paDetailsFilter(){ var q=((document.getElementById('pa-admin-search')||{}).value||'').toLowerCase().trim(); document.querySelectorAll('#pa-details-body tr').forEach(function(tr){ tr.style.display=(!q||(tr.getAttribute('data-k')||'').indexOf(q)>=0)?'':'none'; }); }
+function paAdminMonthChange(){ var s=document.getElementById('pa-admin-month'); _paAdminMonth=s?s.value:null; paRender(); }
+function paAdminColumn(){
+  var cur=_paCurrentCycle(); var cycle=_paAdminMonth||cur;
+  var months={}; if(_paStore&&_paStore.months) Object.keys(_paStore.months).forEach(function(m){months[m]=1;}); months[cur]=1;
+  var mlist=Object.keys(months).sort().reverse();
+  var status=_paCycleStatus(cycle); var st=_paStats(cycle); var lb=_paLeaderboard(cycle);
+  var mo=_paStore&&_paStore.months&&_paStore.months[cycle]; var winner=(mo&&mo.winner)||{revealed:false};
+  var h='<div class="pa-card"><div class="pa-sec-title">'+_paCal()+'Monthly Overview <span style="margin-left:auto;font-size:11px;font-weight:600;color:#6B5CA5">Cycle:&nbsp;</span>'+
+    '<select id="pa-admin-month" onchange="paAdminMonthChange()" style="font-size:11px;padding:5px 9px;border:1px solid #DDD2F7;border-radius:9px;background:#fff;color:#2E1F6B">'+
+    mlist.map(function(m){return '<option value="'+m+'"'+(m===cycle?' selected':'')+'>'+_paEsc(_paCycleLabel(m))+(m===cur?' (current)':'')+'</option>';}).join('')+'</select></div>'+
+    '<div class="pa-ov">'+paOv('Status',status,status==='Open')+paOv('Eligible Voters',st.eligible)+paOv('Voted',st.unique)+paOv('Not Yet Voted',st.notSubmitted)+paOv('Participation',st.participation+'%')+paOv('Total Entries',st.totalEntries)+'</div>'+
+    '<div class="pa-note">Valid Nominations: '+st.totalNoms+' \u00b7 Visual privacy only \u2014 the shared file is technically readable/writable by any authenticated member via Microsoft Graph; it is not confidential or tamper-proof.</div></div>';
+  h+='<div class="pa-card"><div class="pa-sec-title">'+_paTrophyMini()+'Live Leaderboard</div>'+paLbHtml(lb)+paWinnerHtml(cycle,lb,winner)+'</div>';
+  h+='<div class="pa-card"><div class="pa-subtabs"><button class="pa-subtab active" id="pa-stA" onclick="paSubTab(\'A\')">Voter Activity</button><button class="pa-subtab" id="pa-stB" onclick="paSubTab(\'B\')">Nomination Details &amp; Comments</button></div>'+
+    '<div id="pa-panelA">'+paTrackerHtml(cycle)+'</div>'+
+    '<div id="pa-panelB" style="display:none"><input type="text" id="pa-admin-search" class="pa-search" placeholder="Search voter, nominee, or comment\u2026" oninput="paDetailsFilter()"><div class="pa-tbl-wrap">'+paDetailsHtml(cycle)+'</div></div></div>';
+  return h;
+}
+function paSubTab(w){ var A=document.getElementById('pa-panelA'),B=document.getElementById('pa-panelB'),ta=document.getElementById('pa-stA'),tb=document.getElementById('pa-stB'); if(!A||!B)return; if(w==='A'){A.style.display='';B.style.display='none';ta.classList.add('active');tb.classList.remove('active');}else{A.style.display='none';B.style.display='';tb.classList.add('active');ta.classList.remove('active');} }
+async function paRevealWinner(){
+  if(!_paIsAdmin()) return;
+  var cycle=_paAdminMonth||_paCurrentCycle();
+  var names=[]; document.querySelectorAll('.pa-winner-cb:checked').forEach(function(cb){ names.push(cb.value); });
+  if(!names.length){ paMsg('pa-winner-msg','Select at least one winner to reveal.',true); return; }
+  try{ var token=await getToken(); var store=await _paReadStore(token); if(!store.months) store.months={};
+    var mo=store.months[cycle]||{cycle:cycle,entries:[],winner:{}}; mo.winner={names:names,name:names[0],revealed:true,revealedAt:new Date().toISOString()};
+    store.months[cycle]=mo; await _paWriteStore(token,store); _paStore=store; paRender(); paMsg('pa-winner-msg','Revealed to members: '+names.join(', '),false);
+  }catch(e){ console.error('[PA] reveal',e); paMsg('pa-winner-msg','Failed: '+(e&&e.message||'error'),true); }
+}
+async function paHideWinner(){
+  if(!_paIsAdmin()) return;
+  var cycle=_paAdminMonth||_paCurrentCycle();
+  try{ var token=await getToken(); var store=await _paReadStore(token); if(!store.months) store.months={};
+    var mo=store.months[cycle]; if(mo&&mo.winner){ mo.winner.revealed=false; store.months[cycle]=mo; await _paWriteStore(token,store); _paStore=store; }
+    paRender(); paMsg('pa-winner-msg','Winner hidden from members.',false);
+  }catch(e){ console.error('[PA] hide',e); paMsg('pa-winner-msg','Failed: '+(e&&e.message||'error'),true); }
+}
+
 async function initAuth() {
   if (TK.hasAny()) {
     updateAuthUI(true, TK.name());
@@ -6265,6 +6738,15 @@ async function loadLogo(token) {
         console.log('[NavIcon] Loaded: 301702_Story-Book_R.png');
       } else {
         console.warn('[NavIcon] Not found: 301702_Story-Book_R.png (optional)');
+      }
+
+      const heartUrl = await fetchAssetDataUrl(assetItems, '305168_Heart_R.png', token);
+      if (heartUrl) {
+        const elIcon = document.getElementById('tab-icon-peer');
+        if (elIcon) { elIcon.src = heartUrl; elIcon.classList.add('loaded'); }
+        console.log('[NavIcon] Loaded: 305168_Heart_R.png');
+      } else {
+        console.warn('[NavIcon] Not found: 305168_Heart_R.png (Peer Appreciation) \u2014 place the asset in the OneDrive Logos folder');
       }
     }
 
@@ -10135,7 +10617,7 @@ function switchTab(tab) {
   /* Map tab name → section element; guard against same-tab re-click */
   const sectionIds = {
     performance:'section-performance', leave:'section-leave',
-    caf:'section-caf', el:'section-el'
+    caf:'section-caf', el:'section-el', peer:'section-peer'
   };
   const targetEl = document.getElementById(sectionIds[tab]);
   const cur      = document.querySelector('.tab-section:not(.hidden)');
@@ -10147,14 +10629,16 @@ function switchTab(tab) {
     const leave = document.getElementById('section-leave');
     const caf   = document.getElementById('section-caf');
     const el    = document.getElementById('section-el');
+    const peer  = document.getElementById('section-peer');
     const pBtn  = document.getElementById('tab-btn-perf');
     const lBtn  = document.getElementById('tab-btn-leave');
     const cBtn  = document.getElementById('tab-btn-caf');
     const eBtn  = document.getElementById('tab-btn-el');
+    const paBtn = document.getElementById('tab-btn-peer');
 
     /* Hide all sections; deactivate all buttons */
-    [perf, leave, caf, el].forEach(s => s && s.classList.add('hidden'));
-    [pBtn, lBtn, cBtn, eBtn].forEach(b => b && b.classList.remove('active'));
+    [perf, leave, caf, el, peer].forEach(s => s && s.classList.add('hidden'));
+    [pBtn, lBtn, cBtn, eBtn, paBtn].forEach(b => b && b.classList.remove('active'));
 
     if (tab === 'performance') {
       perf && perf.classList.remove('hidden');
@@ -10190,6 +10674,10 @@ function switchTab(tab) {
           .then(t => elLoad(t))
           .catch(e => console.warn('[EL] Tab load failed:', e.message));
       }
+    } else if (tab === 'peer') {
+      peer  && peer.classList.remove('hidden');
+      paBtn && paBtn.classList.add('active');
+      try{ paOnTabShow(); }catch(e){ console.warn('[PA] tab show', e && e.message); }
     }
     try{ _elBackTopToggle(); }catch(e){}
   };
