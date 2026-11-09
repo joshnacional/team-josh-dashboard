@@ -2518,7 +2518,7 @@ html[data-theme="dark"] .elab-issue{color:#FFB366}
 .el-backtop:hover{filter:brightness(1.1)}
 .el-backtop svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 /* == v155: Peer Appreciation Victor -- purple/lavender premium refinement == */
-.pa-wrap{max-width:1200px;margin:0 auto;padding:6px 4px 30px}
+.pa-wrap{max-width:1200px;margin:0 auto;padding:6px 4px 30px;position:relative}
 .pa-member-wrap{max-width:1060px;margin:0 auto}
 .pa-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .pa-col{min-width:0}
@@ -2644,6 +2644,29 @@ html[data-theme="dark"] .elab-issue{color:#FFB366}
 @media(max-width:980px){.pa-admin-grid{grid-template-columns:1fr}.pa-member-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.pa-myst-cup,.pa-qbadge,.pa-spark{animation:none!important}.pa-spark{opacity:.6}}
 @media(max-width:640px){.pa-ov-tile{flex:1 1 44%}.pa-hero{flex-wrap:wrap}.pa-hero-title{font-size:21px}.pa-hero-trophy{display:none}}
+/* == v158: sound toggle, confetti celebration, admin delete == */
+.pa-sound-btn{position:absolute;top:0;right:4px;z-index:20;width:34px;height:34px;border-radius:50%;border:1px solid #E1D8FB;background:#fff;color:#6B2FD6;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(93,54,255,.12);transition:filter .15s,transform .1s}
+.pa-sound-btn:hover{filter:brightness(1.03)} .pa-sound-btn:active{transform:scale(.95)}
+.pa-sound-btn svg{width:17px;height:17px;fill:currentColor}
+.pa-sound-btn.on{background:linear-gradient(135deg,#6B2FD6,#8A4BEF);color:#fff;border-color:#6B2FD6}
+.pa-confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.pa-celebrate-static{box-shadow:0 0 0 2px #F2B134,0 0 26px 6px rgba(242,177,52,.5)!important;transition:box-shadow .4s}
+.pa-del-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid #F3C9CE;background:#FCF0F1;color:#B42318;cursor:pointer;padding:0;transition:filter .15s}
+.pa-del-btn:hover{filter:brightness(.97);background:#F9E3E5}
+.pa-del-btn svg{width:13px;height:13px;fill:currentColor}
+.pa-del-overlay{position:fixed;inset:0;z-index:4000;background:rgba(46,31,107,.42);display:flex;align-items:center;justify-content:center;padding:18px}
+.pa-del-overlay.hidden{display:none}
+.pa-del-dialog{background:#fff;border:1px solid #E6DEFF;border-radius:16px;max-width:430px;width:100%;padding:18px 20px;box-shadow:0 18px 50px rgba(46,31,107,.35)}
+.pa-del-dialog h4{margin:0 0 4px;font-size:15px;font-weight:800;color:#2E1F6B;display:flex;align-items:center;gap:8px}
+.pa-del-dialog h4 svg{width:16px;height:16px;fill:#B42318}
+.pa-del-sub{font-size:11px;color:#6B5CA5;margin-bottom:12px;line-height:1.5}
+.pa-del-info{background:#FBF9FF;border:1px solid #E6DEFF;border-radius:11px;padding:11px 13px;margin-bottom:12px;font-size:11.5px;color:#3A2F72;line-height:1.55}
+.pa-del-info b{color:#2E1F6B}
+.pa-del-warn{font-size:10.5px;color:#B42318;background:#FCF0F1;border:1px solid #F3C9CE;border-radius:9px;padding:8px 11px;margin-bottom:12px;line-height:1.45}
+.pa-del-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.pa-del-del{background:linear-gradient(135deg,#C8372B,#A42318);box-shadow:0 3px 12px rgba(180,35,24,.3)}
+@media(prefers-reduced-motion:reduce){.pa-confetti{display:none}}
+@media(max-width:640px){.pa-sound-btn{top:-2px;right:2px}}
 
 /* ── Member profile photos — shared by .caf-tile and .el-tile ──────────────
    54 × 54 px circular crop; photo zooms inside on tile hover.
@@ -3593,9 +3616,11 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
   <!-- ══ PEER APPRECIATION TAB ════════════════════════════════════════ -->
   <div id="section-peer" class="tab-section hidden">
     <div class="pa-wrap">
+      <button id="pa-sound-btn" class="pa-sound-btn" type="button" onclick="paToggleSound()" title="Enable sound" aria-label="Enable sound"></button>
       <div id="pa-body"><div class="pa-empty">Loading&hellip;</div></div>
     </div>
   </div>
+  <div id="pa-del-overlay" class="pa-del-overlay hidden" onclick="paDelOverlayClick(event)"><div class="pa-del-dialog" id="pa-del-dialog"></div></div>
 
   <!-- ══ LEAVE PLANNER DIALOGS ════════════════════════════════════════ -->
 
@@ -5284,6 +5309,107 @@ function _paRoster(){ return (typeof _WL_MEMBERS!=='undefined' && _WL_MEMBERS) ?
 function _paEligible(){ return (typeof CAF_CSS!=='undefined' && CAF_CSS) ? CAF_CSS.slice() : ['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']; }
 var _paStore=null, _paLoaded=false, _paEditId=null, _paBusy=false, _paAdminMonth=null;
 var _paDriveId=null, _paItemId=null;  /* v157: actual Graph ids of the pre-created shared JSON */
+/* ======== v158: sound effects + winner celebration + admin delete ======== */
+var _paSoundOn=false, _paSoundInit=false, _paAudioCtx=null, _paActiveNodes=[];
+function _paSoundPref(){ try{ return localStorage.getItem('tj_pa_sound')==='1'; }catch(e){ return false; } }
+function _paSetSoundPref(on){ try{ localStorage.setItem('tj_pa_sound', on?'1':'0'); }catch(e){} }
+function _paAudio(){ if(!_paAudioCtx){ try{ var AC=window.AudioContext||window.webkitAudioContext; _paAudioCtx=AC?new AC():null; }catch(e){ _paAudioCtx=null; } } return _paAudioCtx; }
+function paStopAudio(){ try{ for(var i=0;i<_paActiveNodes.length;i++){ try{ _paActiveNodes[i].stop(); }catch(e){} try{ _paActiveNodes[i].disconnect(); }catch(e){} } }catch(e){} _paActiveNodes=[]; }
+function _paBlip(ctx,freq,start,dur,peak,type){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(peak,start+0.02); g.gain.exponentialRampToValueAtTime(0.0001,start+dur); o.connect(g); g.connect(ctx.destination); o.start(start); o.stop(start+dur+0.03); _paActiveNodes.push(o); }
+function paPlayMystery(){ if(!_paSoundOn) return; var ctx=_paAudio(); if(!ctx) return; if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} } paStopAudio(); var t=ctx.currentTime, v=0.12;
+  [[1047,0],[1319,0.13],[1568,0.26],[2093,0.42]].forEach(function(n){ _paBlip(ctx,n[0],t+n[1],0.55,v,'sine'); });
+  _paBlip(ctx,2637,t+0.32,0.6,v*0.45,'triangle'); }
+function paPlayReveal(){ if(!_paSoundOn) return; var ctx=_paAudio(); if(!ctx) return; if(ctx.state==='suspended'){ try{ctx.resume();}catch(e){} } paStopAudio(); var t=ctx.currentTime, v=0.2;
+  [[784,0],[988,0.1],[1175,0.2],[1568,0.33]].forEach(function(n){ _paBlip(ctx,n[0],t+n[1],0.5,v,'triangle'); });
+  [[2093,0.33],[2637,0.46],[3136,0.58],[3520,0.7]].forEach(function(n){ _paBlip(ctx,n[0],t+n[1],0.55,v*0.4,'sine'); }); }
+function paSyncSoundBtn(){ var b=document.getElementById('pa-sound-btn'); if(!b) return;
+  if(_paSoundOn){ b.classList.add('on'); b.title='Sound on \u2014 click to mute'; b.setAttribute('aria-label','Mute sound'); b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zm-2.5-9v2.1a7 7 0 0 1 0 13.8V21a9 9 0 0 0 0-18z"/></svg>'; }
+  else { b.classList.remove('on'); b.title='Enable sound'; b.setAttribute('aria-label','Enable sound'); b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M15 9l5 6m0-6l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'; } }
+function paToggleSound(){ _paSoundInit=true; _paSoundOn=!_paSoundOn; _paSetSoundPref(_paSoundOn); var ctx=_paAudio(); if(ctx&&ctx.state==='suspended'){ try{ctx.resume();}catch(e){} } paSyncSoundBtn();
+  if(_paSoundOn){ try{ if(!_paRevealSig(_paCurrentCycle())) paPlayMystery(); else paPlayReveal(); }catch(e){} } else { paStopAudio(); } }
+function _paRevealSig(cycle){ var mo=_paStore&&_paStore.months&&_paStore.months[cycle]; var w=mo&&mo.winner; var names=_paWinnerNames(w); if(!(w&&w.revealed&&names.length)) return ''; return cycle+'|'+names.slice().sort().join(',')+'|'+(w.revealedAt||''); }
+function _paCelebratedSig(){ try{ return localStorage.getItem('tj_pa_celebrated')||''; }catch(e){ return ''; } }
+function _paSetCelebrated(sig){ try{ localStorage.setItem('tj_pa_celebrated',sig); }catch(e){} }
+function paMaybeCelebrate(cycle){ var sig=_paRevealSig(cycle); if(!sig) return; if(sig===_paCelebratedSig()) return; _paSetCelebrated(sig); try{ paPlayReveal(); }catch(e){} try{ paLaunchConfetti(); }catch(e){} }
+var _paConfRAF=null, _paConfCanvas=null;
+function paClearConfetti(){ if(_paConfRAF){ cancelAnimationFrame(_paConfRAF); _paConfRAF=null; } if(_paConfCanvas&&_paConfCanvas.parentNode){ _paConfCanvas.parentNode.removeChild(_paConfCanvas); } _paConfCanvas=null; }
+function paLaunchConfetti(){
+  var sec=document.getElementById('section-peer'); if(!sec) return;
+  var reduce=false; try{ reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  paClearConfetti();
+  var sc=sec.querySelector('.pa-showcase');
+  if(reduce){ if(sc){ sc.classList.add('pa-celebrate-static'); setTimeout(function(){ try{sc.classList.remove('pa-celebrate-static');}catch(e){} },1800); } return; }
+  var cv=document.createElement('canvas'); cv.className='pa-confetti'; cv.setAttribute('aria-hidden','true'); sec.appendChild(cv); _paConfCanvas=cv;
+  var ctx=cv.getContext('2d'); if(!ctx){ paClearConfetti(); return; }
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  var W=sec.clientWidth, H=sec.clientHeight; if(!W||!H){ paClearConfetti(); return; }
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.scale(dpr,dpr);
+  var colors=['#F2B134','#E0A32E','#FFD66B','#8A4BEF','#6B2FD6','#B9A6F5','#FFFFFF'];
+  function col(){ return colors[(Math.random()*colors.length)|0]; }
+  var parts=[];
+  var N=Math.max(60,Math.min(170,Math.round(W/8)));
+  for(var i=0;i<N;i++){ parts.push({x:Math.random()*W,y:-Math.random()*H*0.4,vx:(-1+Math.random()*2),vy:(1.4+Math.random()*2.6),g:0.03,w:4+Math.random()*6,hh:7+Math.random()*9,rot:Math.random()*6,vr:(-.15+Math.random()*.3),c:col(),burst:false}); }
+  var cards=sec.querySelectorAll('.pa-sc-card'); var sr=sec.getBoundingClientRect(); var origins=[];
+  if(cards.length){ for(var k=0;k<cards.length;k++){ var r=cards[k].getBoundingClientRect(); origins.push({x:r.left-sr.left+r.width*0.5, y:r.top-sr.top+r.height*0.35}); } }
+  else { origins.push({x:W*0.5,y:H*0.4}); }
+  origins.forEach(function(o){ for(var b=0;b<34;b++){ var a=Math.random()*Math.PI*2, sp=2+Math.random()*5; parts.push({x:o.x,y:o.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:0.07,w:3+Math.random()*4,hh:5+Math.random()*6,rot:Math.random()*6,vr:(-.3+Math.random()*.6),c:Math.random()<0.7?(Math.random()<0.5?'#F2B134':'#FFD66B'):'#B9A6F5',burst:true}); } });
+  var t0=performance.now(), DUR=4200;
+  function frame(now){ var el=now-t0; var fade=el>DUR-900?Math.max(0,(DUR-el)/900):1; ctx.clearRect(0,0,W,H);
+    for(var i=0;i<parts.length;i++){ var p=parts[i]; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; if(p.burst) p.vx*=0.985;
+      var a=fade*(p.burst?Math.max(0,1-el/DUR):0.95); if(a<=0) continue;
+      ctx.save(); ctx.globalAlpha=a; ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.hh/2,p.w,p.hh); ctx.restore(); }
+    if(el<DUR){ _paConfRAF=requestAnimationFrame(frame); } else { paClearConfetti(); } }
+  _paConfRAF=requestAnimationFrame(frame);
+}
+function paLeaveTab(){ try{ paStopAudio(); }catch(e){} try{ paClearConfetti(); }catch(e){} }
+var _paDelBusy=false, _paPendingDel=null;
+function _paTrashIcon(){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l1 2h4v2H4V5h4l1-2zM6 9h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 9zm4 2v8h2v-8h-2zm4 0v8h2v-8h-2z"/></svg>'; }
+function paAskDelete(id,cycle){
+  if(!_paIsAdmin()) return;
+  cycle=cycle||_paAdminMonth||_paCurrentCycle();
+  var e=_paEntries(cycle).find(function(x){ return x.id===id; });
+  if(!e){ return; }
+  _paPendingDel={id:id,cycle:cycle};
+  var dlg=document.getElementById('pa-del-dialog'); if(!dlg) return;
+  dlg.innerHTML='<h4>'+_paTrashIcon()+'Delete this nomination entry?</h4>'+
+    '<div class="pa-del-sub">This removes <b>only this one submission</b>. The voter\u2019s other entries, everyone else\u2019s entries, and all other months are kept.</div>'+
+    '<div class="pa-del-info"><div><b>Voter:</b> '+_paEsc(e.voterMember||e.voterName||e.voter||'\u2014')+'</div>'+
+      '<div><b>Entry ID:</b> '+_paEsc(e.id)+' &middot; '+_paEsc(_paCycleLabel(cycle))+'</div>'+
+      '<div style="margin-top:7px"><span class="pa-entry-pts p2">2 pts</span> <b>'+_paEsc(e.n2)+'</b> &mdash; \u201C'+_paEsc(e.c2)+'\u201D</div>'+
+      '<div style="margin-top:4px"><span class="pa-entry-pts p1">1 pt</span> <b>'+_paEsc(e.n1)+'</b> &mdash; \u201C'+_paEsc(e.c1)+'\u201D</div></div>'+
+    '<div class="pa-del-warn">This cannot be undone. Only this entry (by its unique ID) is removed \u2014 no other entries, voters, or months are affected.</div>'+
+    '<div id="pa-del-msg" class="pa-msg"></div>'+
+    '<div class="pa-del-actions"><button class="pa-btn pa-btn-sec" type="button" onclick="paCloseDelete()">Cancel</button>'+
+      '<button class="pa-btn pa-del-del" id="pa-del-confirm" type="button" onclick="paDeleteConfirm()">'+_paTrashIcon()+'Delete Entry</button></div>';
+  var ov=document.getElementById('pa-del-overlay'); if(ov) ov.classList.remove('hidden');
+}
+function paCloseDelete(){ _paPendingDel=null; var ov=document.getElementById('pa-del-overlay'); if(ov) ov.classList.add('hidden'); }
+function paDelOverlayClick(ev){ if(ev&&ev.target&&ev.target.id==='pa-del-overlay') paCloseDelete(); }
+async function paDeleteConfirm(){
+  if(!_paIsAdmin()||!_paPendingDel||_paDelBusy) return;
+  _paDelBusy=true; var cb=document.getElementById('pa-del-confirm'); if(cb){ cb.disabled=true; cb.textContent='Deleting\u2026'; }
+  var id=_paPendingDel.id, cycle=_paPendingDel.cycle, resetNote=false;
+  try{
+    var token=await getToken();
+    var store=await _paReadStore(token); if(!store.months) store.months={};
+    var mo=store.months[cycle]; if(!mo||!mo.entries) throw new Error('month not found');
+    var before=mo.entries.length;
+    mo.entries=mo.entries.filter(function(x){ return x.id!==id; });
+    if(mo.entries.length===before) throw new Error('entry already removed');
+    if(mo.winner && mo.winner.revealed){
+      var pts={}; mo.entries.forEach(function(e){ if(e.n2) pts[e.n2]=(pts[e.n2]||0)+2; if(e.n1) pts[e.n1]=(pts[e.n1]||0)+1; });
+      var wn=_paWinnerNames(mo.winner); var ok=wn.length && wn.every(function(n){ return (pts[n]||0)>0; });
+      if(!ok){ mo.winner.revealed=false; resetNote=true; }
+    }
+    store.months[cycle]=mo;
+    await _paWriteStore(token,store);
+    _paStore=store;
+    paCloseDelete(); paRender();
+    paMsg('pa-winner-msg', resetNote?'Entry deleted. A revealed winner is no longer eligible \u2014 the reveal was reset; please re-select and reveal.':'Entry deleted.', resetNote);
+  }catch(e){ console.error('[PA] delete',e); var m=document.getElementById('pa-del-msg'); if(m){ m.textContent='Delete failed: '+((e&&e.message)||'error'); m.className='pa-msg pa-msg-err'; } }
+  finally{ _paDelBusy=false; var b=document.getElementById('pa-del-confirm'); if(b){ b.disabled=false; b.innerHTML=_paTrashIcon()+'Delete Entry'; } }
+}
+
 
 function _paEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function _paFmt(iso){ if(!iso) return ''; try{ return new Date(iso).toLocaleString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true}); }catch(e){ return String(iso); } }
@@ -5357,7 +5483,9 @@ async function paOnTabShow(){
   if(!(typeof TK!=='undefined' && TK.hasAny && TK.hasAny())){ if(body) body.innerHTML='<div class="pa-card"><div class="pa-empty">Please sign in on the Performance Dashboard tab first to use Peer Appreciation.</div></div>'; return; }
   if(body) body.innerHTML='<div class="pa-card"><div class="pa-empty">Loading\u2026</div></div>';
   try{ var t=await getToken(); await paLoad(t); }catch(e){ console.warn('[PA] tab load',e&&e.message); }
+  if(!_paSoundInit){ _paSoundOn=_paSoundPref(); _paSoundInit=true; }
   paRender();
+  try{ if(_paSoundOn && !_paRevealSig(_paCurrentCycle())) paPlayMystery(); }catch(e){}
 }
 
 /* ── calculations ── */
@@ -5388,6 +5516,8 @@ function paRender(){ var body=document.getElementById('pa-body'); if(!body) retu
   } else {
     body.innerHTML='<div class="pa-member-wrap">'+paMemberColumn(false)+'</div>';
   }
+  try{ paSyncSoundBtn(); }catch(e){}
+  try{ paMaybeCelebrate(_paCurrentCycle()); }catch(e){}
 }
 
 /* ── MEMBER VIEW (own entries only) ── */
@@ -5591,10 +5721,11 @@ function paTrackerFilter(inp){ var q=(inp.value||'').toLowerCase().trim(); docum
 function paDetailsHtml(cycle){
   var entries=_paEntries(cycle).slice().sort(function(a,b){ return String(b.created).localeCompare(String(a.created)); });
   if(!entries.length) return '<div class="pa-empty" style="padding:12px">No entries yet.</div>';
+  var admin=_paIsAdmin();
   var rows=entries.map(function(e){
     var key=((e.voterName||'')+' '+(e.voterMember||'')+' '+(e.n2||'')+' '+(e.n1||'')+' '+(e.c2||'')+' '+(e.c1||'')).toLowerCase();
-    return '<tr data-k="'+_paEsc(key)+'"><td>'+_paEsc(e.id)+'</td><td>'+_paEsc(e.voterMember||e.voterName||e.voter||'')+'</td><td><b>2</b> '+_paEsc(e.n2)+'<div class="pa-entry-cmt">\u201C'+_paEsc(e.c2)+'\u201D</div></td><td><b>1</b> '+_paEsc(e.n1)+'<div class="pa-entry-cmt">\u201C'+_paEsc(e.c1)+'\u201D</div></td><td>'+_paEsc(_paFmt(e.created))+'</td><td>'+(e.updated&&e.updated!==e.created?_paEsc(_paFmt(e.updated)):'\u2014')+'</td></tr>'; }).join('');
-  return '<table class="pa-tbl"><thead><tr><th>Entry ID</th><th>Voter</th><th>2-pt Nominee + Comment</th><th>1-pt Nominee + Comment</th><th>Submitted</th><th>Updated</th></tr></thead><tbody id="pa-details-body">'+rows+'</tbody></table>';
+    return '<tr data-k="'+_paEsc(key)+'"><td>'+_paEsc(e.id)+'</td><td>'+_paEsc(e.voterMember||e.voterName||e.voter||'')+'</td><td><b>2</b> '+_paEsc(e.n2)+'<div class="pa-entry-cmt">\u201C'+_paEsc(e.c2)+'\u201D</div></td><td><b>1</b> '+_paEsc(e.n1)+'<div class="pa-entry-cmt">\u201C'+_paEsc(e.c1)+'\u201D</div></td><td>'+_paEsc(_paFmt(e.created))+'</td><td>'+(e.updated&&e.updated!==e.created?_paEsc(_paFmt(e.updated)):'\u2014')+'</td>'+(admin?('<td><button class="pa-del-btn" type="button" title="Delete this entry" aria-label="Delete this entry" onclick="paAskDelete(\''+_paEsc(e.id)+'\',\''+_paEsc(cycle)+'\')">'+_paTrashIcon()+'</button></td>'):'')+'</tr>'; }).join('');
+  return '<table class="pa-tbl"><thead><tr><th>Entry ID</th><th>Voter</th><th>2-pt Nominee + Comment</th><th>1-pt Nominee + Comment</th><th>Submitted</th><th>Updated</th>'+(admin?'<th></th>':'')+'</tr></thead><tbody id="pa-details-body">'+rows+'</tbody></table>';
 }
 function paDetailsFilter(){ var q=((document.getElementById('pa-admin-search')||{}).value||'').toLowerCase().trim(); document.querySelectorAll('#pa-details-body tr').forEach(function(tr){ tr.style.display=(!q||(tr.getAttribute('data-k')||'').indexOf(q)>=0)?'':'none'; }); }
 function paAdminMonthChange(){ var s=document.getElementById('pa-admin-month'); _paAdminMonth=s?s.value:null; paRender(); }
@@ -10656,6 +10787,7 @@ function switchTab(tab) {
 
   /* Wrap the existing show / lazy-load logic so it can be deferred */
   const doSwitch = () => {
+    try{ paLeaveTab(); }catch(e){}
     const perf  = document.getElementById('section-performance');
     const leave = document.getElementById('section-leave');
     const caf   = document.getElementById('section-caf');
