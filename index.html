@@ -5283,6 +5283,7 @@ var PA_FILE = 'team-josh-peer-appreciation.json';
 function _paRoster(){ return (typeof _WL_MEMBERS!=='undefined' && _WL_MEMBERS) ? _WL_MEMBERS.slice() : ['Josh','Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']; }
 function _paEligible(){ return (typeof CAF_CSS!=='undefined' && CAF_CSS) ? CAF_CSS.slice() : ['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']; }
 var _paStore=null, _paLoaded=false, _paEditId=null, _paBusy=false, _paAdminMonth=null;
+var _paDriveId=null, _paItemId=null;  /* v157: actual Graph ids of the pre-created shared JSON */
 
 function _paEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function _paFmt(iso){ if(!iso) return ''; try{ return new Date(iso).toLocaleString('en-AU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true}); }catch(e){ return String(iso); } }
@@ -5310,19 +5311,45 @@ function _paCycleLabel(cycle){ var mo=parseInt(cycle.slice(5,7),10); return (MON
 function _paCycleEndLabel(cycle){ var y=parseInt(cycle.slice(0,4),10), mo=parseInt(cycle.slice(5,7),10); var last=new Date(Date.UTC(y,mo,0)).getUTCDate(); return (MONTH_NAMES[mo-1]||'')+' '+last+', '+y+' 11:59 PM (Manila)'; }
 
 /* ── shared JSON store ── */
+/* v157: resolve the ACTUAL drive id + item id of the pre-created shared JSON.
+   The file (and Can-edit) is shared per-file with each CSS member; we never
+   create it, never require folder write, and operate by item id thereafter.
+   Attempt A: via the known data folder (Josh / anyone with folder read).
+   Attempt B: /me/drive/sharedWithMe (per-file sharing, no folder access). */
+async function _paResolveFile(token){
+  if(_paDriveId && _paItemId) return;
+  try{
+    if(excelDriveId && excelItemId){
+      if(!lpDataFolderId) await lpResolveDataFolder(token);
+      var meta=await graphGet('/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+PA_FILE+'?$select=id,parentReference', token);
+      if(meta && meta.id){ _paItemId=meta.id; _paDriveId=(meta.parentReference&&meta.parentReference.driveId)||excelDriveId; console.log('[PA] file resolved via folder path:', _paDriveId, _paItemId); return; }
+    }
+  }catch(eA){ console.warn('[PA] folder-path resolve failed, trying sharedWithMe:', eA&&eA.message); }
+  try{
+    var sw=await graphGet('/me/drive/sharedWithMe', token);
+    var items=(sw&&sw.value)||[];
+    var hit=null;
+    for(var i=0;i<items.length;i++){ var it=items[i]; if(it&&it.remoteItem&&it.name&&it.name.toLowerCase()===PA_FILE.toLowerCase()){ hit=it; break; } }
+    if(hit){ var ri=hit.remoteItem; _paItemId=ri.id; _paDriveId=(ri.parentReference&&ri.parentReference.driveId)||null;
+      if(_paDriveId && _paItemId){ console.log('[PA] file resolved via sharedWithMe:', _paDriveId, _paItemId); return; } }
+  }catch(eB){ console.warn('[PA] sharedWithMe resolve failed:', eB&&eB.message); }
+  throw new Error('Could not locate team-josh-peer-appreciation.json. Ask Josh to confirm the file exists in "Team Josh Dashboard Data" and is shared (Can edit) with you.');
+}
 async function _paReadStore(token){
-  if(!excelDriveId||!excelItemId) return {schema:1,months:{}};
-  if(!lpDataFolderId) await lpResolveDataFolder(token);
-  var url='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+PA_FILE+':/content';
-  var resp=await fetch(url,{headers:{'Authorization':'Bearer '+token}});
-  if(resp.status===404) return {schema:1,months:{}};
-  if(!resp.ok) throw new Error('HTTP '+resp.status);
-  var d=await resp.json(); return (d&&d.months)?d:{schema:1,months:{}};
+  await _paResolveFile(token);
+  var resp=await fetch('https://graph.microsoft.com/v1.0/drives/'+_paDriveId+'/items/'+_paItemId+'/content',{headers:{'Authorization':'Bearer '+token}});
+  if(!resp.ok) throw new Error('read HTTP '+resp.status);
+  var txt=await resp.text(); var d;
+  try{ d=JSON.parse(txt||'{}'); }catch(e){ d={}; }
+  if(!d || typeof d!=='object') d={};
+  if(!d.months) d.months={};
+  if(!d.schema) d.schema=1;
+  return d;
 }
 async function _paWriteStore(token,store){
-  var url='https://graph.microsoft.com/v1.0/drives/'+excelDriveId+'/items/'+lpDataFolderId+':/'+PA_FILE+':/content';
-  var resp=await fetch(url,{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/octet-stream'},body:JSON.stringify(store,null,2)});
-  if(!resp.ok) throw new Error('HTTP '+resp.status);
+  await _paResolveFile(token);
+  var resp=await fetch('https://graph.microsoft.com/v1.0/drives/'+_paDriveId+'/items/'+_paItemId+'/content',{method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(store,null,2)});
+  if(!resp.ok) throw new Error('write HTTP '+resp.status);
 }
 async function paLoad(token){ try{ _paStore=await _paReadStore(token); _paLoaded=true; }catch(e){ console.warn('[PA] load failed:',e&&e.message); _paStore=_paStore||{schema:1,months:{}}; } }
 async function paOnTabShow(){
@@ -5345,10 +5372,10 @@ function _paLeaderboard(cycle){
 }
 function _paStats(cycle){
   var entries=_paEntries(cycle); var voters={};
-  entries.forEach(function(e){ voters[e.voterMember||('@'+(e.voter||'?'))]=1; });
+  entries.forEach(function(e){ if(e.voterMember==='Josh') return; voters[e.voterMember||('@'+(e.voter||'?'))]=1; });  /* v156: Josh is admin/nominee, never a voter */
   var unique=Object.keys(voters).length; var noms=0; entries.forEach(function(e){ if(e.n2) noms++; if(e.n1) noms++; });
   var eligible=_paEligible().length;
-  return { eligible:eligible, unique:unique, notSubmitted:Math.max(0,eligible-unique), participation:(eligible?Math.round(unique/eligible*1000)/10:0), totalEntries:entries.length, totalNoms:noms };
+  return { eligible:eligible, unique:unique, notSubmitted:Math.max(0,eligible-unique), participation:(eligible?Math.round(unique/eligible*1000)/10:0), totalEntries:entries.length, totalNoms:noms, eligibleNominees:_paRoster().length };
 }
 
 /* ── render dispatch ── */
@@ -5504,6 +5531,7 @@ function paCancelEdit(){ _paEditId=null; paRender(); }
 function paMsg(id,msg,err){ var el=document.getElementById(id); if(el){ el.textContent=msg; el.className='pa-msg'+(err?' pa-msg-err':(msg?' pa-msg-ok':'')); } }
 async function paSubmit(){
   if(_paBusy) return;
+  if(_paIsAdmin()){ paMsg('pa-form-msg','Josh participates as an eligible nominee and administrator \u2014 not as a voter.',true); return; }  /* v156: Josh cannot cast votes via any path */
   var cycle=_paCurrentCycle();
   if(_paCycleStatus(cycle)!=='Open'){ paMsg('pa-form-msg','Voting is closed for this cycle.',true); return; }
   var self=_paSelfMember();
@@ -5523,7 +5551,10 @@ async function paSubmit(){
     if(!_paEditId){ mo.entries.push({ id:'pa'+Date.now().toString(36)+Math.random().toString(36).slice(2,7), voter:_paSelfEmail(), voterName:_paSelfName(), voterMember:self||'', n2:n2,c2:c2,n1:n1,c1:c1, created:now, updated:now }); }
     store.months[cycle]=mo; await _paWriteStore(token,store); _paStore=store; _paEditId=null;
     paRender(); paMsg('pa-form-msg','Thank you! Your appreciation was saved.',false);
-  }catch(e){ console.error('[PA] submit',e); paMsg('pa-form-msg','Save failed: '+(e&&e.message||'error'),true); }
+  }catch(e){ console.error('[PA] submit',e);
+    paMsg('pa-form-msg','Save failed: '+((e&&e.message)||'error')+' \u2014 your entry was not saved; please try again.',true);
+    var _b=document.getElementById('pa-submit-btn'); if(_b){ _b.disabled=false; _b.textContent=(_paEditId?'Update Entry':'Submit Appreciation'); }
+  }
   finally{ _paBusy=false; }
 }
 
@@ -5551,7 +5582,7 @@ function paWinnerHtml(cycle,lb,winner){
 function paTrackerHtml(cycle){
   var entries=_paEntries(cycle); var by={};
   entries.forEach(function(e){ var k=e.voterMember||('@'+(e.voter||'?')); if(!by[k]) by[k]={name:e.voterMember||e.voterName||e.voter,count:0,latest:'',updated:''}; by[k].count++; if((e.created||'')>by[k].latest) by[k].latest=e.created||''; if((e.updated||'')>by[k].updated) by[k].updated=e.updated||''; });
-  var names={}; _paEligible().forEach(function(m){names[m]=1;}); Object.keys(by).forEach(function(k){ var nm=by[k].name; if(nm) names[nm]=1; });
+  var names={}; _paEligible().forEach(function(m){names[m]=1;}); Object.keys(by).forEach(function(k){ var nm=by[k].name; if(nm && nm!=='Josh') names[nm]=1; });  /* v156: Josh never appears as a voter */
   var rows=Object.keys(names).sort().map(function(nm){ var rec=by[nm]; var sub=!!rec;
     return '<tr data-k="'+_paEsc((nm+(sub?' voted':' not voted')).toLowerCase())+'"><td>'+_paEsc(nm)+'</td><td>'+(sub?'<b style="color:#2C7A43">Yes</b>':'<span style="color:#B42318">No</span>')+'</td><td>'+(rec?rec.count:0)+'</td><td>'+(rec&&rec.latest?_paEsc(_paFmt(rec.latest)):'\u2014')+'</td><td>'+(rec&&rec.updated&&rec.updated!==rec.latest?_paEsc(_paFmt(rec.updated)):'\u2014')+'</td></tr>'; }).join('');
   return '<input type="text" class="pa-search" placeholder="Search member\u2026" oninput="paTrackerFilter(this)"><div class="pa-tbl-wrap"><table class="pa-tbl"><thead><tr><th>CSS Member</th><th>Voted?</th><th>Entries</th><th>Latest</th><th>Updated</th></tr></thead><tbody id="pa-tracker-body">'+rows+'</tbody></table></div>';
@@ -5576,7 +5607,7 @@ function paAdminColumn(){
   var h='<div class="pa-card"><div class="pa-sec-title">'+_paCal()+'Monthly Overview <span style="margin-left:auto;font-size:11px;font-weight:600;color:#6B5CA5">Cycle:&nbsp;</span>'+
     '<select id="pa-admin-month" onchange="paAdminMonthChange()" style="font-size:11px;padding:5px 9px;border:1px solid #DDD2F7;border-radius:9px;background:#fff;color:#2E1F6B">'+
     mlist.map(function(m){return '<option value="'+m+'"'+(m===cycle?' selected':'')+'>'+_paEsc(_paCycleLabel(m))+(m===cur?' (current)':'')+'</option>';}).join('')+'</select></div>'+
-    '<div class="pa-ov">'+paOv('Status',status,status==='Open')+paOv('Eligible Voters',st.eligible)+paOv('Voted',st.unique)+paOv('Not Yet Voted',st.notSubmitted)+paOv('Participation',st.participation+'%')+paOv('Total Entries',st.totalEntries)+'</div>'+
+    '<div class="pa-ov">'+paOv('Status',status,status==='Open')+paOv('Eligible Voters',st.eligible)+paOv('Eligible Nominees',st.eligibleNominees)+paOv('Voted',st.unique)+paOv('Not Yet Voted',st.notSubmitted)+paOv('Participation',st.participation+'%')+paOv('Total Entries',st.totalEntries)+'</div>'+
     '<div class="pa-note">Valid Nominations: '+st.totalNoms+' \u00b7 Visual privacy only \u2014 the shared file is technically readable/writable by any authenticated member via Microsoft Graph; it is not confidential or tamper-proof.</div></div>';
   h+='<div class="pa-card"><div class="pa-sec-title">'+_paTrophyMini()+'Live Leaderboard</div>'+paLbHtml(lb)+paWinnerHtml(cycle,lb,winner)+'</div>';
   h+='<div class="pa-card"><div class="pa-subtabs"><button class="pa-subtab active" id="pa-stA" onclick="paSubTab(\'A\')">Voter Activity</button><button class="pa-subtab" id="pa-stB" onclick="paSubTab(\'B\')">Nomination Details &amp; Comments</button></div>'+
