@@ -138,7 +138,7 @@ body{
   max-width:1440px;
   background:var(--db);
   border-radius:14px;
-  overflow:hidden;
+  overflow:visible;   /* v160: allow sticky header/nav to stick to the viewport */
   box-shadow:var(--ds);
   transition:background .25s, box-shadow .25s;
 }
@@ -467,7 +467,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
    SIGN-IN OVERLAY  (new in v5)
 ════════════════════════════════════════════════════════════════════════════ */
 .signin-overlay{
-  position:absolute;
+  position:fixed;   /* v162: full-viewport sign-in layer (image fits without scrolling) */
   inset:0;
   background-color:var(--db);
   background-image:var(--tj-signin-bg,none);
@@ -478,7 +478,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
   align-items:flex-start;
   justify-content:center;
   padding-top:clamp(64px,12vh,160px);
-  z-index:60;
+  z-index:1000;   /* v161: above sticky header (z300) so no Christmas decor shows on the sign-in page */
   transition:background-color .25s;
 }
 .signin-overlay.hidden{display:none}
@@ -583,7 +583,7 @@ html[data-theme="dark"] .caf-dlg::before{opacity:0}
   position:fixed;inset:0;
   background:rgba(18,10,42,.55);
   display:flex;align-items:center;justify-content:center;
-  z-index:65;
+  z-index:1000;   /* v161: above sticky header so decor does not show during the welcome dialog */
 }
 .welcome-overlay.hidden{display:none}
 .welcome-overlay.welcome-close{
@@ -2974,6 +2974,76 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 .el-copy-btn.copied .el-copy-label{
   display:inline;font-size:10px;font-weight:700;color:#107E3E;
   letter-spacing:.3px;white-space:nowrap}
+/* ===== v160: persistent sticky header + navigation ===== */
+.tj-stickytop{position:sticky;top:0;z-index:300;background:var(--db);border-radius:14px 14px 0 0;overflow:hidden}
+.tab-section{scroll-margin-top:126px}
+@media(max-width:820px){.tab-section{scroll-margin-top:160px}}
+/* ===== v160: Team Josh Christmas Edition (seasonal, isolated — safe to disable/remove) ===== */
+.hdr{position:relative}
+.xmas-layer{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+body.xmas-on .hdr>*:not(.xmas-layer){position:relative;z-index:2}
+.xmas-lights{position:absolute;top:0;left:0;right:0;height:4px;display:flex;justify-content:space-between;padding:0 8px}
+.xmas-bulb{position:relative;width:6px;height:6px;border-radius:50%;margin-top:1px;box-shadow:0 0 5px 1px currentColor;background:currentColor;animation:xmasBlink 2.4s ease-in-out infinite}
+@keyframes xmasBlink{0%,100%{opacity:.4;filter:brightness(.8)}50%{opacity:1;filter:brightness(1.35)}}
+.xmas-santa{position:absolute;top:6px;left:-150px;width:120px;height:40px;animation:xmasSanta 19s linear infinite;will-change:transform}
+@keyframes xmasSanta{0%{transform:translateX(0)}100%{transform:translateX(calc(100vw + 300px))}}
+.xmas-tree{position:absolute;left:62%;bottom:6px;width:24px;height:32px;opacity:.92}
+.xmas-tree .xstar{animation:xmasStar 1.9s ease-in-out infinite;transform-origin:center}
+@keyframes xmasStar{0%,100%{opacity:.55}50%{opacity:1}}
+.xmas-snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.xmas-welcome-msg{display:none}
+body.xmas-on .xmas-welcome-msg{display:block;text-align:center;margin-top:12px}
+.xmas-wl-1{font-size:12px;color:rgba(255,255,255,.85);font-weight:600}
+.xmas-wl-2{font-size:21px;font-weight:800;color:#F7D27A;font-family:Georgia,serif;margin-top:2px;text-shadow:0 2px 8px rgba(0,0,0,.28)}
+.xmas-celebrate-cv{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2400}
+@media(prefers-reduced-motion:reduce){.xmas-bulb{animation:none;opacity:.85}.xmas-santa{display:none}.xmas-snow{display:none}.xmas-tree .xstar{animation:none}}
+/* ===== v161: music toggle, waiting indicator, parol, church, 8-control toolbar ===== */
+body:not(.xmas-on) #btnXmasMusic{display:none}
+.xmas-music-btn{position:relative}
+.xmas-music-btn.muted{opacity:.55}
+.xmus-wait{position:absolute;top:2px;right:2px;width:7px;height:7px;border-radius:50%;background:#FFD66B;box-shadow:0 0 6px 1px #FFD66B;display:none;animation:xmusPulse 1.1s ease-in-out infinite}
+.xmas-music-btn.waiting .xmus-wait{display:block}
+@keyframes xmusPulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+.xmas-parol{position:absolute;left:31%;top:3px;width:28px;height:30px}
+.xmas-parol svg{filter:drop-shadow(0 0 5px rgba(242,177,52,.75))}
+.xmas-parol .pcore{animation:xmasBlink 2.2s ease-in-out infinite}
+.xmas-church{position:absolute;left:52%;bottom:5px;width:34px;height:30px;opacity:.95}
+.xmas-church .xwin{animation:xmasStar 2.3s ease-in-out infinite}
+@media(max-width:640px){.hdr-toolbar{flex-wrap:wrap;max-width:172px;border-radius:20px;justify-content:center;row-gap:3px}}
+@media(prefers-reduced-motion:reduce){.xmas-parol .pcore{animation:none}.xmas-church .xwin{animation:none}.xmus-wait{animation:none}}
+/* ===== v162: Filipino Christmas village (3 parols, people, puto bumbong vendor) ===== */
+.xmas-parol.p2{left:48%;top:2px;width:20px;height:22px}
+.xmas-parol.p3{left:64%;top:4px;width:18px;height:20px}
+.xmas-people{position:absolute;left:44%;bottom:5px;width:26px;height:16px}
+.xmas-people .ppl{animation:xmasWalk 3.6s ease-in-out infinite alternate}
+@keyframes xmasWalk{0%{transform:translateX(0)}100%{transform:translateX(9px)}}
+.xmas-vendor{position:absolute;left:33%;bottom:4px;width:30px;height:26px;filter:drop-shadow(0 0 4px rgba(255,207,94,.5))}
+.xmas-vendor .xsteam{opacity:.7;animation:xmasSteam 2.6s ease-in-out infinite;transform-origin:center bottom}
+@keyframes xmasSteam{0%{opacity:0;transform:translateY(2px) scaleY(.7)}40%{opacity:.7}100%{opacity:0;transform:translateY(-6px) scaleY(1.2)}}
+.xmas-church .xcross{animation:xmasStar 2.6s ease-in-out infinite;filter:drop-shadow(0 0 3px rgba(255,233,184,.8))}
+@media(prefers-reduced-motion:reduce){.xmas-people .ppl{animation:none}.xmas-people2 .ppl2{animation:none}.xmas-vendor .xsteam{animation:none;opacity:.5}.xmas-church .xcross{animation:none}.xmas-gdot{animation:none;opacity:.6}}
+/* ===== v162: Christmas sign-in shows the full image (contain) + blurred fill, viewport-fit ===== */
+body.signin-active{overflow:hidden}
+body.xmas-on .signin-overlay{background-image:none;background-color:#1b1033}
+/* Layer 1 — blurred, enlarged background FILL (only this layer is blurred) */
+body.xmas-on .signin-overlay::before{content:"";position:absolute;inset:0;z-index:0;background-image:var(--tj-signin-bg,none);background-size:cover;background-position:center;background-repeat:no-repeat;filter:blur(22px) brightness(.72);transform:scale(1.12);pointer-events:none}
+/* Layer 2 — complete, SHARP foreground image (no blur, no crop) */
+body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index:1;background-image:var(--tj-signin-bg,none);background-size:contain;background-position:center;background-repeat:no-repeat;pointer-events:none}
+/* Layer 3 — sign-in card above both image layers */
+.signin-card{position:relative;z-index:2}
+@media(max-width:640px){body.xmas-on .signin-overlay::after{background-size:cover}}
+/* v162-fix: Filipino village responsive tidy-up (keep clear of wrapped toolbar on narrow screens) */
+@media(max-width:860px){.xmas-vendor,.xmas-people,.xmas-people2,.xmas-parol.p3{display:none}.xmas-parol{left:34%}.xmas-parol.p2{left:44%}.xmas-church{left:50%}.xmas-tree{left:60%}}
+@media(max-width:560px){.xmas-tree,.xmas-parol.p2{display:none}.xmas-parol{left:40%}.xmas-church{left:52%}}
+/* ===== v163: second people group + continuous ground landscape ===== */
+.xmas-people2{position:absolute;left:29%;bottom:5px;width:22px;height:16px}
+.xmas-people2 .ppl2{animation:xmasGather 2.8s ease-in-out infinite}
+@keyframes xmasGather{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+.xmas-ground{position:absolute;left:0;right:0;bottom:0;height:12px;pointer-events:none;overflow:hidden}
+.xmas-ground-wave{position:absolute;inset:0;width:100%;height:100%}
+.xmas-gitem{position:absolute;bottom:1px;line-height:0}
+.xmas-gdot{position:absolute;bottom:3px;width:3px;height:3px;border-radius:50%;background:#FFCF5E;box-shadow:0 0 4px 1px rgba(255,207,94,.65);animation:xmasGlow 2.4s ease-in-out infinite}
+@keyframes xmasGlow{0%,100%{opacity:.45}50%{opacity:1}}
 </style>
 </head>
 <body>
@@ -3029,6 +3099,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
 <div class="dashboard">
 
   <!-- ── Header ───────────────────────────────────────────────────────── -->
+  <div class="tj-stickytop" id="tj-stickytop">
   <header class="hdr">
     <div class="hdr-left">
       <div class="hdr-top-row">
@@ -3086,6 +3157,10 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
               onclick="toggleTheme()" data-tip="Dark Mode">
         <svg id="theme-icon-svg" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.4 5.4 0 0 1-4.54 2.46 5.4 5.4 0 0 1-5.4-5.4c0-1.14.35-2.2.95-3.07A9.06 9.06 0 0 0 12 3z"/></svg>
       </button>
+      <button class="tb-icon-btn xmas-music-btn" id="btnXmasMusic" onclick="xmasToggleMusic()" data-tip="Christmas Music">
+        <svg viewBox="0 0 24 24"><path d="M9 17a3 3 0 1 1-2-2.83V6l10-2v9.17A3 3 0 1 1 15 13V8.3L9 9.5V17z"/></svg>
+        <span class="xmus-wait" id="xmus-wait" aria-hidden="true"></span>
+      </button>
     </div>
   </header>
 
@@ -3112,6 +3187,7 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       <span>Peer Appreciation</span>
     </button>
   </nav>
+  </div><!-- /tj-stickytop -->
 
   <!-- ══ PERFORMANCE TAB ═══════════════════════════════════════════════ -->
   <div id="section-performance" class="tab-section">
@@ -3882,6 +3958,8 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
       <div class="wl-status-txt" id="wl-status-txt">Initializing&hellip;</div>
     </div>
 
+    <!-- v160: Christmas welcome message (shown only when the seasonal theme is active) -->
+    <div class="xmas-welcome-msg" id="xmas-welcome-msg"><div class="xmas-wl-1">Welcome to Team Josh Executive Dashboard</div><div class="xmas-wl-2">Merry Christmas! <span aria-hidden="true">🎄</span></div></div>
     <!-- v146 (E1): optional, ephemeral daily mood check-in (nothing is recorded) -->
     <div class="mood-panel" id="mood-panel" style="display:none">
       <div class="mood-q" id="mood-q">How are you feeling today?</div>
@@ -4001,7 +4079,8 @@ html[data-theme="dark"] .el-dls-both-missed,html[data-theme="dark"] .el-dls-pend
     /* Restore SignIn_Page.jpg background for the sign-in overlay.
        Value is either a pre-auth https:// URL or a data: URL — both are
        quoted inside url() so special characters in the https URL are safe. */
-    const cachedSignInBg = localStorage.getItem('tj_cached_signin_bg');
+    var _xseason=false; try{ var _xd=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); _xseason=((_xd>='2026-11-10'&&_xd<='2027-01-14')||(_xd>='2027-08-01'&&_xd<='2027-12-31')); }catch(_e){}
+    var cachedSignInBg = _xseason ? (localStorage.getItem('tj_cached_signin_bg_xmas')||localStorage.getItem('tj_cached_signin_bg')) : localStorage.getItem('tj_cached_signin_bg');
     if (cachedSignInBg) {
       document.documentElement.style.setProperty(
         '--tj-signin-bg', 'url("' + cachedSignInBg.replace(/"/g, '%22') + '")'
@@ -4111,6 +4190,10 @@ const EXCEL_SHARE_URL = 'https://sap-my.sharepoint.com/:x:/p/josh_nacional/IQDg9
 const LOGO_FILE_NAME      = 'Team Josh Aqua Logo.png';
 const BG_FILE_NAME        = 'SAP 3D.jpg';
 const SIGNIN_BG_FILE_NAME = 'SignIn_Page.jpg';
+const XMAS_SIGNIN_BG      = 'Christmas_SignIn_Page.jpg';   /* v161: seasonal sign-in background */
+/* v162: single source of truth for the displayed dashboard build version (no longer Config B6).
+   EKX updates this on every new canonical build. Convention: V162 major, V162.1 minor, etc. */
+const DASHBOARD_BUILD_VERSION = 'V162';
 const THUMB_FILE_NAME     = 'thumb.png';
 const GRAPH_SCOPES    = ['Files.ReadWrite.All', 'Mail.ReadWrite', 'Mail.Send', 'ChatMessage.Send'];
 /* v112: Team Josh 3.0 Microsoft Teams group chat ID — non-UI configuration
@@ -4239,7 +4322,7 @@ async function _refresh() {
 async function getToken() {
   if (TK.isValid()) return TK.at();
   try   { return await _refresh(); }
-  catch (e) { TK.clear(); throw new Error('interaction_required'); }
+  catch (e) { TK.clear(); try{ _xmusStop(); }catch(_){} throw new Error('interaction_required'); }
 }
 
 /* ── v103: acquire a delegated token that INCLUDES Mail.ReadWrite ───────────
@@ -4907,6 +4990,8 @@ async function _welcomeAndLoad() {
   } finally {
     await _hideWelcomeOverlay();
   }
+  try{ _xmasWelcomeCelebrate(); }catch(e){}   /* v160: festive welcome celebration (only when seasonal theme active) */
+  try{ _xmusWelcomeStart(); }catch(e){}   /* v162: Christmas music begins ONLY after the welcome/Mood flow completes */
   try{ wnMaybeShow(); }catch(e){}   /* v131: What's New after welcome */
   try{ wnRefreshIndicator(); }catch(e){}   /* v134: balloon indicator */
 }
@@ -5778,18 +5863,202 @@ async function paHideWinner(){
   }catch(e){ console.error('[PA] hide',e); paMsg('pa-winner-msg','Failed: '+(e&&e.message||'error'),true); }
 }
 
+/* ======== v160: Team Josh Christmas Edition \u2014 isolated seasonal module ========
+   Enable/disable entirely via XMAS_SCHEDULE (Asia/Manila, inclusive). Builds all
+   decorations in JS and toggles body.xmas-on; touches no permanent markup, so it
+   can be removed by clearing XMAS_SCHEDULE. No audio; respects reduced motion. */
+var XMAS_SCHEDULE = [
+  { start:'2026-11-10', end:'2027-01-14' },   /* Christmas Edition 2026 */
+  { start:'2027-08-01', end:'2027-12-31' }    /* Christmas Edition 2027 */
+];
+function _xmasManilaDate(){
+  try{ var f=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'});
+    var o={}; f.formatToParts(new Date()).forEach(function(p){ if(p.type!=='literal') o[p.type]=p.value; });
+    return o.year+'-'+o.month+'-'+o.day;
+  }catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+}
+function _xmasOn(){ var t=_xmasManilaDate(); for(var i=0;i<XMAS_SCHEDULE.length;i++){ var s=XMAS_SCHEDULE[i]; if(t>=s.start && t<=s.end) return true; } return false; }
+function _xmasReduced(){ try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } }
+var _xmasSnowRAF=null;
+function _xmasStopSnow(){ if(_xmasSnowRAF){ cancelAnimationFrame(_xmasSnowRAF); _xmasSnowRAF=null; } }
+function _xmasRemoveHeaderDecor(){ _xmasStopSnow(); var l=document.querySelector('.hdr .xmas-layer'); if(l&&l.parentNode) l.parentNode.removeChild(l); }
+function _xmasReindeerSvg(x){ return '<g transform="translate('+x+',0)">'+
+  '<ellipse cx="12" cy="25" rx="10" ry="4" fill="#9A6327"/>'+
+  '<rect x="4" y="27" width="1.8" height="8" rx="0.9" fill="#80501F"/><rect x="9" y="27" width="1.8" height="8" rx="0.9" fill="#80501F"/><rect x="15" y="27" width="1.8" height="8" rx="0.9" fill="#80501F"/><rect x="19.5" y="27" width="1.8" height="8" rx="0.9" fill="#80501F"/>'+
+  '<path d="M20 23 q6 -2 8 -8" fill="none" stroke="#9A6327" stroke-width="3.4" stroke-linecap="round"/>'+
+  '<circle cx="29" cy="14" r="3.4" fill="#9A6327"/>'+
+  '<path d="M30 11 l1.5 -5 M30 11 l4.5 -3 M31.5 12 l4.5 -4.5" stroke="#6E4A1E" stroke-width="1" fill="none" stroke-linecap="round"/>'+
+  '<circle cx="31.6" cy="15" r="1.1" fill="#E33"/>'+
+  '</g>'; }
+function _xmasSantaSvg(){ return '<svg viewBox="0 0 170 46" width="150" height="44" aria-hidden="true">'+
+  /* sleigh (behind, left) */
+  '<path d="M8 32 q-3 6 4 6 h30 q6 0 7 -6 l2 -11 q.6 -3 -2.6 -3 h-30 q-3.4 0 -4.4 3 z" fill="#B4322A"/>'+
+  '<path d="M6 38 q-4 0 -4 4 h48" fill="none" stroke="#F2B134" stroke-width="2.2" stroke-linecap="round"/>'+
+  '<path d="M48 18 q5 0 5 5" fill="none" stroke="#F2B134" stroke-width="2.2"/>'+
+  '<rect x="13" y="21" width="10" height="9" rx="1.6" fill="#3FAE6B"/><rect x="16.5" y="21" width="2.2" height="9" fill="#FFD66B"/>'+
+  '<rect x="25" y="23" width="8" height="7" rx="1.6" fill="#6B2FD6"/><rect x="28" y="23" width="2" height="7" fill="#F7E7B0"/>'+
+  /* Santa riding (red suit, white beard, hat) */
+  '<path d="M33 15 q6 -3 10 2 l1 11 h-13 l1 -11 q.3 -1.6 1 -2z" fill="#C0392B"/>'+
+  '<circle cx="38.5" cy="11" r="4.2" fill="#F2D9C9"/>'+
+  '<path d="M34.6 12.2 q3.9 5 7.8 0 q-1.1 4.2 -3.9 4.2 q-2.8 0 -3.9 -4.2z" fill="#fff"/>'+
+  '<path d="M34 9 q4.5 -5.4 9 0 z" fill="#C0392B"/>'+
+  '<rect x="33.6" y="8.4" width="9.8" height="1.9" rx="0.9" fill="#fff"/>'+
+  '<circle cx="43.4" cy="6.4" r="1.6" fill="#fff"/>'+
+  /* reins/harness from sleigh to reindeer */
+  '<path d="M52 24 C 66 20 80 22 92 22" fill="none" stroke="#7A4A1E" stroke-width="1.4"/>'+
+  '<path d="M52 27 C 70 26 86 27 100 26" fill="none" stroke="#7A4A1E" stroke-width="1"/>'+
+  /* two reindeer in FRONT (right), facing direction of travel */
+  _xmasReindeerSvg(90)+_xmasReindeerSvg(122)+
+  '</svg>'; }
+function _xmasParolSvg(){ return '<svg viewBox="0 0 30 32" width="30" height="32" aria-hidden="true">'+
+  '<polygon class="pcore" points="15,1 18.7,10.5 28.5,11 20.8,17.2 23.5,27 15,21.3 6.5,27 9.2,17.2 1.5,11 11.3,10.5" fill="#F2B134" stroke="#E0564E" stroke-width="1"/>'+
+  '<polygon points="15,6 16.8,11 21,11.3 17.6,14.3 18.8,19 15,16.3 11.2,19 12.4,14.3 9,11.3 13.2,11" fill="#F7E7B0"/>'+
+  '<circle cx="15" cy="12.5" r="1.3" fill="#E0564E"/>'+
+  '<path d="M9 27 l-3 4 M11 28 l-1 4 M19 28 l1 4 M21 27 l3 4" stroke="#3FAE6B" stroke-width="1.1" fill="none" stroke-linecap="round"/>'+
+  '</svg>'; }
+function _xmasChurchSvg(){ return '<svg viewBox="0 0 34 30" width="34" height="30" aria-hidden="true">'+
+  '<g class="xcross"><rect x="15.2" y="1" width="1.6" height="5" fill="#FFE9B8"/><rect x="13.5" y="2.4" width="5" height="1.6" fill="#FFE9B8"/></g>'+
+  '<path d="M16 6 L22 13 H10 z" fill="#5B4A86"/>'+
+  '<rect x="10" y="13" width="12" height="15" fill="#6B5CA5"/>'+
+  '<rect x="2" y="17" width="8" height="11" fill="#5B4A86"/><rect x="22" y="17" width="8" height="11" fill="#5B4A86"/>'+
+  '<path class="xwin" d="M14 18 a2 2 0 0 1 4 0 v5 h-4 z" fill="#FFD66B"/>'+
+  '<rect class="xwin" x="4.5" y="20" width="3" height="5" rx="1.5" fill="#FFCF5E"/><rect class="xwin" x="24.5" y="20" width="3" height="5" rx="1.5" fill="#FFCF5E"/>'+
+  '<rect x="9" y="27" width="16" height="1.4" fill="#4A3B6B"/>'+
+  '</svg>'; }
+function _xmasTreeSvg(){ return '<svg viewBox="0 0 26 34" width="26" height="34" aria-hidden="true">'+
+  '<path class="xstar" d="M13 1 l1.3 2.8 3 .4-2.1 2 .5 3-2.7-1.5-2.7 1.5 .5-3-2.1-2 3-.4z" fill="#FFD66B"/>'+
+  '<path d="M13 7 L20 17 H6 z" fill="#2E8B57"/><path d="M13 12 L22 25 H4 z" fill="#2E7D4F"/>'+
+  '<rect x="11.4" y="25" width="3.2" height="5" fill="#7A4A1E"/>'+
+  '<circle cx="10" cy="15" r="1" fill="#E33"/><circle cx="15" cy="19" r="1" fill="#F2B134"/><circle cx="11" cy="22" r="1" fill="#6B2FD6"/><circle cx="16" cy="14" r="1" fill="#F7E7B0"/>'+
+  '</svg>'; }
+function _xmasFig(x,c){ return '<g transform="translate('+x+',0)"><circle cx="3" cy="4" r="2" fill="#F2D9C9"/><path d="M1 7 h4 l-.5 6 h-3 z" fill="'+c+'"/><rect x="1.2" y="12.6" width="1.2" height="3" fill="#3a3340"/><rect x="3.6" y="12.6" width="1.2" height="3" fill="#3a3340"/></g>'; }
+function _xmasPeopleSvg(){ return '<svg viewBox="0 0 26 16" width="26" height="16" aria-hidden="true"><g class="ppl">'+_xmasFig(1,'#6B2FD6')+_xmasFig(8,'#B4322A')+_xmasFig(15,'#2E7D4F')+'</g></svg>'; }
+function _xmasVendorSvg(){ return '<svg viewBox="0 0 30 26" width="30" height="26" aria-hidden="true">'+
+  '<g class="xsteam" fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round"><path d="M14 6 q2 -2 0 -4"/><path d="M17.5 6 q2 -2 0 -4"/></g>'+
+  '<rect x="6" y="12" width="20" height="8" rx="1.5" fill="#8A5A2B"/><rect x="6" y="11" width="20" height="2.4" fill="#B4322A"/>'+
+  '<path d="M5 11 h22 l-2 -4 h-18 z" fill="#E0564E"/>'+
+  '<ellipse cx="15.5" cy="11.8" rx="4" ry="2" fill="#5A3A1A"/><circle cx="15.5" cy="11.8" r="1.3" fill="#FFCF5E"/>'+
+  '<circle cx="11" cy="21" r="2.2" fill="#4A3B2A"/><circle cx="21" cy="21" r="2.2" fill="#4A3B2A"/>'+
+  '<circle cx="3.6" cy="9" r="2" fill="#F2D9C9"/><path d="M1.6 12 h4 l-.6 7 h-2.8 z" fill="#6B2FD6"/>'+
+  '</svg>'; }
+function _xmasPeopleSvg2(){ return '<svg viewBox="0 0 22 16" width="22" height="16" aria-hidden="true"><g class="ppl2">'+_xmasFig(1,'#C9951D')+_xmasFig(8,'#2E7D4F')+_xmasFig(14,'#8A4BEF')+'</g></svg>'; }
+function _xmasShrubSvg(){ return '<svg viewBox="0 0 12 10" width="12" height="10" aria-hidden="true"><path d="M1 10 q2 -8 5 -8 q3 0 5 8 z" fill="#2E8B57"/><circle cx="6" cy="3.2" r="0.9" fill="#E0564E"/></svg>'; }
+function _xmasMiniTreeSvg(){ return '<svg viewBox="0 0 10 12" width="10" height="12" aria-hidden="true"><path d="M5 0 L9 7 H1 z" fill="#246B43"/><path d="M5 4 L8.5 11 H1.5 z" fill="#2E7D4F"/><rect x="4.2" y="11" width="1.6" height="1.5" fill="#6E4A1E"/></svg>'; }
+function _xmasGroundHtml(){
+  var wave='<svg class="xmas-ground-wave" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true"><path d="M0 7 Q15 3 30 6 T60 5 T90 4 T120 6 T150 4 T180 6 T210 4 T240 6 T270 4 T300 6 L300 14 L0 14 Z" fill="#2E7D4F"/><rect x="0" y="9" width="300" height="5" fill="#246B43"/></svg>';
+  var items='';
+  [4,13,22,71,80,89,96].forEach(function(L){ items+='<span class="xmas-gitem" style="left:'+L+'%">'+_xmasShrubSvg()+'</span>'; });
+  [9,75,93].forEach(function(L){ items+='<span class="xmas-gitem" style="left:'+L+'%">'+_xmasMiniTreeSvg()+'</span>'; });
+  [2,7,16,25,69,78,86,94].forEach(function(L,i){ items+='<span class="xmas-gdot" style="left:'+L+'%;animation-delay:'+((i%5)*0.3).toFixed(1)+'s"></span>'; });
+  return wave+items;
+}
+function _xmasBuildHeaderDecor(){
+  var hdr=document.querySelector('.hdr'); if(!hdr) return;
+  _xmasRemoveHeaderDecor();
+  var layer=document.createElement('div'); layer.className='xmas-layer'; layer.setAttribute('aria-hidden','true');
+  var lights=document.createElement('div'); lights.className='xmas-lights';
+  var cols=['#F2B134','#F7E7B0','#E0564E','#3FAE6B']; var w=hdr.clientWidth||900; var n=Math.max(16,Math.min(42,Math.round(w/34))); var lh='';
+  for(var i=0;i<n;i++){ lh+='<span class="xmas-bulb" style="color:'+cols[i%cols.length]+';animation-delay:'+((i%6)*0.2).toFixed(2)+'s"></span>'; }
+  lights.innerHTML=lh; layer.appendChild(lights);
+  var ground=document.createElement('div'); ground.className='xmas-ground'; ground.innerHTML=_xmasGroundHtml(); layer.appendChild(ground);
+  var tree=document.createElement('div'); tree.className='xmas-tree'; tree.innerHTML=_xmasTreeSvg(); layer.appendChild(tree);
+  ['xmas-parol','xmas-parol p2','xmas-parol p3'].forEach(function(cls){ var pr=document.createElement('div'); pr.className=cls; pr.innerHTML=_xmasParolSvg(); layer.appendChild(pr); });
+  var church=document.createElement('div'); church.className='xmas-church'; church.innerHTML=_xmasChurchSvg(); layer.appendChild(church);
+  var ppl=document.createElement('div'); ppl.className='xmas-people'; ppl.innerHTML=_xmasPeopleSvg(); layer.appendChild(ppl);
+  var ppl2=document.createElement('div'); ppl2.className='xmas-people2'; ppl2.innerHTML=_xmasPeopleSvg2(); layer.appendChild(ppl2);
+  var vend=document.createElement('div'); vend.className='xmas-vendor'; vend.innerHTML=_xmasVendorSvg(); layer.appendChild(vend);
+  if(!_xmasReduced()){
+    var santa=document.createElement('div'); santa.className='xmas-santa'; santa.innerHTML=_xmasSantaSvg(); layer.appendChild(santa);
+    var cv=document.createElement('canvas'); cv.className='xmas-snow'; layer.appendChild(cv);
+    hdr.appendChild(layer); _xmasStartSnow(cv, hdr); return;
+  }
+  hdr.appendChild(layer);
+}
+function _xmasStartSnow(cv, hdr){
+  var ctx=cv.getContext('2d'); if(!ctx) return;
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  var w=hdr.clientWidth||900, hh=hdr.clientHeight||58;
+  cv.width=w*dpr; cv.height=hh*dpr; cv.style.width=w+'px'; cv.style.height=hh+'px'; ctx.setTransform(dpr,0,0,dpr,0,0);
+  var flakes=[]; var N=Math.max(10,Math.min(26,Math.round(w/44)));
+  for(var i=0;i<N;i++){ flakes.push({x:Math.random()*w,y:Math.random()*hh,r:0.8+Math.random()*1.5,sp:0.15+Math.random()*0.45,dr:(-.15+Math.random()*.3)}); }
+  function frame(){ ctx.clearRect(0,0,w,hh); ctx.fillStyle='rgba(255,255,255,.72)';
+    for(var i=0;i<flakes.length;i++){ var f=flakes[i]; f.y+=f.sp; f.x+=f.dr; if(f.y>hh){ f.y=-2; f.x=Math.random()*w; } if(f.x<0)f.x=w; if(f.x>w)f.x=0; ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.3); ctx.fill(); }
+    _xmasSnowRAF=requestAnimationFrame(frame); }
+  _xmasSnowRAF=requestAnimationFrame(frame);
+}
+function _xmasInit(){
+  try{
+    if(_xmasOn()){ document.body.classList.add('xmas-on'); _xmasBuildHeaderDecor(); try{ _xmusOnSeason(); }catch(e){} }
+    else { document.body.classList.remove('xmas-on'); _xmasRemoveHeaderDecor(); try{ _xmusStop(); _xmusSync(); }catch(e){} }
+  }catch(e){ console.warn('[Xmas] init',e&&e.message); }
+}
+/* Welcome celebration: two distinct bursts + gentle snow, ~short, auto-cleanup. No audio. */
+var _xmasCelebRAF=null, _xmasCelebCv=null, _xmasCelebBusy=false;
+function _xmasCleanupCelebrate(){ if(_xmasCelebRAF){ cancelAnimationFrame(_xmasCelebRAF); _xmasCelebRAF=null; } if(_xmasCelebCv&&_xmasCelebCv.parentNode){ _xmasCelebCv.parentNode.removeChild(_xmasCelebCv); } _xmasCelebCv=null; _xmasCelebBusy=false; }
+function _xmasWelcomeCelebrate(){
+  if(!_xmasOn()) return;
+  if(_xmasReduced()) return;                 /* reduced motion: skip animation (festive message remains) */
+  if(_xmasCelebBusy && _xmasCelebCv) return;  /* already running */
+  _xmasCleanupCelebrate(); _xmasCelebBusy=true;
+  var cv=document.createElement('canvas'); cv.className='xmas-celebrate-cv'; cv.setAttribute('aria-hidden','true'); document.body.appendChild(cv); _xmasCelebCv=cv;
+  var ctx=cv.getContext('2d'); if(!ctx){ _xmasCleanupCelebrate(); return; }
+  var dpr=Math.min(2,window.devicePixelRatio||1); var W=window.innerWidth, H=window.innerHeight;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px'; ctx.setTransform(dpr,0,0,dpr,0,0);
+  var colors=['#6B2FD6','#8A4BEF','#F2B134','#FFD66B','#F7E7B0','#C0C0C8','#E0564E','#3FAE6B'];
+  var parts=[], snow=[];
+  function burst(cx,cy){ for(var i=0;i<120;i++){ var a=Math.random()*Math.PI*2, sp=3+Math.random()*7; parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,g:0.12,w:4+Math.random()*5,hh:6+Math.random()*7,rot:Math.random()*6,vr:(-.3+Math.random()*.6),c:colors[(Math.random()*colors.length)|0]}); } }
+  for(var s=0;s<42;s++){ snow.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2,sp:0.5+Math.random()*1.2,dr:(-.3+Math.random()*.6)}); }
+  burst(W*0.3, H*0.42);
+  setTimeout(function(){ try{ if(_xmasCelebCv) burst(W*0.7, H*0.40); }catch(e){} }, 720);
+  var t0=performance.now(), DUR=3800;
+  function frame(now){ var el=now-t0; var fade=el>DUR-900?Math.max(0,(DUR-el)/900):1; ctx.clearRect(0,0,W,H);
+    for(var i=0;i<parts.length;i++){ var p=parts[i]; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.vx*=0.992; p.rot+=p.vr; var a=fade*Math.max(0,1-el/DUR*0.55); if(a<=0)continue; ctx.save(); ctx.globalAlpha=Math.min(1,a); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.hh/2,p.w,p.hh); ctx.restore(); }
+    ctx.fillStyle='rgba(255,255,255,'+(0.8*fade).toFixed(3)+')';
+    for(var j=0;j<snow.length;j++){ var f=snow[j]; f.y+=f.sp; f.x+=f.dr; if(f.y>H){ f.y=-4; f.x=Math.random()*W; } ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.3); ctx.fill(); }
+    if(el<DUR){ _xmasCelebRAF=requestAnimationFrame(frame); } else { _xmasCleanupCelebrate(); } }
+  _xmasCelebRAF=requestAnimationFrame(frame);
+}
+
+/* ======== v161: Christmas background music (synth "We Wish You a Merry Christmas").
+   Separate AudioContext from Peer Appreciation (fully independent). Per-user
+   preference (default ON). Loops seamlessly; season-gated; stops on sign-out. ======== */
+var _xmusCtx=null,_xmusGain=null,_xmusOn=false,_xmusInit=false,_xmusPlaying=false,_xmusTimer=null,_xmusNodes=[],_xmus_unlock=false,_xmusWelcomeDone=false;
+var _XNF={G4:392.00,A4:440.00,B4:493.88,C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99};
+var XMUS_SEQ=[['G4',1],['C5',1],['C5',.5],['D5',.5],['C5',.5],['B4',.5],['A4',1],['A4',1],['D5',1],['D5',.5],['E5',.5],['D5',.5],['C5',.5],['B4',1],['G4',1],['E5',1],['E5',.5],['F5',.5],['E5',.5],['D5',.5],['C5',1],['A4',1],['G4',.5],['G4',.5],['A4',1],['D5',1],['B4',1],['C5',2],[null,1]];
+function _xmusKey(){ var em=''; try{ em=(TK.email()||'').trim().toLowerCase(); }catch(e){} return 'tj_xmas_music_'+(em||'anon'); }
+function _xmusPref(){ try{ var v=localStorage.getItem(_xmusKey()); return v===null ? true : v==='1'; }catch(e){ return true; } }
+function _xmusSetPref(on){ try{ localStorage.setItem(_xmusKey(), on?'1':'0'); }catch(e){} }
+function _xmusAudio(){ if(!_xmusCtx){ try{ var AC=window.AudioContext||window.webkitAudioContext; _xmusCtx=AC?new AC():null; if(_xmusCtx){ _xmusGain=_xmusCtx.createGain(); _xmusGain.gain.value=0.085; _xmusGain.connect(_xmusCtx.destination); } }catch(e){ _xmusCtx=null; } } return _xmusCtx; }
+function _xmusSetWaiting(b){ var el=document.getElementById('btnXmasMusic'); if(el){ if(b) el.classList.add('waiting'); else el.classList.remove('waiting'); } }
+function _xmusSync(){ var el=document.getElementById('btnXmasMusic'); if(!el) return; if(_xmusOn){ el.classList.remove('muted'); el.setAttribute('data-tip','Christmas Music: On'); el.title='Christmas Music: On'; } else { el.classList.add('muted'); el.setAttribute('data-tip','Christmas Music: Muted'); el.title='Christmas Music: Muted'; _xmusSetWaiting(false); } }
+function _xmusStop(){ _xmusPlaying=false; if(_xmusTimer){ clearTimeout(_xmusTimer); _xmusTimer=null; } for(var i=0;i<_xmusNodes.length;i++){ try{_xmusNodes[i].stop();}catch(e){} try{_xmusNodes[i].disconnect();}catch(e){} } _xmusNodes=[]; _xmusSetWaiting(false); }
+function _xmusVoice(ctx,f,t,dur,peak,type){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.value=f; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+0.03); g.gain.exponentialRampToValueAtTime(0.0001,t+Math.max(0.08,dur*0.92)); o.connect(g); g.connect(_xmusGain); o.start(t); o.stop(t+dur); _xmusNodes.push(o); }
+function _xmusScheduleLoop(){ if(!_xmusPlaying) return; var ctx=_xmusAudio(); if(!ctx) return; var beat=0.44; var t=ctx.currentTime+0.06;
+  for(var i=0;i<XMUS_SEQ.length;i++){ var nm=XMUS_SEQ[i][0], dur=XMUS_SEQ[i][1]*beat; if(nm){ var f=_XNF[nm]; _xmusVoice(ctx,f,t,dur,0.9,'triangle'); if(XMUS_SEQ[i][1]>=1){ _xmusVoice(ctx,f/2,t,dur,0.32,'sine'); } } t+=dur; }
+  var total=t-ctx.currentTime; _xmusTimer=setTimeout(function(){ _xmusNodes=[]; _xmusScheduleLoop(); }, Math.max(60,(total-0.12)*1000)); }
+function _xmusBegin(){ if(_xmusPlaying) return; _xmusPlaying=true; _xmusSetWaiting(false); _xmusScheduleLoop(); }
+function _xmusInstallUnlock(){ if(_xmus_unlock) return; _xmus_unlock=true; var fn=function(){ if(!(_xmusOn&&_xmasOn()&&_xmusWelcomeDone)) return; var ctx=_xmusAudio(); if(ctx){ ctx.resume().then(function(){ if(ctx.state==='running'&&_xmusWelcomeDone) _xmusBegin(); }).catch(function(){}); } }; try{ ['pointerdown','keydown','touchstart'].forEach(function(ev){ window.addEventListener(ev, fn, {passive:true}); }); }catch(e){ try{ window.addEventListener('pointerdown', fn, true); }catch(e2){} } }
+function _xmusMaybeStart(){ if(!_xmasOn()||!_xmusOn) return; var ctx=_xmusAudio(); if(!ctx) return; if(ctx.state==='suspended'){ _xmusSetWaiting(true); _xmusInstallUnlock(); ctx.resume().then(function(){ if(ctx.state==='running'&&_xmusOn&&_xmasOn()) _xmusBegin(); }).catch(function(){}); return; } _xmusBegin(); }
+function _xmusOnSeason(){ _xmusOn=_xmusPref(); _xmusInit=true; _xmusSync(); _xmusInstallUnlock(); /* v162: prepared but gated — music starts only after the welcome/Mood flow */ }
+function _xmusWelcomeStart(){ _xmusWelcomeDone=true; if(_xmasOn()&&_xmusOn) _xmusMaybeStart(); }
+function xmasToggleMusic(){ _xmusInit=true; _xmusWelcomeDone=true; _xmusOn=!_xmusOn; _xmusSetPref(_xmusOn); _xmusSync(); if(_xmusOn){ _xmusInstallUnlock(); _xmusMaybeStart(); } else { _xmusStop(); } }
+
+try{ _xmasInit(); }catch(e){}
+
 async function initAuth() {
   if (TK.hasAny()) {
     updateAuthUI(true, TK.name());
     try {
       const token = await getToken();
       await loadAndBuild(token);
+      try{ _xmusWelcomeStart(); }catch(e){}   /* v162: returning session has no welcome flow — allow music on the dashboard */
       try{ wnMaybeShow(); }catch(e){}   /* v131: What's New for returning sessions (gated once) */
       try{ wnRefreshIndicator(); }catch(e){}   /* v134: balloon indicator */
       return;
     } catch(e) {
       /* silent failed — show sign-in */
       TK.clear();
+      try{ _xmusStop(); }catch(_){}
     }
   }
   updateAuthUI(false);
@@ -5814,10 +6083,12 @@ function updateAuthUI(signedIn, displayName) {
 function showSignInOverlay() {
   const el = document.getElementById('signin-overlay');
   if (el) el.classList.remove('hidden');
+  try{ document.body.classList.add('signin-active'); }catch(e){}   /* v162: no document scroll on the sign-in page */
 }
 function hideSignInOverlay() {
   const el = document.getElementById('signin-overlay');
   if (el) el.classList.add('hidden');
+  try{ document.body.classList.remove('signin-active'); }catch(e){}
 }
 
 
@@ -5903,7 +6174,7 @@ function cvPreviewIdx(i){
 var WHATS_NEW_RELEASES = [
   {
     id: '2026-11-r2',
-    rev: 4,                                  /* v151: revision-aware dismissal; bumped to re-show the new CAF announcement within the same window */
+    rev: 5,                                  /* v160: revision-aware dismissal; bumped to re-show the new Peer Appreciation announcement within the same window */
     title: "What's New",
     window: { start: '2026-11-06', end: '2026-11-13' },
     items: [
@@ -5924,7 +6195,9 @@ var WHATS_NEW_RELEASES = [
       { n:8, title:'Daily Mood Check-in', target:null,
         text:'Say hello on the welcome page! Pick how you’re feeling today and receive a little motivational message. It’s just for you — your response is not recorded.' },
       { n:9, title:'Client Assignment File — Quick Guide', tab:'caf', target:'#tab-btn-caf',
-        text:'Double-click any client row in the Client Assignment File to open the right-side drawer and view the complete client details. Use Request Update to access the Client Status Monitoring Form in the designated MS Teams channel — a confirmation prompt appears before it opens.' }
+        text:'Double-click any client row in the Client Assignment File to open the right-side drawer and view the complete client details. Use Request Update to access the Client Status Monitoring Form in the designated MS Teams channel — a confirmation prompt appears before it opens.' },
+      { n:10, title:'Peer Appreciation Victor', tab:'peer', target:'#tab-btn-peer',
+        text:'Replacing our former Thankful Fridays initiative, Peer Appreciation Victor gives Team Josh members a new way to recognize teammates who make a difference. Whether through case assistance, OOO support, knowledge sharing, client help, or simply going the extra mile, every act of support deserves appreciation. A little thank-you goes a long way \u2014 let\u2019s celebrate the people who make our team stronger!' }
     ]
   }
 ];
@@ -6249,7 +6522,8 @@ function parseConfig(values) {
   const prevMonthName = getMonthName(prevMonth);
   const prevMonthStr  = prevYear + '-' + String(prevMonth).padStart(2, '0');
   const currMonthStr  = year     + '-' + String(month).padStart(2, '0');
-  const version       = String(kv['Dashboard Version'] || 'V9');
+  const configVersionB6 = String(kv['Dashboard Version'] || '');   /* v162: B6 retained (unused for display) */
+  const version       = DASHBOARD_BUILD_VERSION;
   const theme         = String(kv['Dashboard Theme']   || 'SAP Horizon Light');
 
   /* ── Salesforce Name → Dashboard Name mapping ───────────────────────────
@@ -6295,7 +6569,7 @@ function parseConfig(values) {
 
   return {
     year, month, month_name: monthName, report_date: reportDate,
-    data_as_of: dataAsOfStr, version, theme,
+    data_as_of: dataAsOfStr, version, configVersionB6, theme,
     prev_month_name: prevMonthName,
     prev_month_str:  prevMonthStr,
     curr_month_str:  currMonthStr,
@@ -6311,7 +6585,7 @@ function _defaultConfig() {
   const pm = m > 1 ? m - 1 : 12, py = m > 1 ? y : y - 1;
   return {
     year: y, month: m, month_name: mn, report_date: mn + ' ' + y,
-    data_as_of: formatDayMonthYear(now), version: 'V9', theme: 'SAP Horizon Light',
+    data_as_of: formatDayMonthYear(now), version: DASHBOARD_BUILD_VERSION, theme: 'SAP Horizon Light',
     prev_month_name: getMonthName(pm),
     prev_month_str:  py + '-' + String(pm).padStart(2,'0'),
     curr_month_str:  y  + '-' + String(m).padStart(2,'0'),
@@ -6826,8 +7100,13 @@ async function loadLogo(token) {
          network requests.  Falls back to caching the CDN URL if localStorage
          quota is exceeded (expires ~1 h; refreshed automatically on each sign-in).
        assetItems is already resolved above — no extra API calls for navigation.  */
-    const _signinItem = (assetItems || []).find(f => f.name === SIGNIN_BG_FILE_NAME)
-                     || (assetItems || []).find(f => f.name.toLowerCase() === SIGNIN_BG_FILE_NAME.toLowerCase());
+    var _xOn = (typeof _xmasOn==='function') && _xmasOn();
+    var _bgFile = _xOn ? XMAS_SIGNIN_BG : SIGNIN_BG_FILE_NAME;
+    var _bgKey  = _xOn ? 'tj_cached_signin_bg_xmas' : 'tj_cached_signin_bg';
+    const _signinItem = (assetItems || []).find(f => f.name === _bgFile)
+                     || (assetItems || []).find(f => f.name.toLowerCase() === _bgFile.toLowerCase())
+                     || (_xOn ? ((assetItems || []).find(f => f.name === SIGNIN_BG_FILE_NAME) || (assetItems || []).find(f => f.name.toLowerCase() === SIGNIN_BG_FILE_NAME.toLowerCase())) : null);
+    if (_xOn && _signinItem) { _bgKey = (_signinItem.name && _signinItem.name.toLowerCase()===XMAS_SIGNIN_BG.toLowerCase()) ? 'tj_cached_signin_bg_xmas' : 'tj_cached_signin_bg'; }
     if (_signinItem) {
       graphGet('/drives/' + excelDriveId + '/items/' + _signinItem.id, token)
         .then(function(meta) {
@@ -6843,17 +7122,17 @@ async function loadLogo(token) {
             .then(function(blob) { return blobToDataUrl(blob); })
             .then(function(dataUrl) {
               try {
-                localStorage.setItem('tj_cached_signin_bg', dataUrl);
+                localStorage.setItem(_bgKey, dataUrl);
                 console.log('[SignInBG] Phase 2 — cached as permanent data URL');
               } catch(e) {
                 /* localStorage quota exceeded — cache the short CDN URL as fallback
                    (expires ~1 h but is refreshed on every sign-in)                 */
-                try { localStorage.setItem('tj_cached_signin_bg', dlUrl); } catch(e2) {}
+                try { localStorage.setItem(_bgKey, dlUrl); } catch(e2) {}
                 console.warn('[SignInBG] localStorage quota full — CDN URL cached as fallback');
               }
             })
             .catch(function() {
-              try { localStorage.setItem('tj_cached_signin_bg', dlUrl); } catch(e) {}
+              try { localStorage.setItem(_bgKey, dlUrl); } catch(e) {}
             });
         })
         .catch(function(e) {
@@ -6866,7 +7145,7 @@ async function loadLogo(token) {
               return blobToDataUrl(blob);
             })
             .then(function(dataUrl) {
-              try { localStorage.setItem('tj_cached_signin_bg', dataUrl); } catch(e) {}
+              try { localStorage.setItem(_bgKey, dataUrl); } catch(e) {}
               console.log('[SignInBG] Phase 1 fallback — applied via Object URL');
             })
             .catch(function() {});
@@ -9787,7 +10066,7 @@ const STATUS_STYLE = {
 
 function renderHeader(cfg) {
   document.getElementById('hdr-month').textContent   = cfg.month_name + ' ' + cfg.year;
-  document.getElementById('hdr-version').textContent = cfg.version;
+  document.getElementById('hdr-version').textContent = DASHBOARD_BUILD_VERSION;   /* v162: central build-version constant */
   document.getElementById('hdr-date').textContent    = cfg.data_as_of;
 }
 
@@ -10655,6 +10934,7 @@ async function loadAndBuild(token) {
   hideSignInOverlay();
   PERF.overlayHide = PERF.now() - _tOverlay0;   /* v109: splash/overlay removal */
   setLastRefresh();
+  try{ _xmasInit(); }catch(e){}   /* v160: re-evaluate Christmas schedule on load/refresh (no cached state) */
   try{ _applyUpdateGate(); }catch(e){}   /* v124: restrict update controls to Josh (UX) */
   /* v109: finalize + print the performance breakdown to the console */
   PERF.total = PERF.now() - PERF.loadStart;
