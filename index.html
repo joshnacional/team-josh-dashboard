@@ -5311,8 +5311,14 @@ var _paStore=null, _paLoaded=false, _paEditId=null, _paBusy=false, _paAdminMonth
 var _paDriveId=null, _paItemId=null;  /* v157: actual Graph ids of the pre-created shared JSON */
 /* ======== v158: sound effects + winner celebration + admin delete ======== */
 var _paSoundOn=false, _paSoundInit=false, _paAudioCtx=null, _paActiveNodes=[];
-function _paSoundPref(){ try{ return localStorage.getItem('tj_pa_sound')==='1'; }catch(e){ return false; } }
-function _paSetSoundPref(on){ try{ localStorage.setItem('tj_pa_sound', on?'1':'0'); }catch(e){} }
+function _paSoundKey(){ var em=''; try{ em=(TK.email()||'').trim().toLowerCase(); }catch(e){} return 'tj_pa_sound_'+(em||'anon'); }
+function _paSoundPref(){ try{ return localStorage.getItem(_paSoundKey())==='1'; }catch(e){ return false; } }
+function _paSetSoundPref(on){ try{ localStorage.setItem(_paSoundKey(), on?'1':'0'); }catch(e){} }
+var _paUnlockInstalled=false;
+function _paInstallAudioUnlock(){ if(_paUnlockInstalled) return; _paUnlockInstalled=true;
+  var fn=function(){ try{ if(_paAudioCtx && _paAudioCtx.state==='suspended') _paAudioCtx.resume(); }catch(e){} };
+  try{ ['pointerdown','keydown','touchstart'].forEach(function(ev){ window.addEventListener(ev, fn, {passive:true}); }); }
+  catch(e){ try{ window.addEventListener('pointerdown', fn, true); }catch(e2){} } }
 function _paAudio(){ if(!_paAudioCtx){ try{ var AC=window.AudioContext||window.webkitAudioContext; _paAudioCtx=AC?new AC():null; }catch(e){ _paAudioCtx=null; } } return _paAudioCtx; }
 function paStopAudio(){ try{ for(var i=0;i<_paActiveNodes.length;i++){ try{ _paActiveNodes[i].stop(); }catch(e){} try{ _paActiveNodes[i].disconnect(); }catch(e){} } }catch(e){} _paActiveNodes=[]; }
 function _paBlip(ctx,freq,start,dur,peak,type){ var o=ctx.createOscillator(),g=ctx.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(peak,start+0.02); g.gain.exponentialRampToValueAtTime(0.0001,start+dur); o.connect(g); g.connect(ctx.destination); o.start(start); o.stop(start+dur+0.03); _paActiveNodes.push(o); }
@@ -5325,12 +5331,19 @@ function paPlayReveal(){ if(!_paSoundOn) return; var ctx=_paAudio(); if(!ctx) re
 function paSyncSoundBtn(){ var b=document.getElementById('pa-sound-btn'); if(!b) return;
   if(_paSoundOn){ b.classList.add('on'); b.title='Sound on \u2014 click to mute'; b.setAttribute('aria-label','Mute sound'); b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zm-2.5-9v2.1a7 7 0 0 1 0 13.8V21a9 9 0 0 0 0-18z"/></svg>'; }
   else { b.classList.remove('on'); b.title='Enable sound'; b.setAttribute('aria-label','Enable sound'); b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M15 9l5 6m0-6l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'; } }
-function paToggleSound(){ _paSoundInit=true; _paSoundOn=!_paSoundOn; _paSetSoundPref(_paSoundOn); var ctx=_paAudio(); if(ctx&&ctx.state==='suspended'){ try{ctx.resume();}catch(e){} } paSyncSoundBtn();
+function paToggleSound(){ _paSoundInit=true; _paSoundOn=!_paSoundOn; _paSetSoundPref(_paSoundOn); var ctx=_paAudio(); if(ctx&&ctx.state==='suspended'){ try{ctx.resume();}catch(e){} } _paInstallAudioUnlock(); paSyncSoundBtn();
   if(_paSoundOn){ try{ if(!_paRevealSig(_paCurrentCycle())) paPlayMystery(); else paPlayReveal(); }catch(e){} } else { paStopAudio(); } }
 function _paRevealSig(cycle){ var mo=_paStore&&_paStore.months&&_paStore.months[cycle]; var w=mo&&mo.winner; var names=_paWinnerNames(w); if(!(w&&w.revealed&&names.length)) return ''; return cycle+'|'+names.slice().sort().join(',')+'|'+(w.revealedAt||''); }
 function _paCelebratedSig(){ try{ return localStorage.getItem('tj_pa_celebrated')||''; }catch(e){ return ''; } }
 function _paSetCelebrated(sig){ try{ localStorage.setItem('tj_pa_celebrated',sig); }catch(e){} }
-function paMaybeCelebrate(cycle){ var sig=_paRevealSig(cycle); if(!sig) return; if(sig===_paCelebratedSig()) return; _paSetCelebrated(sig); try{ paPlayReveal(); }catch(e){} try{ paLaunchConfetti(); }catch(e){} }
+/* v159: celebrate on every genuine Peer Appreciation tab entry (called ONLY from paOnTabShow).
+   Hidden -> mystery chime (if sound on). Revealed -> fanfare (if sound on) + confetti (always).
+   The reveal signature is retained for data-change detection but no longer suppresses replay. */
+function paCelebrateOnEntry(){
+  var cycle=_paCurrentCycle();
+  if(_paRevealSig(cycle)){ if(_paSoundOn){ try{ paPlayReveal(); }catch(e){} } try{ paLaunchConfetti(); }catch(e){} }
+  else { if(_paSoundOn){ try{ paPlayMystery(); }catch(e){} } }
+}
 var _paConfRAF=null, _paConfCanvas=null;
 function paClearConfetti(){ if(_paConfRAF){ cancelAnimationFrame(_paConfRAF); _paConfRAF=null; } if(_paConfCanvas&&_paConfCanvas.parentNode){ _paConfCanvas.parentNode.removeChild(_paConfCanvas); } _paConfCanvas=null; }
 function paLaunchConfetti(){
@@ -5483,9 +5496,9 @@ async function paOnTabShow(){
   if(!(typeof TK!=='undefined' && TK.hasAny && TK.hasAny())){ if(body) body.innerHTML='<div class="pa-card"><div class="pa-empty">Please sign in on the Performance Dashboard tab first to use Peer Appreciation.</div></div>'; return; }
   if(body) body.innerHTML='<div class="pa-card"><div class="pa-empty">Loading\u2026</div></div>';
   try{ var t=await getToken(); await paLoad(t); }catch(e){ console.warn('[PA] tab load',e&&e.message); }
-  if(!_paSoundInit){ _paSoundOn=_paSoundPref(); _paSoundInit=true; }
+  _paSoundOn=_paSoundPref(); _paSoundInit=true; _paInstallAudioUnlock();
   paRender();
-  try{ if(_paSoundOn && !_paRevealSig(_paCurrentCycle())) paPlayMystery(); }catch(e){}
+  try{ paCelebrateOnEntry(); }catch(e){}
 }
 
 /* ── calculations ── */
@@ -5517,7 +5530,6 @@ function paRender(){ var body=document.getElementById('pa-body'); if(!body) retu
     body.innerHTML='<div class="pa-member-wrap">'+paMemberColumn(false)+'</div>';
   }
   try{ paSyncSoundBtn(); }catch(e){}
-  try{ paMaybeCelebrate(_paCurrentCycle()); }catch(e){}
 }
 
 /* ── MEMBER VIEW (own entries only) ── */
