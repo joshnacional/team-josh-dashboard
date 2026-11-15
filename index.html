@@ -3051,6 +3051,30 @@ body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index
 html[data-theme="dark"] .el-successmap-cta{background:rgba(120,80,255,.16);border-color:rgba(120,80,255,.45)}
 html[data-theme="dark"] .el-successmap-cta .sm-desc{color:#CDBEFF}
 @media(max-width:700px){.el-successmap-cta{margin-left:0;align-items:flex-start;width:100%}.el-successmap-cta .sm-desc{text-align:left}}
+/* ===== v166: Hannah temporary delegated-access dialog ===== */
+.hdlg-overlay{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(18,10,42,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.hdlg-overlay.hidden{display:none}
+.hdlg-card{width:100%;max-width:440px;max-height:92vh;overflow:auto;background:linear-gradient(160deg,#FBF9FF 0%,#F4F0FF 100%);border:1px solid #E1D8FB;border-radius:18px;padding:22px 22px 20px;box-shadow:0 20px 60px rgba(29,19,64,.42);text-align:center}
+.hdlg-icon{width:52px;height:52px;margin:0 auto 10px;border-radius:14px;background:linear-gradient(135deg,#6B2FD6,#8A4BEF);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(107,47,214,.35)}
+.hdlg-icon svg{width:30px;height:30px;fill:#fff;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hdlg-icon svg path{fill:#fff;stroke:none} .hdlg-icon svg polyline{fill:none;stroke:#6B2FD6;stroke-width:2.2}
+.hdlg-title{font-size:18px;font-weight:800;color:#2E1F6B;font-family:Georgia,serif;letter-spacing:.2px}
+.hdlg-badge{display:inline-block;margin:7px 0 4px;font-size:9.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#5D36FF;background:#EEE9FF;border:1px solid #DDD2F7;border-radius:20px;padding:3px 11px}
+.hdlg-hi{font-size:13px;font-weight:800;color:#4A3B8A;margin:10px 0 4px}
+.hdlg-msg{font-size:11.5px;color:#4A3B72;line-height:1.5;margin:0 0 10px}
+.hdlg-sub{font-size:10.5px;font-weight:700;color:#6B5CA5;text-align:left;margin:0 0 4px}
+.hdlg-list{list-style:none;margin:0 0 12px;padding:0;text-align:left}
+.hdlg-list li{position:relative;font-size:12px;font-weight:700;color:#2E1F6B;padding:6px 10px 6px 30px;margin-bottom:5px;background:#fff;border:1px solid #E6DEFF;border-radius:9px}
+.hdlg-list li::before{content:"";position:absolute;left:11px;top:50%;width:10px;height:6px;border-left:2px solid #2EA35A;border-bottom:2px solid #2EA35A;transform:translateY(-70%) rotate(-45deg)}
+.hdlg-period{display:flex;align-items:center;justify-content:space-between;gap:8px;background:linear-gradient(135deg,#6B2FD6,#8A4BEF);border-radius:10px;padding:8px 13px;margin:0 0 8px}
+.hdlg-period-lbl{font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:rgba(255,255,255,.82)}
+.hdlg-period-val{font-size:14px;font-weight:800;color:#fff;font-family:Georgia,serif}
+.hdlg-expiry{font-size:11px;color:#8A5A12;background:#FFF4DC;border:1px solid #F0DDAE;border-radius:9px;padding:8px 11px;line-height:1.45;margin:0 0 10px}
+.hdlg-foot{font-size:10px;color:#6B5CA5;line-height:1.5;margin:0 0 14px}
+.hdlg-btn{font-size:12.5px;font-weight:800;border:none;border-radius:11px;padding:11px 22px;cursor:pointer;background:linear-gradient(135deg,#6B2FD6,#8A4BEF);color:#fff;box-shadow:0 4px 14px rgba(107,47,214,.34);transition:filter .15s,transform .1s;width:100%}
+.hdlg-btn:hover{filter:brightness(1.07)} .hdlg-btn:active{transform:scale(.99)}
+@media(max-width:480px){.hdlg-card{padding:18px 16px 16px}.hdlg-period{flex-direction:column;align-items:flex-start;gap:2px}}
+@media(prefers-reduced-motion:reduce){.hdlg-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}}
 </style>
 </head>
 <body>
@@ -3708,6 +3732,29 @@ html[data-theme="dark"] .el-successmap-cta .sm-desc{color:#CDBEFF}
     </div>
   </div>
   <div id="pa-del-overlay" class="pa-del-overlay hidden" onclick="paDelOverlayClick(event)"><div class="pa-del-dialog" id="pa-del-dialog"></div></div>
+
+  <!-- v166: Hannah temporary delegated-access notice (shown after the Welcome dialogue, before Mood Check-in) -->
+  <div id="hdlg-overlay" class="hdlg-overlay hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="hdlg-title">
+    <div class="hdlg-card">
+      <div class="hdlg-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5l8-3z"/><polyline points="8.5 12 11 14.5 15.5 9.5"/></svg></div>
+      <div class="hdlg-title" id="hdlg-title">Temporary Delegated Access</div>
+      <div class="hdlg-badge">Delegated access &mdash; not full admin</div>
+      <p class="hdlg-hi">Hi Hannah!</p>
+      <p class="hdlg-msg">You have been granted temporary delegated access to selected management features while Josh is out of the office.</p>
+      <div class="hdlg-sub">Your authorized access includes:</div>
+      <ul class="hdlg-list">
+        <li>Manage Touch Base</li>
+        <li>Upload Survey Data</li>
+        <li>Manage PFTC</li>
+        <li>Update IRT/ORT Snapshot</li>
+        <li>Upload Utilization Data</li>
+      </ul>
+      <div class="hdlg-period"><span class="hdlg-period-lbl">Access period</span><span class="hdlg-period-val">November 16&ndash;19, 2026</span></div>
+      <div class="hdlg-expiry">Your access will automatically expire on <strong>November 20, 2026 at 12:00 AM (Manila time)</strong>.</div>
+      <p class="hdlg-foot">Please continue using your own Microsoft 365 account. All changes you make will be attributed to your account. Quality and eLearning data management remain restricted to Josh.</p>
+      <button class="hdlg-btn" type="button" onclick="_hannahDelegDone()">Got it &mdash; Continue</button>
+    </div>
+  </div>
 
   <!-- ══ LEAVE PLANNER DIALOGS ════════════════════════════════════════ -->
 
@@ -4998,6 +5045,7 @@ async function _welcomeAndLoad() {
     const dataPromise = loadAndBuild();
     await _wlRunSequence();
     await dataPromise;            /* ensure full dashboard is ready before reveal */
+    try { await _hannahDelegNotice(); } catch(e) { console.warn('[Deleg] notice skipped:', e && e.message); }  /* v166: Hannah delegated-access notice (eligible only) */
     try { await _moodCheckin(); } catch(e) { console.warn('[Mood] check-in skipped:', e && e.message); }  /* v146 (E1): optional ephemeral step */
   } catch(e) {
     console.error('[Welcome] Load error during welcome:', e);
@@ -14990,10 +15038,27 @@ function _isJoshUser(){ try{ return (TK.email()||'').trim().toLowerCase()===JOSH
    Josh's leave (Nov 16-18, 2026, Asia/Manila). Re-evaluated on every gate render and
    every action handler call (no cached permission state). This is a UX gate only --
    the actual enforcement is the file-level OneDrive Edit permissions Josh granted. */
-var TJ_DELEG = { email:'hannah.mitz.cachola@sap.com', start:'2026-11-16', end:'2026-11-18', actions:['touchbase','surveys','pftc','irtort','uhm'] };
+var TJ_DELEG = { email:'hannah.mitz.cachola@sap.com', start:'2026-11-16', end:'2026-11-19', actions:['touchbase','surveys','pftc','irtort','uhm'] };  /* v166: Nov 19 now a full authorized day */
 function _delegManilaDate(){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } }
 function _delegActive(){ var d=_delegManilaDate(); return d>=TJ_DELEG.start && d<=TJ_DELEG.end; }
 function _isDelegate(){ try{ var e=(TK && TK.email) ? String(TK.email()||'') : ''; e=e.trim().toLowerCase(); return e!=='' && e===TJ_DELEG.email; }catch(e){ return false; } }  /* v165: exact Microsoft identity (email claim) only; fails closed if absent */
+function _hannahDelegEligible(){ return _isDelegate() && _delegActive(); }
+function _hannahDelegNotice(){
+  return new Promise(function(resolve){
+    try{
+      if(!_hannahDelegEligible()){ resolve(); return; }
+      var ov=document.getElementById('hdlg-overlay'); if(!ov){ resolve(); return; }
+      _hannahDelegResolve=resolve;
+      ov.classList.remove('hidden');
+      var b=ov.querySelector('.hdlg-btn'); if(b){ try{ b.focus(); }catch(e){} }
+    }catch(e){ resolve(); }
+  });
+}
+var _hannahDelegResolve=null;
+function _hannahDelegDone(){
+  var ov=document.getElementById('hdlg-overlay'); if(ov) ov.classList.add('hidden');
+  var r=_hannahDelegResolve; _hannahDelegResolve=null; if(r) r();
+}
 function _canManage(action){
   if(_isJoshUser()) return true;
   if(action && _delegActive() && _isDelegate() && TJ_DELEG.actions.indexOf(action)>=0) return true;
