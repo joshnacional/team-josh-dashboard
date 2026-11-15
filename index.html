@@ -3044,6 +3044,13 @@ body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index
 .xmas-gitem{position:absolute;bottom:1px;line-height:0}
 .xmas-gdot{position:absolute;bottom:3px;width:3px;height:3px;border-radius:50%;background:#FFCF5E;box-shadow:0 0 4px 1px rgba(255,207,94,.65);animation:xmasGlow 2.4s ease-in-out infinite}
 @keyframes xmasGlow{0%,100%{opacity:.45}50%{opacity:1}}
+/* ===== v165: SAP SuccessMap CTA relocated to the Course Compliance heading ===== */
+.el-card-bar-cc{flex-wrap:wrap;gap:6px 12px}
+.el-successmap-cta{margin-left:auto;display:inline-flex;flex-direction:column;align-items:flex-end;gap:2px;background:rgba(93,54,255,.08);border:1px solid #E1D8FB;border-radius:10px;padding:6px 10px 7px;max-width:100%}
+.el-successmap-cta .sm-desc{font-size:9px;color:#6B5CA5;line-height:1.35;text-align:right}
+html[data-theme="dark"] .el-successmap-cta{background:rgba(120,80,255,.16);border-color:rgba(120,80,255,.45)}
+html[data-theme="dark"] .el-successmap-cta .sm-desc{color:#CDBEFF}
+@media(max-width:700px){.el-successmap-cta{margin-left:0;align-items:flex-start;width:100%}.el-successmap-cta .sm-desc{text-align:left}}
 </style>
 </head>
 <body>
@@ -3608,7 +3615,6 @@ body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index
         <div class="el-hdr-sub" id="el-hdr-sub"></div>
         <div class="el-hdr-actions">
           <span class="elab-badge" id="elab-badge">No SAP LAB import yet — completion data from workbook</span>
-          <a class="elab-update-btn el-successmap-btn" href="https://sap.plateau.com/learning/user/personal/landOnPortalHome.do?fromSF=Y&amp;fromDeepLink=true&amp;pageID=" target="_blank" rel="noopener noreferrer" data-tip="Open the SAP SuccessMap learning portal (opens in a new tab)"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>SAP SuccessMap</a>
           <button class="elab-update-btn" id="elab-update-btn" onclick="elabOpenPanel()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>Update eLearning Data</button>
           <span class="upd-note" id="elab-update-note" style="display:none">Josh use only — do not update</span>
         </div>
@@ -3646,15 +3652,19 @@ body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index
 
       <!-- ── Course Compliance Table ──────────────────────────────────── -->
       <div class="el-section-card">
-        <div class="el-card-bar">
+        <div class="el-card-bar el-card-bar-cc">
           <span class="el-card-bar-title">Course Compliance</span>
+          <div class="el-successmap-cta">
+            <a class="lp-fiori-link lp-pulse-btn" href="https://sap.plateau.com/learning/user/personal/landOnPortalHome.do?fromSF=Y&amp;fromDeepLink=true&amp;pageID=" target="_blank" rel="noopener noreferrer" title="Open the SAP SuccessMap learning portal in a new tab"><svg class="lp-hb" viewBox="0 0 36 16" aria-hidden="true"><polyline points="0,8 7,8 10,3 14,13 18,5 21,8 36,8"></polyline></svg><span>Click here &mdash; SAP SuccessMap &#8599;</span></a>
+            <span class="sm-desc">Access your assigned learning courses through SAP SuccessMap.</span>
+          </div>
         </div>
         <!-- v116/v117: Course Link information callout (compact lavender) -->
         <div class="el-note">
           <svg class="el-note-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="7.5" x2="12" y2="7.6"/></svg>
           <div class="el-note-text">
             <span class="el-note-label">Accessing Courses</span>
-            All courses are now accessed through the SAP SuccessMap portal — use the <strong>SAP SuccessMap</strong> button above. If a course doesn’t open, make sure you are logged in to SuccessMap/SuccessFactors, then open it from your eLearning page.
+            All courses are now accessed through the SAP SuccessMap portal — use the <strong>SAP SuccessMap</strong> link above. If a course doesn’t open, make sure you are logged in to SuccessMap/SuccessFactors, then open it from your eLearning page.
           </div>
         </div>
         <div class="el-tbl-wrap">
@@ -14980,10 +14990,10 @@ function _isJoshUser(){ try{ return (TK.email()||'').trim().toLowerCase()===JOSH
    Josh's leave (Nov 16-18, 2026, Asia/Manila). Re-evaluated on every gate render and
    every action handler call (no cached permission state). This is a UX gate only --
    the actual enforcement is the file-level OneDrive Edit permissions Josh granted. */
-var TJ_DELEG = { member:'Hannah', start:'2026-11-16', end:'2026-11-18', actions:['touchbase','surveys','pftc','irtort','uhm'] };
+var TJ_DELEG = { email:'hannah.mitz.cachola@sap.com', start:'2026-11-16', end:'2026-11-18', actions:['touchbase','surveys','pftc','irtort','uhm'] };
 function _delegManilaDate(){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } }
 function _delegActive(){ var d=_delegManilaDate(); return d>=TJ_DELEG.start && d<=TJ_DELEG.end; }
-function _isDelegate(){ try{ return (typeof _paSelfMember==='function') && _paSelfMember()===TJ_DELEG.member; }catch(e){ return false; } }
+function _isDelegate(){ try{ var e=(TK && TK.email) ? String(TK.email()||'') : ''; e=e.trim().toLowerCase(); return e!=='' && e===TJ_DELEG.email; }catch(e){ return false; } }  /* v165: exact Microsoft identity (email claim) only; fails closed if absent */
 function _canManage(action){
   if(_isJoshUser()) return true;
   if(action && _delegActive() && _isDelegate() && TJ_DELEG.actions.indexOf(action)>=0) return true;
