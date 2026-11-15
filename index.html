@@ -3608,6 +3608,7 @@ body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index
         <div class="el-hdr-sub" id="el-hdr-sub"></div>
         <div class="el-hdr-actions">
           <span class="elab-badge" id="elab-badge">No SAP LAB import yet — completion data from workbook</span>
+          <a class="elab-update-btn el-successmap-btn" href="https://sap.plateau.com/learning/user/personal/landOnPortalHome.do?fromSF=Y&amp;fromDeepLink=true&amp;pageID=" target="_blank" rel="noopener noreferrer" data-tip="Open the SAP SuccessMap learning portal (opens in a new tab)"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>SAP SuccessMap</a>
           <button class="elab-update-btn" id="elab-update-btn" onclick="elabOpenPanel()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>Update eLearning Data</button>
           <span class="upd-note" id="elab-update-note" style="display:none">Josh use only — do not update</span>
         </div>
@@ -3652,8 +3653,8 @@ body.xmas-on .signin-overlay::after{content:"";position:absolute;inset:0;z-index
         <div class="el-note">
           <svg class="el-note-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="7.5" x2="12" y2="7.6"/></svg>
           <div class="el-note-text">
-            <span class="el-note-label">Course Link Information</span>
-            Note: Course links may not work if you are not currently logged in to SuccessMap/SuccessFactors. If you encounter an issue, please log in to SuccessMap/SuccessFactors and access the course directly through your eLearning page.
+            <span class="el-note-label">Accessing Courses</span>
+            All courses are now accessed through the SAP SuccessMap portal — use the <strong>SAP SuccessMap</strong> button above. If a course doesn’t open, make sure you are logged in to SuccessMap/SuccessFactors, then open it from your eLearning page.
           </div>
         </div>
         <div class="el-tbl-wrap">
@@ -5051,31 +5052,61 @@ const _MOOD_MSGS = {
     "Rough days happen, and they don't define you. Be as kind to yourself today as you'd be to a teammate.",
     "You showed up, and that already counts for something. Take it one small step at a time.",
     "It's okay to not be okay. Breathe, go gently, and let today be enough.",
-    "Heavy days pass. You don't have to carry everything at once \u2014 just the next small thing."
+    "Heavy days pass. You don't have to carry everything at once, just the next small thing.",
+    "Hard days are real, and so is your resilience. Give yourself permission to go slow.",
+    "You don't have to fix everything right now. Pick one thing, and let the rest wait.",
+    "Tough moments ask a lot of us. It's fair to feel the weight, and it's fair to rest.",
+    "Be patient with yourself today. You're doing more than you give yourself credit for.",
+    "On the hard days, small is enough: a short walk, a glass of water, one finished task.",
+    "You're allowed to have an off day. It doesn't erase all the good ones behind you."
   ],
   2: [
     "A quiet, low day is still a valid one. Go easy, and let small wins find you.",
     "You don't need to feel your best to do your best. Start light, and be patient with yourself.",
     "Some days ask for less hustle and more kindness. Give yourself a little of both.",
-    "Low energy isn't failure \u2014 it's a signal to slow down. The team has your back."
+    "Low energy isn't failure, it's a signal to slow down. The team has your back.",
+    "Not every day needs a big push. A gentle, steady pace counts too.",
+    "It's fine to run in a lower gear today. Protect your energy and pick your battles.",
+    "A slow start is still a start. Ease in, and let momentum build on its own.",
+    "Feeling flat is human. Do the next small thing, then take a breath.",
+    "You can care about your work and still take it easy today. Both are allowed.",
+    "Quiet days have their own value. Tidy one corner of the work and call it a win."
   ],
   3: [
     "Okay is a perfectly good place to start. Small steady steps add up more than you think.",
     "Steady is underrated. A calm, ordinary day is its own kind of progress.",
-    "Not every day needs to be remarkable \u2014 showing up steadily is what builds momentum.",
-    "You're right where you need to be. Pick one small thing to feel good about today."
+    "Not every day needs to be remarkable; showing up steadily is what builds momentum.",
+    "You're right where you need to be. Pick one small thing to feel good about today.",
+    "Middle-of-the-road days keep the wheels turning, and that matters more than it feels.",
+    "No highs, no lows, just steady. That's a solid foundation to work from.",
+    "Fine is fine. Choose one task, finish it well, and let that set the tone.",
+    "An even keel is a gift on a busy week. Use the calm to get a little ahead.",
+    "You don't have to feel inspired to make progress. Routine does a lot of quiet good.",
+    "Okay today can become good tomorrow. For now, keep it simple and steady."
   ],
   4: [
-    "Love that energy \u2014 ride it! A good mood is a great time to tackle something you've been putting off.",
+    "Love that energy, ride it! A good mood is a great time to tackle something you've been putting off.",
     "Feeling good looks great on you. Share a little of that with the team today.",
-    "Nice \u2014 momentum is on your side. Let's make today count.",
-    "That's the spirit. Keep doing what's working and enjoy the good stretch."
+    "Nice, momentum is on your side. Let's make today count.",
+    "That's the spirit. Keep doing what's working and enjoy the good stretch.",
+    "Good days are great for the hard tasks. Start with the one you've been avoiding.",
+    "You're in a nice groove. Protect it, and let it carry you through the afternoon.",
+    "A good mood is worth spending well: help a teammate or finish something satisfying.",
+    "When it's flowing, let it flow. Trust the rhythm you've found today.",
+    "Feeling solid is a quiet superpower. Put it toward something you'll be proud of.",
+    "Keep that lightness going. A little good energy spreads further than you'd expect."
   ],
   5: [
-    "Amazing! Days like this are worth celebrating \u2014 go make them count.",
+    "Amazing! Days like this are worth celebrating, go make them count.",
     "You're on fire today! Channel that energy and let it lift the whole team.",
-    "Fantastic! Confidence like this is contagious \u2014 pass it on.",
-    "Love to see it! Soak it in, stay grateful, and keep that momentum rolling."
+    "Fantastic! Confidence like this is contagious, pass it on.",
+    "Love to see it! Soak it in, stay grateful, and keep that momentum rolling.",
+    "Big-energy days are rare and wonderful. Aim high while the spark is here.",
+    "You're clearly in your element. Take on the thing you've been saving for a day like this.",
+    "Riding high feels good; earn it and enjoy it, you've put in the work.",
+    "This is your kind of day. Set the pace and let the wins stack up.",
+    "Great mood, great chance to shine. Share the credit and keep it going.",
+    "Days like this deserve a mental high-five. Celebrate the win, then chase the next one."
   ]
 };
 let _moodLast = {};
@@ -5244,7 +5275,7 @@ function pftcMgrEdit(name){
   document.getElementById('pftc-m-app').value=(r.appreciate!=null?r.appreciate:''); document.getElementById('pftc-m-comm').value=(r.commendation!=null?r.commendation:''); pftcMgrCalc();
 }
 async function pftcMgrOpen(){
-  if(!_isJoshUser()) return;
+  if(!_canManage('pftc')) return;
   var ov=document.getElementById('pftc-mgr-overlay'); if(!ov) return;
   var sel=document.getElementById('pftc-m-name');
   if(sel){ var mem=(typeof _WL_MEMBERS!=='undefined'?_WL_MEMBERS:['Josh','Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']); sel.innerHTML=mem.map(function(x){return '<option value="'+x+'">'+x+'</option>';}).join(''); }
@@ -5258,7 +5289,7 @@ async function pftcMgrOpen(){
 function pftcMgrClose(){ var ov=document.getElementById('pftc-mgr-overlay'); if(ov) ov.classList.add('hidden'); }
 function pftcMgrMonthChange(){ var mo=document.getElementById('pftc-m-month'); pftcMgrRenderList(mo?mo.value:''); }
 async function pftcMgrSave(){
-  if(!_isJoshUser()){ pftcMgrStatus('Not authorized.',true); return; }
+  if(!_canManage('pftc')){ pftcMgrStatus('Not authorized.',true); return; }
   var month=document.getElementById('pftc-m-month').value;
   var name=document.getElementById('pftc-m-name').value;
   if(!month){ pftcMgrStatus('Please choose a reporting month.',true); return; }
@@ -5334,7 +5365,7 @@ function tbMgrRenderList(){
 }
 function tbMgrEdit(name){ var sel=document.getElementById('tb-m-css'); if(sel) sel.value=name; tbMgrLoadMember(); tbMgrStatus('Editing '+name+' \u2014 update the values and click Save.',false); var body=document.getElementById('tb-mgr-body'); if(body) body.scrollTop=0; }
 async function tbMgrOpen(){
-  if(!_isJoshUser()) return;
+  if(!_canManage('touchbase')) return;
   var ov=document.getElementById('tb-mgr-overlay'); if(!ov) return;
   var sel=document.getElementById('tb-m-css');
   if(sel){ var mem=(typeof CAF_CSS!=='undefined'?CAF_CSS:['Dhean','Hannah','Hart','Oliver','Rob','Roanne','Thor']); sel.innerHTML=mem.map(function(x){return '<option value="'+x+'">'+x+'</option>';}).join(''); }
@@ -5347,7 +5378,7 @@ async function tbMgrOpen(){
 }
 function tbMgrClose(){ var ov=document.getElementById('tb-mgr-overlay'); if(ov) ov.classList.add('hidden'); }
 async function tbMgrSave(){
-  if(!_isJoshUser()){ tbMgrStatus('Not authorized.',true); return; }
+  if(!_canManage('touchbase')){ tbMgrStatus('Not authorized.',true); return; }
   var month=document.getElementById('tb-m-month').value, css=document.getElementById('tb-m-css').value;
   if(!month){ tbMgrStatus('Please choose a reporting month.',true); return; }
   if(!css){ tbMgrStatus('Please select a CSS member.',true); return; }
@@ -10320,7 +10351,7 @@ function _iosMapRows(rows){
 }
 
 /* ── panel open/close/tabs ─────────────────────────────────────────────── */
-function iosOpenPanel(){ if(!_isJoshUser()){ return; } var p=document.getElementById('ios-panel'); if(p) p.style.display='block';
+function iosOpenPanel(){ if(!_canManage('irtort')){ return; } var p=document.getElementById('ios-panel'); if(p) p.style.display='block';
   _iosPasteHtml=''; var ta=document.getElementById('ios-paste'); if(ta) ta.value='';
   var cf=document.getElementById('ios-csv'); if(cf) cf.value='';
   var prev=document.getElementById('ios-preview'); if(prev){ prev.innerHTML=''; prev.style.display='none'; }
@@ -10403,7 +10434,7 @@ function _iosValidate(){
 
 /* ── Confirm & Apply -> save to OneDrive (only then update display) ─────── */
 async function iosConfirmApply(){
-  if(!_isJoshUser()){ _iosErr('Update controls are restricted to Josh Nacional.'); return; }
+  if(!_canManage('irtort')){ _iosErr('Not authorized to update the IRT/ORT snapshot.'); return; }
   var btn=document.getElementById('ios-confirm-btn'); if(btn&&btn.disabled) return;
   if(!_iosDraft || _iosDraft._block){ return; }
   var summary={}; IOS_COLS.forEach(function(c){ summary[c]=(_iosDraft.summary&&_iosDraft.summary[c]!=null)?_iosDraft.summary[c]:''; });
@@ -13521,7 +13552,6 @@ function elRenderTable() {
   /* CS headers centered to align with status pills */
   const headers =
     '<th class="el-th-course">eLearning Course</th>' +
-    (hasLinks ? '<th class="el-th-link">Course Link</th>' : '') +
     '<th class="el-th-intdead">CS Internal Deadline</th>' +
     '<th class="el-th-sapdead">SAP Deadline</th>' +
     showCs.map(cs => '<th class="el-th-cs">' + cafEsc(cs) + '</th>').join('');
@@ -13551,7 +13581,6 @@ function elRenderTable() {
 
     return '<tr' + rowCls + '>' +
       '<td class="el-td-course">' + cafEsc(c.name) + countBadge + warnBadge + '</td>' +
-      (hasLinks ? linkCell(c.courseLink) : '') +
       '<td class="el-td-intdead el-deadline-int">' + cafEsc(c.intDeadline) + '</td>' +
       '<td class="el-td-sapdead el-deadline-sap">' + cafEsc(c.sapDeadline) + '</td>' +
       showCs.map(cs => '<td class="el-td-status">' + statusPill(c.status[cs]) + '</td>').join('') +
@@ -14415,7 +14444,7 @@ function _uhmParse(rows){
 }
 
 /* ── panel ─────────────────────────────────────────────────────────────── */
-function uhmOpenPanel(){ if(!_isJoshUser()) return; _uhmDraft=null; _uhmPendingImg=null; _uhmPasteHtml=''; _uhmReplaceArmedMonth=null;
+function uhmOpenPanel(){ if(!_canManage('uhm')) return; _uhmDraft=null; _uhmPendingImg=null; _uhmPasteHtml=''; _uhmReplaceArmedMonth=null;
   var ta=document.getElementById('uhm-paste'); if(ta) ta.value='';
   var ip=document.getElementById('uhm-imgprev'); if(ip){ ip.innerHTML=''; ip.style.display='none'; }
   var pv=document.getElementById('uhm-preview'); if(pv){ pv.innerHTML=''; pv.style.display='none'; }
@@ -14502,7 +14531,7 @@ function _uhmValidate(){
 
 /* ── confirm & save ────────────────────────────────────────────────────── */
 async function uhmConfirm(){
-  if(!_isJoshUser()){ _uhmErr('Upload controls are restricted to Josh Nacional.'); return; }
+  if(!_canManage('uhm')){ _uhmErr('Not authorized to upload utilization data.'); return; }
   if(!_uhmDraft || _uhmDraft._block) return;
   var btn=document.getElementById('uhm-confirm-btn'); if(btn&&btn.disabled) return;
   var sel=document.getElementById('uhm-prev-month'); var month=sel?sel.value:_uhmCurMonth();
@@ -14714,7 +14743,7 @@ async function survUniqueName(token, dumpId, name){
 }
 
 async function survUploadFile(ev){
-  if(!_isJoshUser()){ survSetStatus('Not authorized \u2014 survey upload is restricted to Josh Nacional.', true); return; }
+  if(!_canManage('surveys')){ survSetStatus('Not authorized to upload survey data.', true); return; }
   var f=ev.target.files && ev.target.files[0]; if(!f) return;
   _survDraft=null; _survArchived=null;
   var ab=document.getElementById('surv-approve-btn'); if(ab) ab.disabled=true;
@@ -14779,7 +14808,7 @@ async function _survSaveMonth(snap){
 }
 
 async function survConfirm(){
-  if(!_isJoshUser()){ survSetStatus('Not authorized.', true); return; }
+  if(!_canManage('surveys')){ survSetStatus('Not authorized.', true); return; }
   if(!_survDraft){ survSetStatus('Nothing to publish \u2014 upload a workbook first.', true); return; }
   var ab=document.getElementById('surv-approve-btn'); if(ab){ ab.disabled=true; ab.textContent='Publishing\u2026'; }
   try{
@@ -14808,7 +14837,7 @@ async function survLoad(token){
 }
 
 function survOpenPanel(){
-  if(!_isJoshUser()) return;
+  if(!_canManage('surveys')) return;
   _survDraft=null;
   var p=document.getElementById('surv-panel'); if(p) p.style.display='block';
   var pv=document.getElementById('surv-preview'); if(pv) pv.innerHTML='';
@@ -14947,6 +14976,19 @@ function uhmRenderDisplay(){
 
 var JOSH_EMAIL = 'josh.nacional@sap.com';
 function _isJoshUser(){ try{ return (TK.email()||'').trim().toLowerCase()===JOSH_EMAIL; }catch(e){ return false; } }
+/* v164: temporary, action-specific delegated management access for Hannah during
+   Josh's leave (Nov 16-18, 2026, Asia/Manila). Re-evaluated on every gate render and
+   every action handler call (no cached permission state). This is a UX gate only --
+   the actual enforcement is the file-level OneDrive Edit permissions Josh granted. */
+var TJ_DELEG = { member:'Hannah', start:'2026-11-16', end:'2026-11-18', actions:['touchbase','surveys','pftc','irtort','uhm'] };
+function _delegManilaDate(){ try{ return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }catch(e){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); } }
+function _delegActive(){ var d=_delegManilaDate(); return d>=TJ_DELEG.start && d<=TJ_DELEG.end; }
+function _isDelegate(){ try{ return (typeof _paSelfMember==='function') && _paSelfMember()===TJ_DELEG.member; }catch(e){ return false; } }
+function _canManage(action){
+  if(_isJoshUser()) return true;
+  if(action && _delegActive() && _isDelegate() && TJ_DELEG.actions.indexOf(action)>=0) return true;
+  return false;
+}
 /* ════════════════════════════════════════════════════════════════════════════
    v147 (E2/E3/E4) — DASHBOARD-MANAGED MONTHLY DATA (November 2026 onward)
    Josh-only writes to month-keyed JSON in the Team Josh Dashboard Data folder.
@@ -15038,11 +15080,12 @@ function tbFromStore(month){
 function tbForMonth(month, excelObj){ if(_mgmtActiveMonth(month)){ var s=tbFromStore(month); if(s) return s; } return excelObj; }
 
 function _applyUpdateGate(){
-  var josh=_isJoshUser();
-  [['ios-update-btn','ios-update-note'],['elab-update-btn','elab-update-note'],['uhm-update-btn','uhm-update-note'],['qual-mgr-btn',null],['pftc-mgr-btn',null],['tb-mgr-btn',null],['sv-mgr-btn',null]].forEach(function(pr){
+  /* pr[2] = delegated action key (null => Josh only, e.g. eLearning update and Quality) */
+  [['ios-update-btn','ios-update-note','irtort'],['elab-update-btn','elab-update-note',null],['uhm-update-btn','uhm-update-note','uhm'],['qual-mgr-btn',null,null],['pftc-mgr-btn',null,'pftc'],['tb-mgr-btn',null,'touchbase'],['sv-mgr-btn',null,'surveys']].forEach(function(pr){
+    var allow = pr[2] ? _canManage(pr[2]) : _isJoshUser();
     var b=document.getElementById(pr[0]), n=document.getElementById(pr[1]);
-    if(b) b.style.display = josh?'':'none';
-    if(n) n.style.display = josh?'none':'';
+    if(b) b.style.display = allow?'':'none';
+    if(n) n.style.display = allow?'none':'';
   });
 }
 
