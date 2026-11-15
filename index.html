@@ -3086,6 +3086,16 @@ html[data-theme="dark"] .el-successmap-cta .sm-desc{color:#CDBEFF}
 html[data-theme="dark"] .uhm-source-note{color:#A99FD0}
 @media(prefers-reduced-motion:reduce){.tj-cta-pulse{animation:none}}
 @media(max-width:640px){.uhm-actions{margin-left:0;width:100%}}
+/* ===== v167.? -> v165.2: CTA heartbeat (scale) + synchronized glow, modeled on the SAP Fiori Leave Tool CTA ===== */
+@keyframes tjCtaBeat{
+  0%,100%{transform:scale(1);box-shadow:0 2px 8px rgba(93,54,255,.26),0 0 5px rgba(93,54,255,.16)}
+  8%{transform:scale(1.05);box-shadow:0 3px 13px rgba(93,54,255,.42),0 0 18px rgba(93,54,255,.58)}
+  16%{transform:scale(1);box-shadow:0 2px 9px rgba(93,54,255,.3),0 0 8px rgba(93,54,255,.26)}
+  24%{transform:scale(1.03);box-shadow:0 3px 11px rgba(93,54,255,.36),0 0 13px rgba(93,54,255,.44)}
+  32%{transform:scale(1);box-shadow:0 2px 8px rgba(93,54,255,.26),0 0 5px rgba(93,54,255,.16)}
+}
+.tj-cta-beat{animation:tjCtaBeat 1.8s ease-in-out infinite;transform-origin:center;will-change:transform}
+@media(prefers-reduced-motion:reduce){.tj-cta-beat{animation:none;box-shadow:0 2px 8px rgba(93,54,255,.26)}}
 </style>
 </head>
 <body>
@@ -3365,7 +3375,7 @@ html[data-theme="dark"] .uhm-source-note{color:#A99FD0}
     <!-- ═══ PFTC (col 3, bottom) ════════════════════════════════════════ -->
     <div class="card">
       <div class="card-accent" style="background:#2CE0BF"></div>
-      <div class="card-head card-head-flex">PFTC<span class="ch-btns"><button class="mgmt-head-btn tj-cta-pulse" id="pftc-mgr-btn" style="display:none" onclick="pftcMgrOpen()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.7a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.3 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.3h.1A1.6 1.6 0 0 0 8 1V1a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 17 2.3a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V7a1.6 1.6 0 0 0 1.1 1H23a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>Manage PFTC</button><a class="mgmt-head-btn pftc-submit-link tj-cta-pulse" href="https://apps.powerapps.com/play/e/default-42f7676c-f455-423c-82f6-dc2d99791af7/a/b155cf60-acc2-404e-bd21-1fe2b6ec7b3b?tenantId=42f7676c-f455-423c-82f6-dc2d99791af7&amp;hint=3c79c752-b305-4a2a-8b29-ffabeeba75c4&amp;sourcetime=1780625787333" target="_blank" rel="noopener noreferrer" data-tip="Open PFTC Submission Form (opens in a new tab)"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Submit PFTC</a></span></div>
+      <div class="card-head card-head-flex">PFTC<span class="ch-btns"><button class="mgmt-head-btn tj-cta-pulse" id="pftc-mgr-btn" style="display:none" onclick="pftcMgrOpen()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.7a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.3 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 7 2.3h.1A1.6 1.6 0 0 0 8 1V1a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 17 2.3a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V7a1.6 1.6 0 0 0 1.1 1H23a2 2 0 0 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>Manage PFTC</button><a class="mgmt-head-btn pftc-submit-link tj-cta-beat" href="https://apps.powerapps.com/play/e/default-42f7676c-f455-423c-82f6-dc2d99791af7/a/b155cf60-acc2-404e-bd21-1fe2b6ec7b3b?tenantId=42f7676c-f455-423c-82f6-dc2d99791af7&amp;hint=3c79c752-b305-4a2a-8b29-ffabeeba75c4&amp;sourcetime=1780625787333" target="_blank" rel="noopener noreferrer" data-tip="Open PFTC Submission Form (opens in a new tab)"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Submit PFTC</a></span></div>
       <div class="card-body">
         <div class="sec-hdr">PFTC Leaderboard</div>
         <div class="chart-wrap h200"><canvas id="chartPftc"></canvas></div>
@@ -3407,7 +3417,7 @@ html[data-theme="dark"] .uhm-source-note{color:#A99FD0}
           </div>
           <!-- Action -->
           <div class="cse-action" style="margin-left:auto">
-            <a class="cse-btn tj-cta-pulse" href="https://static.ekx.cloud.sap/e8bd8626-190a-413f-bfaa-3135263c857c/" target="_blank" rel="noopener noreferrer">
+            <a class="cse-btn tj-cta-beat" href="https://static.ekx.cloud.sap/e8bd8626-190a-413f-bfaa-3135263c857c/" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               Open CS Experts Case Central Dashboard
             </a>
@@ -3461,7 +3471,7 @@ html[data-theme="dark"] .uhm-source-note{color:#A99FD0}
         <span class="uhm-badge uhm-badge-manual">Manually uploaded</span>
         <span class="uhm-badge" id="uhm-updated-badge">Last updated: &mdash;</span>
         <div class="uhm-actions">
-          <a class="cse-btn tj-cta-pulse" href="https://app.powerbi.com/groups/me/reports/58a96fe4-2bc6-47c4-a168-8e52c7e34a8f/7e2ecad2e4f966750dc3?experience=power-bi&amp;bookmarkGuid=ed9fd39520a44b7c645f" target="_blank" rel="noopener noreferrer" data-tip="Open the Reporting Team&#39;s Utilization Dashboard (opens in a new tab)">
+          <a class="cse-btn tj-cta-beat" href="https://app.powerbi.com/groups/me/reports/58a96fe4-2bc6-47c4-a168-8e52c7e34a8f/7e2ecad2e4f966750dc3?experience=power-bi&amp;bookmarkGuid=ed9fd39520a44b7c645f" target="_blank" rel="noopener noreferrer" data-tip="Open the Reporting Team&#39;s Utilization Dashboard (opens in a new tab)">
             <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             Open Utilization Dashboard
           </a>
@@ -4273,7 +4283,7 @@ const SIGNIN_BG_FILE_NAME = 'SignIn_Page.jpg';
 const XMAS_SIGNIN_BG      = 'Christmas_SignIn_Page.jpg';   /* v161: seasonal sign-in background */
 /* v162: single source of truth for the displayed dashboard build version (no longer Config B6).
    EKX updates this on every new canonical build. Convention: V162 major, V162.1 minor, etc. */
-const DASHBOARD_BUILD_VERSION = 'V165';
+const DASHBOARD_BUILD_VERSION = 'V165.2';
 const THUMB_FILE_NAME     = 'thumb.png';
 const GRAPH_SCOPES    = ['Files.ReadWrite.All', 'Mail.ReadWrite', 'Mail.Send', 'ChatMessage.Send'];
 /* v112: Team Josh 3.0 Microsoft Teams group chat ID — non-UI configuration
