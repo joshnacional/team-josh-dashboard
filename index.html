@@ -3128,9 +3128,70 @@ img.yor-fabimg.yor-float{animation:yorFloat 3.4s ease-in-out infinite}
 .yor-particles i:nth-child(2){animation-delay:.9s;left:34%}
 .yor-particles i:nth-child(3){animation-delay:1.7s;left:66%;top:48%}
 @keyframes yorP{0%{opacity:0;transform:translateY(7px) scale(.6)}30%{opacity:.9}100%{opacity:0;transform:translateY(-20px) scale(1)}}
-.yor-zzz{position:absolute;right:0;top:-7px;font-size:12px;font-weight:800;color:#8A6FD0;opacity:0}
-.yor-fab.yor-sleep .yor-zzz{animation:yorZzz 3s ease-in-out infinite}
-@keyframes yorZzz{0%{opacity:0;transform:translateY(5px)}40%{opacity:.9}100%{opacity:0;transform:translateY(-11px)}}
+/* v165.6: expressive sleep (multi-Zzz + breathing) */
+.yor-zzz{position:absolute;right:-2px;top:-12px;pointer-events:none;opacity:0}
+.yor-fab.yor-sleep .yor-zzz{opacity:1}
+.yor-zzz b{position:absolute;font-style:normal;font-weight:800;color:#8A6FD0;text-shadow:0 1px 2px rgba(255,255,255,.6);opacity:0}
+.yor-zzz b:nth-child(1){font-size:9px;right:0}
+.yor-zzz b:nth-child(2){font-size:12px;right:6px}
+.yor-zzz b:nth-child(3){font-size:15px;right:13px}
+.yor-fab.yor-sleep .yor-zzz b{animation:yorZzz 3s ease-in-out infinite}
+.yor-fab.yor-sleep .yor-zzz b:nth-child(2){animation-delay:.5s}
+.yor-fab.yor-sleep .yor-zzz b:nth-child(3){animation-delay:1s}
+@keyframes yorZzz{0%{opacity:0;transform:translate(0,5px) scale(.7)}35%{opacity:.95}100%{opacity:0;transform:translate(7px,-15px) scale(1.1)}}
+.yor-fab.yor-sleep>img.yor-fabimg{animation:yorBreathe 4.4s ease-in-out infinite!important}
+@keyframes yorBreathe{0%,100%{transform:translateY(2px) scale(1) rotate(-1.5deg)}50%{transform:translateY(3px) scale(1.015) rotate(-1.5deg)}}
+.yor-fab.yor-sleep{filter:drop-shadow(0 6px 14px rgba(60,30,120,.32)) saturate(.9) brightness(.97)}
+/* v165.6: elemental effects layer (decorative; pointer-events:none) */
+.yor-aura{position:absolute;inset:-14%;border-radius:50%;z-index:-1;pointer-events:none;animation:yorAura 3.4s ease-in-out infinite}
+@keyframes yorAura{0%,100%{opacity:.45;transform:scale(.95)}50%{opacity:.8;transform:scale(1.05)}}
+.yor-fx{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.yor-fx i,.yor-fx span{position:absolute;opacity:0;pointer-events:none;display:block}
+.yor-fx span svg{width:100%;height:100%;display:block}
+@keyframes yorRise{0%{opacity:0;transform:translateY(7px) scale(.6)}25%{opacity:.95}100%{opacity:0;transform:translateY(-22px) scale(1)}}
+@keyframes yorFall{0%{opacity:0;transform:translateY(-8px) rotate(0)}25%{opacity:.9}100%{opacity:0;transform:translateY(20px) rotate(70deg)}}
+@keyframes yorTw{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes yorSwirl{0%{opacity:0;transform:translate(0,0) rotate(0)}30%{opacity:.85}100%{opacity:0;transform:translate(11px,-11px) rotate(45deg)}}
+@keyframes yorArc{0%,70%,100%{opacity:0}74%,86%{opacity:.95}}
+.yor-aura-fire{background:radial-gradient(circle,rgba(255,120,40,.5),rgba(232,65,46,0) 70%)}
+.yor-fx-fire .ember{width:5px;height:5px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#FFD66B,#E8412E);box-shadow:0 0 6px #FF6A2E;animation:yorRise 2.6s ease-in infinite}
+.yor-fx-fire .spark{width:3px;height:3px;border-radius:50%;background:#FFCF6B;box-shadow:0 0 5px #FFB03A;animation:yorTw 1.4s ease-in-out infinite}
+.yor-aura-water{background:radial-gradient(circle,rgba(70,160,255,.45),rgba(46,139,232,0) 70%)}
+.yor-fx-water .bubble{width:6px;height:6px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(120,195,255,.35));border:1px solid rgba(190,230,255,.85);animation:yorRise 3s ease-in infinite}
+.yor-fx-water .drop{width:3px;height:4px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#7FC0FF;box-shadow:0 0 4px rgba(127,192,255,.7);animation:yorTw 1.8s ease-in-out infinite}
+.yor-aura-earth{background:radial-gradient(circle,rgba(240,160,60,.42),rgba(200,106,16,0) 70%)}
+.yor-fx-earth .mote{width:4px;height:4px;border-radius:50%;background:#E0A24E;box-shadow:0 0 4px rgba(200,106,16,.6);animation:yorRise 3.4s ease-in-out infinite}
+.yor-fx-earth .leaf{width:6px;height:4px;border-radius:0 60% 0 60%;background:#8FBF5A;animation:yorFall 3.8s linear infinite}
+.yor-aura-electric{background:radial-gradient(circle,rgba(255,225,70,.5),rgba(245,197,24,0) 70%)}
+.yor-fx-electric .spark{width:3px;height:3px;border-radius:50%;background:#FFF07A;box-shadow:0 0 6px #FFE24D;animation:yorTw 1s ease-in-out infinite}
+.yor-fx-electric .arc{width:9px;height:14px;animation:yorArc 2.4s linear infinite}
+.yor-aura-nature{background:radial-gradient(circle,rgba(90,210,120,.42),rgba(63,174,90,0) 70%)}
+.yor-fx-nature .leaf{width:7px;height:5px;border-radius:0 60% 0 60%;background:#5FC06F;box-shadow:0 0 3px rgba(63,174,90,.5);animation:yorFall 3.8s linear infinite}
+.yor-fx-nature .pollen{width:3px;height:3px;border-radius:50%;background:#CDEBA0;box-shadow:0 0 4px rgba(120,208,138,.7);animation:yorRise 3s ease-in-out infinite}
+.yor-aura-ice{background:radial-gradient(circle,rgba(150,215,255,.5),rgba(191,234,255,0) 70%)}
+.yor-fx-ice .flake{width:9px;height:9px;color:#DCF0FF;filter:drop-shadow(0 0 2px #BFEAFF);animation:yorFall 4.2s linear infinite}
+.yor-fx-ice .crystal{width:4px;height:4px;background:#EAF7FF;box-shadow:0 0 6px #BFEAFF;transform:rotate(45deg);animation:yorTw 1.6s ease-in-out infinite}
+.yor-aura-wind{background:radial-gradient(circle,rgba(170,130,240,.42),rgba(122,75,214,0) 70%)}
+.yor-fx-wind .swirl{width:13px;height:8px;color:#C9B5F5;animation:yorSwirl 3.2s ease-in-out infinite}
+.yor-fx-wind .feather{width:3px;height:7px;border-radius:50%;background:#B79CEC;animation:yorFall 3.8s linear infinite}
+.yor-aura-light{background:radial-gradient(circle,rgba(255,220,150,.5),rgba(247,182,200,0) 72%)}
+.yor-fx-light .spark{width:4px;height:4px;border-radius:50%;background:radial-gradient(circle,#FFF0B0,#FFD166);box-shadow:0 0 6px #FFE39A;animation:yorTw 1.5s ease-in-out infinite}
+.yor-fx-light .petal{width:4px;height:4px;border-radius:50%;background:#FBC7D8;box-shadow:0 0 5px #F7B6C8;animation:yorTw 2s ease-in-out infinite}
+.yor-aura-shadow{background:radial-gradient(circle,rgba(190,40,120,.45),rgba(60,20,50,0) 70%)}
+.yor-fx-shadow .wisp{width:7px;height:7px;border-radius:50%;background:radial-gradient(circle,rgba(214,40,111,.8),rgba(120,20,70,0));animation:yorSwirl 3s ease-in-out infinite}
+.yor-fx-shadow .crescent{width:8px;height:8px;color:#F2619E;animation:yorTw 2.2s ease-in-out infinite}
+.yor-aura-cosmic{background:radial-gradient(circle,rgba(150,120,255,.42),rgba(255,160,90,.12) 45%,rgba(60,40,120,0) 72%)}
+.yor-fx-cosmic .star{width:8px;height:8px;color:#fff;filter:drop-shadow(0 0 3px #CBB3FF);animation:yorTw 1.8s ease-in-out infinite}
+.yor-fx-cosmic .mote{width:3px;height:3px;border-radius:50%;animation:yorTw 1.5s ease-in-out infinite}
+.yor-fx-cosmic .mote.m1{background:#FF8A5E;box-shadow:0 0 5px #FF8A5E}
+.yor-fx-cosmic .mote.m2{background:#5EC2FF;box-shadow:0 0 5px #5EC2FF}
+.yor-fx-cosmic .mote.m3{background:#8A4BEF;box-shadow:0 0 5px #8A4BEF}
+.yor-fab.yor-sleep .yor-aura{opacity:.3;animation-duration:6.5s}
+.yor-fab.yor-sleep .yor-fx{opacity:.5}
+.yor-fab.yor-sleep .yor-fx i,.yor-fab.yor-sleep .yor-fx span{animation-duration:6.5s!important}
+.yor-fab.yor-sleep .yor-fx-electric{opacity:0}
+.yor-fab.yor-burst .yor-aura{opacity:1;transform:scale(1.14)}
+.yor-fab.yor-burst .yor-fx i,.yor-fab.yor-burst .yor-fx span{animation-duration:1.1s!important}
 .yor-fab.yor-sleep .yor-float{animation-play-state:paused}
 .yor-fab.yor-sleep .yor-eye{animation:none;transform:scaleY(.12)}
 .yor-fab.yor-sleep .yor-particles{opacity:.22}
@@ -3205,6 +3266,10 @@ img.yor-fabimg.yor-float{animation:yorFloat 3.4s ease-in-out infinite}
 
 @media(prefers-reduced-motion:reduce){
   .yor-float,.yor-eye,.yor-particles i,.yor-fab .yor-tail,.yor-fab .yor-ear,.yor-fab .yor-wing,.yor-fab.yor-sleep .yor-zzz,.yor-fab.yor-wake>svg,.yor-fab.yor-happy>svg,.yor-fab.yor-eat>svg,.yor-fab.yor-wake>img,.yor-fab.yor-happy>img,.yor-fab.yor-eat>img,.yor-spot{animation:none!important}
+  .yor-fx{display:none}
+  .yor-aura{animation:none;opacity:.5}
+  .yor-fab.yor-sleep>img.yor-fabimg{animation:none!important}
+  .yor-fab.yor-sleep .yor-zzz b{animation:none;opacity:.85}
   .yor-particles{display:none}
 }
 
@@ -4395,7 +4460,7 @@ const SIGNIN_BG_FILE_NAME = 'SignIn_Page.jpg';
 const XMAS_SIGNIN_BG      = 'Christmas_SignIn_Page.jpg';   /* v161: seasonal sign-in background */
 /* v162: single source of truth for the displayed dashboard build version (no longer Config B6).
    EKX updates this on every new canonical build. Convention: V162 major, V162.1 minor, etc. */
-const DASHBOARD_BUILD_VERSION = 'V165.5';
+const DASHBOARD_BUILD_VERSION = 'V165.6';
 const THUMB_FILE_NAME     = 'thumb.png';
 const GRAPH_SCOPES    = ['Files.ReadWrite.All', 'Mail.ReadWrite', 'Mail.Send', 'ChatMessage.Send'];
 /* v112: Team Josh 3.0 Microsoft Teams group chat ID — non-UI configuration
@@ -15952,7 +16017,7 @@ function yorFabClick(){
 
 /* ------------------------------ awake / sleep / wake ------------------------------ */
 function yorResetSleep(){ if(!YST.dom) return; if(YST.sleepTimer) clearTimeout(YST.sleepTimer); YST.dom.fab.classList.remove('yor-sleep'); if(YST.panelOpen) return; YST.sleepTimer=setTimeout(function(){ if(!YST.panelOpen && !YST.dragging){ YST.dom.fab.classList.add('yor-sleep'); } },5000); }
-function yorWake(){ if(!YST.dom) return; var f=YST.dom.fab; f.classList.remove('yor-sleep'); if(!rmotion()){ f.classList.remove('yor-wake'); void f.offsetWidth; f.classList.add('yor-wake'); setTimeout(function(){ f.classList.remove('yor-wake'); },650); } yorResetSleep(); }
+function yorWake(){ if(!YST.dom) return; var f=YST.dom.fab; f.classList.remove('yor-sleep'); if(!rmotion()){ f.classList.remove('yor-wake'); void f.offsetWidth; f.classList.add('yor-wake'); setTimeout(function(){ f.classList.remove('yor-wake'); },650); } yorBurst(); yorResetSleep(); }
 function yorWakeBrief(){ yorSnd('wake'); yorWake(); }
 function yorReact(kind){ if(!YST.dom||rmotion()) return; var f=YST.dom.fab, c='yor-'+(kind==='eat'?'eat':'happy'); f.classList.remove('yor-happy','yor-eat'); void f.offsetWidth; f.classList.add(c); setTimeout(function(){ f.classList.remove(c); }, kind==='eat'?1600:680); }
 var YOR_MSGS={happy:['Yay!','That tickles!','Hehe!','I\u2019m so glad you\u2019re here.'],curious:['Ooh, what\u2019s this?','Need a hand?','I\u2019m listening!'],sleepy:['*yawn* oh, hi!','Was just resting my eyes.'],excited:['Let\u2019s go!','Ready when you are!'],playful:['Boop!','Wheee!','Tag, you\u2019re it!'],treat:['Yum, thank you!','Nom nom!','My favourite!']};
@@ -15965,12 +16030,37 @@ function yorToast(msg){
   t.classList.add('show'); if(t._to) clearTimeout(t._to); t._to=setTimeout(function(){ t.classList.remove('show'); },2600);
 }
 
+/* ------------------------------ elemental effects ------------------------------ */
+/* v165.6: character-specific elemental effects + interaction burst (decorative only) */
+function yorFxKey(p){ return (p&&p.element?p.element:'').toLowerCase(); }
+function yorFxHtml(p){
+  var k=yorFxKey(p);
+  var FLAKE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15"/></svg>';
+  var STAR='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7H22l-6 4.5L18.5 21 12 16.5 5.5 21 8 13.5 2 9h7.5z"/></svg>';
+  var CRESC='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 3a9 9 0 100 18 7.2 7.2 0 010-18z"/></svg>';
+  var SWIRL='<svg viewBox="0 0 24 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 7q5 -6 10 0t10 0"/></svg>';
+  var ARC='<svg viewBox="0 0 10 16" fill="none" stroke="#FFF07A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 1L2.5 8H6l-3 7"/></svg>';
+  var m={};
+  m.fire='<i class="ember" style="left:24%;bottom:8%"></i><i class="ember" style="left:70%;bottom:12%;animation-delay:1.1s"></i><i class="ember" style="left:50%;bottom:2%;animation-delay:.6s"></i><i class="spark" style="left:80%;top:28%;animation-delay:.3s"></i>';
+  m.water='<i class="bubble" style="left:22%;bottom:10%"></i><i class="bubble" style="left:68%;bottom:14%;animation-delay:1.3s"></i><i class="bubble" style="left:50%;bottom:4%;animation-delay:.7s"></i><i class="drop" style="left:82%;top:30%;animation-delay:.5s"></i>';
+  m.earth='<i class="mote" style="left:20%;bottom:16%"></i><i class="mote" style="left:72%;bottom:20%;animation-delay:1.4s"></i><i class="mote" style="left:50%;bottom:8%;animation-delay:.8s"></i><i class="leaf" style="left:78%;top:12%;animation-delay:.4s"></i>';
+  m.electric='<i class="spark" style="left:22%;top:26%"></i><i class="spark" style="left:76%;top:30%;animation-delay:.5s"></i><i class="spark" style="left:50%;top:14%;animation-delay:.9s"></i><span class="arc" style="left:14%;top:38%">'+ARC+'</span><span class="arc" style="left:80%;top:42%;animation-delay:1.2s">'+ARC+'</span>';
+  m.nature='<i class="leaf" style="left:20%;top:12%"></i><i class="leaf" style="left:74%;top:16%;animation-delay:1.6s"></i><i class="pollen" style="left:50%;bottom:10%;animation-delay:.6s"></i><i class="pollen" style="left:30%;bottom:16%;animation-delay:1.1s"></i>';
+  m.ice='<span class="flake" style="left:20%;top:8%">'+FLAKE+'</span><span class="flake" style="left:72%;top:14%;animation-delay:1.6s">'+FLAKE+'</span><span class="flake" style="left:48%;top:2%;animation-delay:.8s">'+FLAKE+'</span><i class="crystal" style="left:84%;top:42%;animation-delay:.4s"></i><i class="crystal" style="left:12%;top:46%;animation-delay:1.2s"></i>';
+  m.wind='<span class="swirl" style="left:12%;top:30%">'+SWIRL+'</span><span class="swirl" style="left:66%;top:20%;animation-delay:1.4s">'+SWIRL+'</span><i class="feather" style="left:82%;top:40%;animation-delay:.6s"></i>';
+  m.light='<i class="spark" style="left:22%;top:18%"></i><i class="spark" style="left:76%;top:22%;animation-delay:1s"></i><i class="petal" style="left:50%;top:6%;animation-delay:.5s"></i><i class="petal" style="left:30%;bottom:14%;animation-delay:1.3s"></i>';
+  m.shadow='<span class="crescent" style="left:76%;top:14%">'+CRESC+'</span><i class="wisp" style="left:18%;top:34%"></i><i class="wisp" style="left:68%;top:42%;animation-delay:1.2s"></i><span class="crescent" style="left:16%;top:12%;animation-delay:1.5s">'+STAR+'</span>';
+  m.cosmic='<span class="star" style="left:20%;top:10%">'+STAR+'</span><span class="star" style="left:74%;top:16%;animation-delay:1.1s">'+STAR+'</span><i class="mote m1" style="left:50%;top:4%;animation-delay:.4s"></i><i class="mote m2" style="left:30%;bottom:14%;animation-delay:.9s"></i><i class="mote m3" style="left:72%;bottom:12%;animation-delay:1.4s"></i>';
+  var inner=m[k]||'';
+  return '<span class="yor-aura yor-aura-'+k+'"></span><span class="yor-fx yor-fx-'+k+'">'+inner+'</span>';
+}
+function yorBurst(){ if(!YST.dom||rmotion()) return; var f=YST.dom.fab; f.classList.add('yor-burst'); if(f._burstT) clearTimeout(f._burstT); f._burstT=setTimeout(function(){ f.classList.remove('yor-burst'); },700); }
+
 /* ------------------------------ render floating companion ------------------------------ */
 function yorRenderFab(){
   if(!YST.dom) return; var fab=YST.dom.fab, p=yorActivePet();
   if(!p){ fab.classList.add('yor-hidden'); return; }
-  var dots='<span class="yor-particles"><i style="background:'+p.glow+'"></i><i style="background:'+p.hex+'"></i><i style="background:'+p.glow+'"></i></span>';
-  fab.innerHTML=dots+'<span class="yor-zzz">z</span>'+yorArt(p,'fab');
+  fab.innerHTML=yorFxHtml(p)+yorArt(p,'fab')+'<span class="yor-zzz"><b>z</b><b>z</b><b>z</b></span>';
   var svg=fab.querySelector('svg'); if(svg) svg.classList.add('yor-float');
   yorSyncVis(); yorResetSleep();
 }
@@ -16082,7 +16172,7 @@ function yorGo(tab,sel){
 function yorWhatsNew(){ yorClosePanel(); try{ wnOpenLatest(); }catch(e){ yorToast('What\u2019s New is unavailable right now.'); } };
 
 /* ------------------------------ pet care ------------------------------ */
-function yorTreat(){ yorWake(); yorSnd('treat'); yorReact('eat'); setTimeout(function(){ yorBuddyMsg('treat'); },420); };
+function yorTreat(){ yorWake(); yorSnd('treat'); yorReact('eat'); setTimeout(function(){ yorBuddyMsg('treat'); },420); setTimeout(yorBurst,1500); };
 function yorChangeCompanion(){ yorOpenGallery(true); };
 function yorToggleSound(){
   YST.sndOn=!YST.sndOn; yorSet('sound',YST.sndOn?'1':'0');
